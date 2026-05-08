@@ -112,8 +112,6 @@ class DatabaseSeeder extends Seeder
         $clients[] = Client::create([
             'user_id' => $client1->id,
             'address' => 'Jl. Merdeka No. 123, Jakarta Selatan',
-            'address_lat' => -6.2615,
-            'address_lng' => 106.8106,
             'emergency_contact' => '081234567895',
         ]);
 
@@ -129,8 +127,6 @@ class DatabaseSeeder extends Seeder
         $clients[] = Client::create([
             'user_id' => $client2->id,
             'address' => 'Jl. Sudirman No. 45, Jakarta Pusat',
-            'address_lat' => -6.1944,
-            'address_lng' => 106.8229,
             'emergency_contact' => '081234567897',
         ]);
 
@@ -146,8 +142,6 @@ class DatabaseSeeder extends Seeder
         $clients[] = Client::create([
             'user_id' => $client3->id,
             'address' => 'Jl. Gatot Subroto No. 88, Jakarta Selatan',
-            'address_lat' => -6.2297,
-            'address_lng' => 106.8261,
             'emergency_contact' => '081234567899',
         ]);
 
