@@ -188,8 +188,12 @@ class ScheduleController extends Controller
 
     public function destroy(Schedule $schedule)
     {
-        if ($schedule->tutor_id !== Auth::user()->tutor->id) abort(403);
-        if ($schedule->status !== 'scheduled') {
+        $tutor = Auth::user()->tutor;
+        if (!$tutor || $schedule->tutor_id != $tutor->id) {
+            abort(403, 'Unauthorized access: Jadwal ini bukan milik Anda.');
+        }
+
+        if ($schedule->status != 'scheduled') {
             return redirect()->route('tutor.schedules.index')->with('error', 'Hanya jadwal yang masih berstatus Scheduled yang dapat dihapus.');
         }
 

@@ -53,10 +53,24 @@
             </div>
 
             <!-- Student Address -->
-            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h3 class="font-semibold mb-2">Alamat Siswa</h3>
-                <p class="text-gray-700">{{ $schedule->student->client->address }}</p>
-
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold mb-2 text-gray-900">Alamat Siswa</h3>
+                    <p class="text-gray-700">{{ $schedule->student->client->address }}</p>
+                </div>
+                
+                @if($schedule->status === 'scheduled' && !$schedule->attendance)
+                    <form action="{{ route('tutor.schedules.destroy', $schedule) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors flex items-center gap-2">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Hapus Jadwal
+                        </button>
+                    </form>
+                @endif
             </div>
 
             <!-- Attendance Section -->
