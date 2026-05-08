@@ -42,7 +42,6 @@ class DatabaseSeeder extends Seeder
         $tutors[] = Tutor::create([
             'user_id' => $tutor1->id,
             'specialization' => ['Matematika', 'Fisika'],
-            'hourly_rate' => 100000,
             'session_rate' => 40000,
             'rating_avg' => 4.8,
             'total_sessions' => 156,
@@ -65,7 +64,6 @@ class DatabaseSeeder extends Seeder
         $tutors[] = Tutor::create([
             'user_id' => $tutor2->id,
             'specialization' => ['Bahasa Inggris', 'Bahasa Indonesia'],
-            'hourly_rate' => 90000,
             'session_rate' => 40000,
             'rating_avg' => 4.9,
             'total_sessions' => 203,
@@ -88,7 +86,6 @@ class DatabaseSeeder extends Seeder
         $tutors[] = Tutor::create([
             'user_id' => $tutor3->id,
             'specialization' => ['Kimia', 'Biologi'],
-            'hourly_rate' => 95000,
             'session_rate' => 40000,
             'rating_avg' => 4.6,
             'total_sessions' => 128,
