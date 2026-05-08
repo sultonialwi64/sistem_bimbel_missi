@@ -60,7 +60,7 @@ class ScheduleController extends Controller
                       ->where('end_time', '>', $validated['start_time']);
                 });
             })
-            ->where('status', '!=', 'cancelled')
+            ->where('status', 'scheduled')
             ->exists();
 
         if ($tutorConflict) {
@@ -76,7 +76,7 @@ class ScheduleController extends Controller
                       ->where('end_time', '>', $validated['start_time']);
                 });
             })
-            ->where('status', '!=', 'cancelled')
+            ->where('status', 'scheduled')
             ->exists();
 
         if ($studentConflict) {
@@ -151,7 +151,7 @@ class ScheduleController extends Controller
                       ->where('end_time', '>', $validated['start_time']);
                 });
             })
-            ->where('status', '!=', 'cancelled')
+            ->where('status', 'scheduled')
             ->exists();
 
         if ($tutorConflict) {
@@ -168,7 +168,7 @@ class ScheduleController extends Controller
                       ->where('end_time', '>', $validated['start_time']);
                 });
             })
-            ->where('status', '!=', 'cancelled')
+            ->where('status', 'scheduled')
             ->exists();
 
         if ($studentConflict) {
