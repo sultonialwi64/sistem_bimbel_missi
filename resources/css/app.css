@@ -1,0 +1,346 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    /* ==========================================
+       PREMIUM CARD SYSTEM
+       ========================================== */
+    .card-premium {
+        @apply bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300;
+    }
+
+    .card-premium-dark {
+        @apply bg-slate-800 rounded-2xl shadow-lg border border-slate-700 overflow-hidden;
+    }
+
+    /* ==========================================
+       SECTION HEADERS
+       ========================================== */
+    .section-header-blue, .section-header-green, .section-header-amber, .section-header-purple, 
+    .section-header-indigo, .section-header-rose, .section-header-teal, .section-header-slate {
+        @apply bg-slate-50 px-6 py-4 border-b border-slate-100;
+    }
+
+    .section-header-title {
+        @apply text-lg font-bold text-slate-800 flex items-center gap-2;
+    }
+
+    .section-header-link {
+        @apply text-brand-navy-600 hover:text-brand-navy-800 text-sm font-semibold flex items-center gap-1 transition-colors;
+    }
+
+    /* ==========================================
+       STAT CARDS (Dashboard)
+       ========================================== */
+    .stat-card {
+        @apply bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden;
+        @apply hover:shadow-md transition-all duration-300;
+    }
+
+    .stat-card .stat-decoration-tr, .stat-card .stat-decoration-bl {
+        @apply hidden;
+    }
+
+    .stat-card .stat-label {
+        @apply text-sm font-semibold text-slate-500 uppercase tracking-wide;
+    }
+
+    .stat-card .stat-value {
+        @apply text-4xl font-black text-slate-900 mt-2;
+    }
+
+    .stat-card .stat-value-sm {
+        @apply text-2xl font-black text-slate-900 mt-2;
+    }
+
+    .stat-card .stat-icon-box {
+        @apply h-12 w-12 rounded-xl flex items-center justify-center bg-brand-navy-50 border border-brand-navy-100;
+        @apply text-brand-navy-600 transition-colors duration-300;
+    }
+    
+    .stat-card:hover .stat-icon-box {
+        @apply bg-brand-navy-600 text-white;
+    }
+
+    /* ==========================================
+       BUTTONS
+       ========================================== */
+    .btn-primary {
+        @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white;
+        @apply bg-brand-navy-700 hover:bg-brand-navy-800 shadow-sm hover:shadow transition-all duration-300;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm;
+        @apply bg-white text-slate-700 border border-slate-200;
+        @apply hover:bg-slate-50 hover:border-slate-300 shadow-sm hover:shadow transition-all duration-300;
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white;
+        @apply bg-red-600 hover:bg-red-700 shadow-sm hover:shadow transition-all duration-300;
+    }
+
+    .btn-success {
+        @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white;
+        @apply bg-emerald-600 hover:bg-emerald-700 shadow-sm hover:shadow transition-all duration-300;
+    }
+
+    .btn-icon {
+        @apply p-2 rounded-lg transition-all duration-200;
+    }
+
+    /* ==========================================
+       FORM INPUTS
+       ========================================== */
+    .input-premium {
+        @apply w-full rounded-2xl border-2 border-gray-200 px-4 py-3 text-gray-700;
+        @apply focus:border-brand-navy-500 focus:ring-4 focus:ring-brand-navy-100;
+        @apply transition-all duration-300 placeholder:text-gray-400;
+    }
+
+    .select-premium {
+        @apply rounded-2xl border-2 border-gray-200 px-4 py-3 text-gray-700;
+        @apply focus:border-brand-navy-500 focus:ring-4 focus:ring-brand-navy-100;
+        @apply transition-all duration-300;
+    }
+
+    .textarea-premium {
+        @apply w-full rounded-2xl border-2 border-gray-200 px-4 py-3 text-gray-700 resize-none;
+        @apply focus:border-brand-navy-500 focus:ring-4 focus:ring-brand-navy-100;
+        @apply transition-all duration-300 placeholder:text-gray-400;
+    }
+
+    .form-label {
+        @apply block text-sm font-bold text-gray-800 mb-2;
+    }
+
+    .form-error {
+        @apply text-red-500 text-xs mt-2 flex items-center gap-1;
+    }
+
+    /* Form Section Card with left accent */
+    .form-section {
+        @apply bg-white rounded-3xl shadow-xl border border-gray-100 p-8 relative overflow-hidden;
+        @apply hover:shadow-2xl transition-all duration-300;
+    }
+
+    .form-section .form-accent {
+        @apply absolute top-0 left-0 w-2 h-full;
+    }
+
+    /* ==========================================
+       TABLE SYSTEM
+       ========================================== */
+    .table-premium {
+        @apply min-w-full;
+    }
+
+    .table-premium thead {
+        @apply bg-indigo-900;
+    }
+
+    .table-premium thead th {
+        @apply px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider opacity-90;
+    }
+
+    .table-premium tbody {
+        @apply divide-y divide-gray-100;
+    }
+
+    .table-premium tbody tr {
+        @apply hover:bg-gray-50 transition-all duration-200;
+    }
+
+    .table-premium tbody td {
+        @apply px-6 py-4;
+    }
+
+    /* ==========================================
+       BADGES & STATUS
+       ========================================== */
+    .badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+    }
+
+    .badge-green {
+        @apply bg-green-100 text-green-700;
+    }
+    .badge-blue {
+        @apply bg-blue-100 text-blue-700;
+    }
+    .badge-amber {
+        @apply bg-amber-100 text-amber-700;
+    }
+    .badge-red {
+        @apply bg-red-100 text-red-700;
+    }
+    .badge-gray {
+        @apply bg-gray-100 text-gray-700;
+    }
+    .badge-purple {
+        @apply bg-purple-100 text-purple-700;
+    }
+    .badge-indigo {
+        @apply bg-brand-navy-100 text-brand-navy-700;
+    }
+
+    /* ==========================================
+       AVATAR/ICON BOXES
+       ========================================== */
+    .avatar-gradient {
+        @apply h-12 w-12 rounded-xl flex items-center justify-center shadow-lg;
+    }
+    .avatar-gradient span {
+        @apply text-white font-bold text-sm;
+    }
+
+    /* ==========================================
+       LIST ITEMS (Dashboard style)
+       ========================================== */
+    .list-item-premium {
+        @apply flex items-center justify-between p-4 rounded-2xl border border-gray-100;
+        @apply bg-gray-50;
+        @apply hover:shadow-lg transition-all duration-300;
+    }
+
+    /* ==========================================
+       BACK LINK
+       ========================================== */
+    .back-link {
+        @apply inline-flex items-center gap-2 text-brand-navy-600 hover:text-brand-navy-800 font-semibold text-sm;
+        @apply transition-all duration-200 hover:-translate-x-1;
+    }
+
+    /* ==========================================
+       PAGE FILTER BAR
+       ========================================== */
+    .filter-bar {
+        @apply card-premium p-5;
+    }
+
+    .filter-bar form {
+        @apply flex gap-4 flex-wrap items-end;
+    }
+
+    /* ==========================================
+       EMPTY STATE
+       ========================================== */
+    .empty-state {
+        @apply text-gray-400 text-center py-12 flex flex-col items-center gap-3;
+    }
+    .empty-state svg {
+        @apply h-16 w-16 text-slate-600;
+    }
+}
+
+/* ==========================================
+   CUSTOM SCROLLBAR
+   ========================================== */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
+}
+
+/* ==========================================
+   SIDEBAR CUSTOM SCROLLBAR
+   ========================================== */
+.sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.3);
+    border-radius: 2px;
+}
+
+/* ==========================================
+   SMOOTH ANIMATIONS
+   ========================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.animate-slide-in-left {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+.animate-slide-out-left {
+    animation: slideOutLeft 0.3s ease-out;
+}
+
+/* ==========================================
+   MOBILE OVERLAY
+   ========================================== */
+.sidebar-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* ==========================================
+   TABLE RESPONSIVE
+   ========================================== */
+.table-container {
+    @apply overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ==========================================
+   STAGGERED ANIMATIONS FOR CARDS
+   ========================================== */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
