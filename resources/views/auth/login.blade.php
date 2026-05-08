@@ -10,7 +10,18 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus+jakarta+sans:400,500,600,700,800&display=swap" rel="stylesheet" />
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
     
     <style>
         * {
@@ -232,6 +243,18 @@
                             <label for="password" class="block text-xs font-bold text-slate-400 uppercase tracking-wide">
                                 Password
                             </label>
+                            <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        },
+                    },
+                },
+            }
+        </script>
                             @if (Route::has('password.request'))
                                 <a href="{{ route('password.request') }}" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
                                     Forgot?
