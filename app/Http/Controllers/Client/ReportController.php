@@ -24,8 +24,9 @@ class ReportController extends Controller
     public function show(SessionReport $report)
     {
         // Authorize - only parent of the student can view
-        if ($report->student->client->user_id !== Auth::id()) {
-            abort(403);
+        $client = Auth::user()->client;
+        if (!$client || $report->student->client_id != $client->id) {
+            abort(403, 'Unauthorized access: Laporan ini bukan milik Anda.');
         }
         
         $report->load(['tutor.user', 'student', 'schedule.subject']);
@@ -34,8 +35,9 @@ class ReportController extends Controller
 
     public function submitFeedback(\Illuminate\Http\Request $request, SessionReport $report)
     {
-        if ($report->student->client->user_id !== Auth::id()) {
-            abort(403);
+        $client = Auth::user()->client;
+        if (!$client || $report->student->client_id != $client->id) {
+            abort(403, 'Unauthorized access: Laporan ini bukan milik Anda.');
         }
 
         $validated = $request->validate([

@@ -19,8 +19,9 @@ class ProgressController extends Controller
     public function show(Student $student)
     {
         // Authorize
-        if ($student->client->user_id !== Auth::id()) {
-            abort(403);
+        $client = Auth::user()->client;
+        if (!$client || $student->client_id != $client->id) {
+            abort(403, 'Unauthorized access: Data ini bukan milik Anda.');
         }
 
         // Get all session reports with subject info

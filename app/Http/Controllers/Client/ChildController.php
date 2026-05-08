@@ -24,8 +24,9 @@ class ChildController extends Controller
     public function show(Student $student)
     {
         // Authorize - only parent can view their child
-        if ($student->client->user_id !== Auth::id()) {
-            abort(403);
+        $client = Auth::user()->client;
+        if (!$client || $student->client_id != $client->id) {
+            abort(403, 'Unauthorized access: Data ini bukan milik Anda.');
         }
 
         $student->load(['client', 'schedules.subject', 'schedules.tutor.user', 'payments']);
