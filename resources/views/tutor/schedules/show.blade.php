@@ -226,7 +226,7 @@
                 <div class="border-t pt-6 mt-6">
                     <h3 class="text-lg font-semibold mb-4">Laporan Sesi</h3>
                     @php
-                        $report = $schedule->sessionReport;
+                        $report = $schedule->sessionReport->first();
                     @endphp
                     
                     @if(!$report)

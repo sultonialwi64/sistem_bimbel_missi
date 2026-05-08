@@ -212,7 +212,7 @@
         <div class="p-6">
             <div class="space-y-4">
                 @forelse($recentSessions as $session)
-                    @php $report = $session->sessionReport; @endphp
+                    @php $report = $session->sessionReport->first(); @endphp
                     <div class="group flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all duration-300">
                         <div class="flex items-center gap-4">
                             <div class="h-10 w-10 rounded-xl {{ $report ? 'bg-gray-200 text-gray-500' : 'bg-amber-100 text-amber-600' }} flex items-center justify-center font-bold text-xs transition-colors">
