@@ -100,8 +100,9 @@ class ScheduleController extends Controller
     public function show(Schedule $schedule)
     {
         $tutor = Auth::user()->tutor;
-        if ($schedule->tutor_id !== $tutor->id) {
-            abort(403, 'Unauthorized access');
+        
+        if (!$tutor || $schedule->tutor_id != $tutor->id) {
+            abort(403, 'Unauthorized access: Jadwal ini bukan milik Anda.');
         }
 
         $schedule->load(['student.client', 'subject', 'attendance', 'sessionReport']);
@@ -110,7 +111,8 @@ class ScheduleController extends Controller
 
     public function edit(Schedule $schedule)
     {
-        if ($schedule->tutor_id !== Auth::user()->tutor->id) abort(403);
+        $tutor = Auth::user()->tutor;
+        if (!$tutor || $schedule->tutor_id != $tutor->id) abort(403);
         if ($schedule->status !== 'scheduled') {
             return redirect()->route('tutor.schedules.index')->with('error', 'Hanya jadwal yang masih berstatus Scheduled yang dapat diedit.');
         }
@@ -123,7 +125,8 @@ class ScheduleController extends Controller
 
     public function update(Request $request, Schedule $schedule)
     {
-        if ($schedule->tutor_id !== Auth::user()->tutor->id) abort(403);
+        $tutor = Auth::user()->tutor;
+        if (!$tutor || $schedule->tutor_id != $tutor->id) abort(403);
         if ($schedule->status !== 'scheduled') {
             return redirect()->route('tutor.schedules.index')->with('error', 'Hanya jadwal yang masih berstatus Scheduled yang dapat diedit.');
         }
