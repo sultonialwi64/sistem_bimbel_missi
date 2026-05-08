@@ -17,8 +17,9 @@ class AttendanceController extends Controller
     public function submitAttendance(Request $request, Schedule $schedule)
     {
         // Authorize
-        if ($schedule->tutor->user_id !== Auth::id()) {
-            abort(403);
+        $tutor = Auth::user()->tutor;
+        if (!$tutor || $schedule->tutor_id != $tutor->id) {
+            abort(403, 'Unauthorized access: Jadwal ini bukan milik Anda.');
         }
 
         // === VALIDASI WAKTU ABSEN ===
