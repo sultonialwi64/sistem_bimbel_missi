@@ -24,8 +24,9 @@ class ReportController extends Controller
     public function create(Schedule $schedule)
     {
         // Authorize
-        if ($schedule->tutor->user_id !== Auth::id()) {
-            abort(403);
+        $tutor = Auth::user()->tutor;
+        if (!$tutor || $schedule->tutor_id != $tutor->id) {
+            abort(403, 'Unauthorized access: Jadwal ini bukan milik Anda.');
         }
 
         // Check if already has report
@@ -52,8 +53,9 @@ class ReportController extends Controller
         $schedule = Schedule::findOrFail($validated['schedule_id']);
 
         // Authorize
-        if ($schedule->tutor->user_id !== Auth::id()) {
-            abort(403);
+        $tutor = Auth::user()->tutor;
+        if (!$tutor || $schedule->tutor_id != $tutor->id) {
+            abort(403, 'Unauthorized access: Jadwal ini bukan milik Anda.');
         }
 
         $report = SessionReport::create([
