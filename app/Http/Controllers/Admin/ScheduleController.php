@@ -39,7 +39,7 @@ class ScheduleController extends Controller
             'student_id' => ['required', 'exists:students,id'],
             'tutor_id' => ['required', 'exists:tutors,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
-            'date' => ['required', 'date', 'after_or_equal:today'],
+            'date' => ['required', 'date'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'notes' => ['nullable', 'string'],

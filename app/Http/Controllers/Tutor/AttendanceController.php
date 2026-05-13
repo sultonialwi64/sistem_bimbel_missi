@@ -22,14 +22,8 @@ class AttendanceController extends Controller
             abort(403, 'Unauthorized access: Jadwal ini bukan milik Anda.');
         }
 
-        // === VALIDASI WAKTU ABSEN ===
-        $scheduleDate  = $schedule->date->format('Y-m-d');
-        // Selalu pakai tanggal dari $schedule->date, ambil hanya H:i:s dari start_time/end_time
-        $sessionStart  = \Carbon\Carbon::parse($scheduleDate . ' ' . \Carbon\Carbon::parse($schedule->start_time)->format('H:i:s'));
-        $sessionEnd    = \Carbon\Carbon::parse($scheduleDate . ' ' . \Carbon\Carbon::parse($schedule->end_time)->format('H:i:s'));
-        $deadlineAbsen = $sessionEnd->copy()->addMinutes(90);
-        $now = now();
-
+        // === VALIDASI WAKTU ABSEN (DIBEBASKAN UNTUK PENGISIAN DATA LALU) ===
+        /*
         if ($now->lt($sessionStart)) {
             return back()->with('error', 'Absensi belum bisa dilakukan. Sesi dimulai pukul ' . $sessionStart->format('H:i') . ' WIB.');
         }
@@ -37,6 +31,7 @@ class AttendanceController extends Controller
         if ($now->gt($deadlineAbsen)) {
             return back()->with('error', 'Waktu absensi sudah habis. Batas terakhir adalah ' . $deadlineAbsen->format('H:i') . ' WIB (90 menit setelah sesi selesai).');
         }
+        */
 
         $validated = $request->validate([
             'status' => ['required', 'string', 'in:hadir,libur_sakit,pindah_lokasi,batal'],

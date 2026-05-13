@@ -91,23 +91,7 @@
             <div class="border-t pt-6" x-data="attendanceForm()">
                 <h3 class="text-lg font-semibold mb-4">Absensi Sesi</h3>
                 
-                @if(!$attendance)
-                    {{-- TIME WINDOW GUARD --}}
-                    @if($tooEarly)
-                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
-                            <svg class="h-10 w-10 text-blue-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <p class="font-bold text-blue-800 text-lg">Sesi Belum Dimulai</p>
-                            <p class="text-blue-600 text-sm mt-1">Absensi baru bisa dilakukan mulai pukul <span class="font-bold">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} WIB</span></p>
-                            <p class="text-blue-500 text-xs mt-2">Batas terakhir absen: {{ $deadlineAbsen->format('H:i') }} WIB (90 menit setelah sesi selesai)</p>
-                        </div>
-                    @elseif($tooLate)
-                        <div class="bg-red-50 border border-red-200 rounded-xl p-5 text-center">
-                            <svg class="h-10 w-10 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <p class="font-bold text-red-800 text-lg">Waktu Absen Sudah Habis</p>
-                            <p class="text-red-600 text-sm mt-1">Batas absensi adalah 90 menit setelah sesi selesai ({{ $deadlineAbsen->format('H:i') }} WIB).</p>
-                            <p class="text-red-500 text-xs mt-2">Hubungi Admin jika ada kendala.</p>
-                        </div>
-                    @else
+                @if(!$attendance && $schedule->status === 'scheduled')
                     <form action="{{ route('tutor.attendance.submit', $schedule) }}" method="POST">
                         @csrf
                         
