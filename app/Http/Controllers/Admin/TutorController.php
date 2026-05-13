@@ -112,8 +112,13 @@ class TutorController extends Controller
 
     public function destroy(Tutor $tutor)
     {
+        $user = $tutor->user;
         $tutor->delete();
+        if ($user) {
+            $user->delete();
+        }
+        
         return redirect()->route('admin.tutors.index')
-            ->with('success', 'Tutor berhasil dihapus!');
+            ->with('success', 'Tutor dan akun login berhasil dihapus!');
     }
 }

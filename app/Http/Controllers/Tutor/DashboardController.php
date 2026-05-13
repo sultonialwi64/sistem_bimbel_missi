@@ -13,6 +13,11 @@ class DashboardController extends Controller
     {
         $tutor = Auth::user()->tutor;
 
+        if (!$tutor) {
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Akun Anda tidak memiliki profil tutor yang valid. Silakan hubungi admin.');
+        }
+
         $stats = [
             'total_sessions'     => $tutor->total_sessions,
             'rating_avg'         => $tutor->rating_avg,

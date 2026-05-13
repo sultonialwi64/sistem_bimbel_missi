@@ -12,6 +12,12 @@ class DashboardController extends Controller
     public function index()
     {
         $client = Auth::user()->client;
+
+        if (!$client) {
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Akun Anda tidak memiliki profil wali murid yang valid. Silakan hubungi admin.');
+        }
+
         $students = $client->students()->where('is_active', true)->get();
 
         $stats = [

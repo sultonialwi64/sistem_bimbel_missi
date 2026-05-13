@@ -94,8 +94,13 @@ class ClientController extends Controller
 
     public function destroy(Client $client)
     {
+        $user = $client->user;
         $client->delete();
+        if ($user) {
+            $user->delete();
+        }
+        
         return redirect()->route('admin.clients.index')
-            ->with('success', 'Client berhasil dihapus!');
+            ->with('success', 'Client dan akun login berhasil dihapus!');
     }
 }
