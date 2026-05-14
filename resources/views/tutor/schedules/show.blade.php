@@ -165,9 +165,8 @@
                             Submit Absensi
                         </button>
                     </form>
-                    @endif
                 @else
-                    <!-- Completed Attendance View -->
+                    {{-- Completed Attendance View --}}
                     <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
