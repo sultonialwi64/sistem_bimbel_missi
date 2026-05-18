@@ -21,7 +21,7 @@
                         <option value="">-- Pilih Jenjang --</option>
                         @foreach($levels as $level)
                             <option value="{{ $level->id }}" {{ old('grade_level_id') == $level->id ? 'selected' : '' }}>
-                                {{ $level->name }} ({{ $level->description }})
+                                {{ $level->name }}@if($level->description) ({{ $level->description }})@endif
                             </option>
                         @endforeach
                     </select>
