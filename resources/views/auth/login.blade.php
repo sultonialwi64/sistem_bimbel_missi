@@ -19,7 +19,6 @@
 
         body {
             background-color: #0b1120; /* Very dark slate, almost navy */
-            background-image: flex;
         }
 
         /* Subtle ambient lighting */
