@@ -137,7 +137,23 @@ Route::middleware('auth')->group(function () {
         
         // Profile & Earnings
         Route::get('/earnings', [App\Http\Controllers\Tutor\EarningController::class, 'index'])->name('earnings.index');
+        // Clients management
+        Route::get('/clients', [App\Http\Controllers\Tutor\ClientController::class, 'index'])->name('clients.index');
+        Route::get('/clients/create', [App\Http\Controllers\Tutor\ClientController::class, 'create'])->name('clients.create');
+        Route::post('/clients', [App\Http\Controllers\Tutor\ClientController::class, 'store'])->name('clients.store');
+        Route::get('/clients/{client}', [App\Http\Controllers\Tutor\ClientController::class, 'show'])->name('clients.show');
+        Route::get('/clients/{client}/edit', [App\Http\Controllers\Tutor\ClientController::class, 'edit'])->name('clients.edit');
+        Route::put('/clients/{client}', [App\Http\Controllers\Tutor\ClientController::class, 'update'])->name('clients.update');
+        Route::delete('/clients/{client}', [App\Http\Controllers\Tutor\ClientController::class, 'destroy'])->name('clients.destroy');
+
+        // Students management
         Route::get('/students', [App\Http\Controllers\Tutor\StudentController::class, 'index'])->name('students.index');
+        Route::get('/students/create', [App\Http\Controllers\Tutor\StudentController::class, 'create'])->name('students.create');
+        Route::post('/students', [App\Http\Controllers\Tutor\StudentController::class, 'store'])->name('students.store');
+        Route::get('/students/{student}', [App\Http\Controllers\Tutor\StudentController::class, 'show'])->name('students.show');
+        Route::get('/students/{student}/edit', [App\Http\Controllers\Tutor\StudentController::class, 'edit'])->name('students.edit');
+        Route::put('/students/{student}', [App\Http\Controllers\Tutor\StudentController::class, 'update'])->name('students.update');
+        Route::delete('/students/{student}', [App\Http\Controllers\Tutor\StudentController::class, 'destroy'])->name('students.destroy');
     });
 
     // Client routes
