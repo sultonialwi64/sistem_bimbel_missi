@@ -270,24 +270,7 @@
                     </button>
                 </form>
 
-                <!-- Demo Credentials -->
-                <div class="mt-12 pt-8 border-t border-slate-800">
-                    <p class="text-[10px] font-bold text-slate-500 text-center mb-5 uppercase tracking-widest">Sandbox Access Credentials</p>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-indigo-500/50 rounded-xl p-3 text-center cursor-pointer transition-all group" onclick="document.getElementById('email').value='admin@bimbel.com'; document.getElementById('password').value='password';">
-                            <p class="font-bold text-indigo-400 group-hover:text-indigo-300 text-[11px] uppercase tracking-wider mb-1 transition-colors">Admin</p>
-                            <p class="text-slate-500 group-hover:text-slate-400 text-[10px] truncate transition-colors" title="admin@bimbel.com">admin@...</p>
-                        </div>
-                        <div class="bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-cyan-500/50 rounded-xl p-3 text-center cursor-pointer transition-all group" onclick="document.getElementById('email').value='ahmad.tutor@bimbel.com'; document.getElementById('password').value='password';">
-                            <p class="font-bold text-cyan-400 group-hover:text-cyan-300 text-[11px] uppercase tracking-wider mb-1 transition-colors">Tutor</p>
-                            <p class="text-slate-500 group-hover:text-slate-400 text-[10px] truncate transition-colors" title="ahmad.tutor@bimbel.com">ahmad@...</p>
-                        </div>
-                        <div class="bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-purple-500/50 rounded-xl p-3 text-center cursor-pointer transition-all group" onclick="document.getElementById('email').value='rina.client@bimbel.com'; document.getElementById('password').value='password';">
-                            <p class="font-bold text-purple-400 group-hover:text-purple-300 text-[11px] uppercase tracking-wider mb-1 transition-colors">Client</p>
-                            <p class="text-slate-500 group-hover:text-slate-400 text-[10px] truncate transition-colors" title="rina.client@bimbel.com">rina@...</p>
-                        </div>
-                    </div>
-                </div>
+
             </div>
             
             <!-- Mobile Footer -->
