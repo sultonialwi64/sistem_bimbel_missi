@@ -395,6 +395,7 @@
 
         var eventsData = @json($calendarEvents);
         var isMobile = window.innerWidth < 640;
+        var lastWidth = window.innerWidth;
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: isMobile ? 'listWeek' : 'dayGridMonth',
@@ -419,6 +420,9 @@
             height: 'auto',
             dayMaxEvents: isMobile ? 2 : 4,
             windowResize: function(view) {
+                if (window.innerWidth === lastWidth) return; // Ignore vertical resize (mobile scroll)
+                lastWidth = window.innerWidth;
+                
                 var mobile = window.innerWidth < 640;
                 if (mobile && calendar.view.type !== 'listWeek') {
                     calendar.changeView('listWeek');
