@@ -31,7 +31,7 @@
     
     @stack('styles')
 </head>
-<body class="bg-slate-900 font-sans antialiased" x-data="{ sidebarOpen: false }">
+<body class="bg-slate-900 font-sans antialiased overflow-x-hidden w-full relative" x-data="{ sidebarOpen: false }">
     <div class="min-h-screen flex">
         <!-- Mobile Sidebar Overlay -->
         <div x-show="sidebarOpen" 

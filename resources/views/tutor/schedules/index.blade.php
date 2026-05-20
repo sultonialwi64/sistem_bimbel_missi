@@ -34,36 +34,36 @@
 
 @section('content')
 <div class="space-y-8" x-data="{ viewMode: 'calendar' }">
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <p class="text-gray-500">Kelola jadwal mengajar Anda</p>
+            <p class="text-gray-500 text-sm">Kelola jadwal mengajar Anda</p>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
             {{-- View Mode Toggle --}}
             <div class="bg-gray-100 p-1 rounded-xl flex items-center shadow-inner">
                 <button @click="viewMode = 'calendar'"
                         :class="viewMode === 'calendar' ? 'bg-white shadow-md text-indigo-600' : 'text-gray-500 hover:text-gray-700'"
-                        class="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all duration-200">
+                        class="px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all duration-200">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    Calendar
+                    <span class="hidden sm:inline text-xs">Kalender</span>
                 </button>
                 <button @click="viewMode = 'list'"
                         :class="viewMode === 'list' ? 'bg-white shadow-md text-indigo-600' : 'text-gray-500 hover:text-gray-700'"
-                        class="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all duration-200">
+                        class="px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all duration-200">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                     </svg>
-                    List
+                    <span class="hidden sm:inline text-xs">Daftar</span>
                 </button>
             </div>
 
-            <a href="{{ route('tutor.schedules.create') }}" class="btn-primary-gradient text-white font-bold px-6 py-2.5 rounded-xl hover:shadow-2xl flex items-center gap-2 shadow-xl shadow-indigo-500/30 transition-all">
+            <a href="{{ route('tutor.schedules.create') }}" class="btn-primary-gradient text-white font-bold px-4 py-2.5 rounded-xl hover:shadow-2xl flex items-center gap-2 shadow-xl shadow-indigo-500/30 transition-all flex-1 sm:flex-auto justify-center">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
-                Buat Jadwal Baru
+                <span class="text-sm">Jadwal Baru</span>
             </a>
         </div>
     </div>
@@ -87,11 +87,12 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        {{-- Desktop Table --}}
+        <div class="hidden sm:block overflow-x-auto">
             <table class="table-premium">
                 <thead class="bg-indigo-900">
                     <tr>
-                        <th class="text-left py-4 px-6 text-white font-bold opacity-90">Date & Time</th>
+                        <th class="text-left py-4 px-6 text-white font-bold opacity-90">Date &amp; Time</th>
                         <th class="text-left py-4 px-6 text-white font-bold opacity-90">Student</th>
                         <th class="text-left py-4 px-6 text-white font-bold opacity-90">Subject</th>
                         <th class="text-left py-4 px-6 text-white font-bold opacity-90">Status</th>
@@ -117,9 +118,7 @@
                                 </div>
                             </td>
                             <td class="py-4 px-6">
-                                <div>
-                                    <p class="font-medium text-gray-900">{{ $schedule->subject->name }}</p>
-                                </div>
+                                <p class="font-medium text-gray-900">{{ $schedule->subject->name }}</p>
                             </td>
                             <td class="py-4 px-6">
                                 <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold
@@ -134,27 +133,19 @@
                             <td class="py-4 px-6 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('tutor.schedules.show', $schedule) }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-xl font-semibold text-xs hover:bg-indigo-50 transition-all">
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         Detail
                                     </a>
-                                    
                                     @if($schedule->status === 'scheduled')
                                         <a href="{{ route('tutor.schedules.edit', $schedule) }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 text-amber-700 border border-amber-100 rounded-xl font-semibold text-xs hover:bg-amber-50 transition-all">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                             Edit
                                         </a>
                                         <form action="{{ route('tutor.schedules.destroy', $schedule) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?');" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 text-red-700 border border-red-100 rounded-xl font-semibold text-xs hover:bg-red-50 transition-all">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                </svg>
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                 Hapus
                                             </button>
                                         </form>
@@ -167,9 +158,7 @@
                             <td colspan="5" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
-                                        <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
+                                        <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     </div>
                                     <p class="text-gray-500 font-semibold">Tidak ada jadwal ditemukan</p>
                                 </div>
@@ -178,6 +167,62 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        {{-- Mobile Card List --}}
+        <div class="sm:hidden p-4 space-y-3">
+            @forelse($schedules as $schedule)
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-start justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md flex-shrink-0">
+                                <span class="text-white font-bold text-xs">{{ substr($schedule->student->name, 0, 2) }}</span>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-900 text-sm">{{ $schedule->student->name }}</p>
+                                <p class="text-xs text-gray-500">{{ $schedule->subject->name }}</p>
+                            </div>
+                        </div>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold flex-shrink-0
+                            @if($schedule->status === 'completed') bg-green-100 text-green-700
+                            @elseif($schedule->status === 'scheduled') bg-blue-100 text-blue-700
+                            @elseif($schedule->status === 'cancelled') bg-red-100 text-red-700
+                            @else bg-amber-100 text-amber-700
+                            @endif">
+                            {{ ucfirst($schedule->status) }}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-3 text-xs text-gray-600">
+                        <svg class="h-3.5 w-3.5 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="font-semibold text-gray-800">{{ $schedule->date->format('d M Y') }}</span>
+                        <span class="text-gray-400">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 pt-3 border-t border-gray-50">
+                        <a href="{{ route('tutor.schedules.show', $schedule) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-semibold text-xs hover:bg-indigo-100 transition-all">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Detail
+                        </a>
+                        @if($schedule->status === 'scheduled')
+                            <a href="{{ route('tutor.schedules.edit', $schedule) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-amber-50 text-amber-700 rounded-xl font-semibold text-xs hover:bg-amber-100 transition-all">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                Edit
+                            </a>
+                            <form action="{{ route('tutor.schedules.destroy', $schedule) }}" method="POST" onsubmit="return confirm('Hapus jadwal ini?');" class="inline flex-1">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-700 rounded-xl font-semibold text-xs hover:bg-red-100 transition-all">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    Hapus
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-12">
+                    <p class="text-gray-500 font-semibold">Tidak ada jadwal ditemukan</p>
+                </div>
+            @endforelse
         </div>
 
         @if($schedules->hasPages())
@@ -215,15 +260,16 @@
     .fc .fc-button-primary {
         background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
         border: none;
-        border-radius: 0.75rem;
-        padding: 0.5rem 1.25rem;
+        border-radius: 0.5rem;
+        padding: 0.4rem 0.85rem;
         font-weight: 600;
-        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2), 0 2px 4px -1px rgba(99, 102, 241, 0.1);
+        font-size: 0.8rem;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
         transition: all 0.2s ease;
     }
     .fc .fc-button-primary:hover {
         background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3), 0 4px 6px -2px rgba(99, 102, 241, 0.15);
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
         transform: translateY(-1px);
     }
     .fc .fc-button-primary:disabled {
@@ -236,7 +282,7 @@
     }
     .fc-toolbar-title {
         font-weight: 800 !important;
-        font-size: 1.5rem !important;
+        font-size: 1.25rem !important;
         color: #1e293b;
     }
     .fc-event {
@@ -272,6 +318,28 @@
         justify-content: center;
         margin: 4px;
     }
+    /* Mobile responsive calendar toolbar */
+    @media (max-width: 639px) {
+        .fc-toolbar {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .fc-toolbar-title {
+            font-size: 1rem !important;
+        }
+        .fc-toolbar-chunk {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .fc .fc-button-primary {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.75rem;
+        }
+        .fc-header-toolbar {
+            margin-bottom: 0.75rem !important;
+        }
+    }
 </style>
 @endpush
 
@@ -283,10 +351,15 @@
         if (!calendarEl) return;
 
         var eventsData = @json($calendarEvents);
+        var isMobile = window.innerWidth < 640;
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
+            initialView: isMobile ? 'listWeek' : 'dayGridMonth',
+            headerToolbar: isMobile ? {
+                left: 'prev,next',
+                center: 'title',
+                right: 'today,dayGridMonth,listWeek'
+            } : {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
@@ -301,7 +374,25 @@
             },
             displayEventEnd: true,
             height: 'auto',
-            dayMaxEvents: 4,
+            dayMaxEvents: isMobile ? 3 : 4,
+            windowResize: function(view) {
+                var newMobile = window.innerWidth < 640;
+                if (newMobile) {
+                    calendar.changeView('listWeek');
+                    calendar.setOption('headerToolbar', {
+                        left: 'prev,next',
+                        center: 'title',
+                        right: 'today,dayGridMonth,listWeek'
+                    });
+                } else {
+                    calendar.changeView('dayGridMonth');
+                    calendar.setOption('headerToolbar', {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    });
+                }
+            },
             eventContent: function(arg) {
                 var p = arg.event.extendedProps;
                 return {

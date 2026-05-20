@@ -71,6 +71,10 @@
         @apply bg-brand-navy-700 hover:bg-brand-navy-800 shadow-sm hover:shadow transition-all duration-300;
     }
 
+    .btn-primary-gradient {
+        @apply bg-gradient-to-r from-brand-navy-600 to-brand-navy-800 hover:from-brand-navy-700 hover:to-brand-navy-900 transition-all duration-300;
+    }
+
     .btn-secondary {
         @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm;
         @apply bg-white text-slate-700 border border-slate-200;

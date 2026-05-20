@@ -5,31 +5,29 @@
 @section('page-subtitle', 'Pilih anak untuk melihat detail hasil belajarnya')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-5">
     @if($students->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($students as $student)
                 <a href="{{ route('client.progress.show', $student) }}"
-                   class="group card-premium block hover:scale-[1.02] transition-all duration-300">
+                   class="group card-premium block hover:scale-[1.01] transition-all duration-300">
                     <!-- Gradient Top Bar -->
-                    <div class="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-4 mb-5">
+                    <div class="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex items-center gap-3 mb-4">
                             <img src="{{ $student->photo ? asset('storage/' . $student->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($student->name) . '&background=205085&color=fff&size=128' }}"
-                                 class="h-16 w-16 rounded-2xl object-cover ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/40 transition-all">
-                            <div class="flex-1">
-                                <h3 class="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                                    {{ $student->name }}
-                                </h3>
-                                <p class="text-sm text-gray-500">{{ $student->grade_level ?? '-' }} • {{ $student->school_name ?? '-' }}</p>
+                                 class="h-14 w-14 rounded-2xl object-cover ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/40 transition-all flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">{{ $student->name }}</h3>
+                                <p class="text-xs text-gray-500 mt-0.5 truncate">{{ $student->grade_level ?? '-' }} • {{ $student->school_name ?? '-' }}</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-100">
                             <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider group-hover:text-indigo-700">
                                 Lihat Hasil Belajar
                             </span>
-                            <svg class="h-5 w-5 text-indigo-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-4 w-4 text-indigo-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>

@@ -7,7 +7,7 @@
 @section('content')
 <div class="space-y-8">
     <!-- Stats Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <!-- Sesi Bulan Ini -->
         <div class="card-premium overflow-hidden border-none shadow-xl bg-indigo-800 relative group col-span-1">
             <div class="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-full transition-transform group-hover:scale-110"></div>
@@ -127,17 +127,17 @@
                 @if($todaySchedules->count() > 0)
                     <div class="space-y-4">
                         @foreach($todaySchedules as $schedule)
-                            <div class="group flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all duration-300">
+                            <div class="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all duration-300 gap-3 sm:gap-0">
                                 <div class="flex items-center gap-4">
-                                    <div class="h-12 w-12 rounded-xl bg-indigo-800 flex items-center justify-center shadow-lg">
+                                    <div class="h-12 w-12 flex-shrink-0 rounded-xl bg-indigo-800 flex items-center justify-center shadow-lg">
                                         <span class="text-white font-bold text-sm">{{ substr($schedule->student->name, 0, 1) }}</span>
                                     </div>
-                                    <div>
-                                        <p class="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">{{ $schedule->student->name }}</p>
-                                        <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider">{{ $schedule->subject->name }}</p>
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors truncate">{{ $schedule->student->name }}</p>
+                                        <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider truncate">{{ $schedule->subject->name }}</p>
                                     </div>
                                 </div>
-                                <div class="text-right">
+                                <div class="text-left sm:text-right ml-16 sm:ml-0">
                                     <p class="text-sm font-black text-gray-900">
                                         {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} – {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }} WIB
                                     </p>
@@ -177,12 +177,12 @@
             <div class="p-6">
                 <div class="space-y-4">
                     @forelse($upcomingSchedules as $schedule)
-                        <div class="group flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all duration-300">
-                            <div>
-                                <p class="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">{{ $schedule->student->name }}</p>
-                                <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider">{{ $schedule->subject->name }}</p>
+                        <div class="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all duration-300 gap-2 sm:gap-0">
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors truncate">{{ $schedule->student->name }}</p>
+                                <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider truncate">{{ $schedule->subject->name }}</p>
                             </div>
-                            <div class="text-right">
+                            <div class="text-left sm:text-right mt-1 sm:mt-0">
                                 <p class="text-sm font-black text-gray-900">{{ $schedule->date->translatedFormat('d M') }}</p>
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} WIB</p>
                             </div>
@@ -213,18 +213,18 @@
             <div class="space-y-4">
                 @forelse($recentSessions as $session)
                     @php $report = $session->sessionReport; @endphp
-                    <div class="group flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all duration-300">
-                        <div class="flex items-center gap-4">
-                            <div class="h-10 w-10 rounded-xl {{ $report ? 'bg-gray-200 text-gray-500' : 'bg-amber-100 text-amber-600' }} flex items-center justify-center font-bold text-xs transition-colors">
+                    <div class="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all duration-300 gap-3 sm:gap-0">
+                        <div class="flex items-start sm:items-center gap-4">
+                            <div class="h-10 w-10 flex-shrink-0 rounded-xl {{ $report ? 'bg-gray-200 text-gray-500' : 'bg-amber-100 text-amber-600' }} flex items-center justify-center font-bold text-xs transition-colors mt-1 sm:mt-0">
                                 {{ substr($session->student->name, 0, 1) }}
                             </div>
-                            <div>
-                                <p class="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">{{ $session->student->name }}</p>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1.5 mt-0.5">
-                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                    {{ $session->date->translatedFormat('d M Y') }}
-                                    <span class="text-gray-300">•</span>
-                                    {{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} WIB
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors truncate">{{ $session->student->name }}</p>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <span>{{ $session->date->translatedFormat('d M Y') }}</span>
+                                    <span class="text-gray-300 hidden sm:inline">•</span>
+                                    <span>{{ \Carbon\Carbon::parse($session->start_time)->format('H:i') }} WIB</span>
                                 </p>
                                 @if($report)
                                     <p class="text-xs text-gray-500 font-medium italic line-clamp-1 mt-1">"{{ $report->material_covered }}"</p>
@@ -233,7 +233,7 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="text-right">
+                        <div class="text-left sm:text-right ml-14 sm:ml-0 mt-2 sm:mt-0">
                             @if($report)
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest
                                     @if($report->student_understanding >= 4) bg-green-100 text-green-700
