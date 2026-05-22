@@ -250,7 +250,8 @@
                     noCalendar: true,
                     dateFormat: "H:i",
                     time_24hr: true,
-                    minuteIncrement: 5
+                    minuteIncrement: 5,
+                    disableMobile: true
                 });
             });
         });
