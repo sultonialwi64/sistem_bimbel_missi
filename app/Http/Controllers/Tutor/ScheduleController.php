@@ -50,51 +50,78 @@ class ScheduleController extends Controller
         ]);
 
         $tutorId = Auth::user()->tutor->id;
-
-        // Validation 1: Cek jadwal tutor bentrok
-        $tutorConflict = Schedule::where('tutor_id', $tutorId)
-            ->where('date', $validated['date'])
-            ->where(function($query) use ($validated) {
-                $query->where(function($q) use ($validated) {
-                    $q->where('start_time', '<', $validated['end_time'])
-                      ->where('end_time', '>', $validated['start_time']);
-                });
-            })
-            ->where('status', 'scheduled')
-            ->exists();
-
-        if ($tutorConflict) {
-            return back()->withInput()->withErrors(['time_conflict' => 'Anda sudah memiliki jadwal mengajar di jam tersebut!']);
+        $repeatWeeks = intval($request->input('repeat_weeks', 0));
+        
+        $baseDate = \Carbon\Carbon::parse($validated['date']);
+        $datesToCreate = [];
+        
+        for ($i = 0; $i <= $repeatWeeks; $i++) {
+            $datesToCreate[] = $baseDate->copy()->addWeeks($i)->format('Y-m-d');
         }
 
-        // Validation 2: Cek jadwal murid bentrok
-        $studentConflict = Schedule::where('student_id', $validated['student_id'])
-            ->where('date', $validated['date'])
-            ->where(function($query) use ($validated) {
-                $query->where(function($q) use ($validated) {
-                    $q->where('start_time', '<', $validated['end_time'])
-                      ->where('end_time', '>', $validated['start_time']);
-                });
-            })
-            ->where('status', 'scheduled')
-            ->exists();
+        $conflicts = [];
 
-        if ($studentConflict) {
-            return back()->withInput()->withErrors(['time_conflict' => 'Murid ini sudah memiliki jadwal bimbel di jam tersebut (dengan tutor lain)!']);
+        foreach ($datesToCreate as $date) {
+            // Validation 1: Cek jadwal tutor bentrok
+            $tutorConflict = Schedule::where('tutor_id', $tutorId)
+                ->where('date', $date)
+                ->where(function($query) use ($validated) {
+                    $query->where(function($q) use ($validated) {
+                        $q->where('start_time', '<', $validated['end_time'])
+                          ->where('end_time', '>', $validated['start_time']);
+                    });
+                })
+                ->where('status', 'scheduled')
+                ->exists();
+
+            if ($tutorConflict) {
+                $formattedDate = \Carbon\Carbon::parse($date)->translatedFormat('d F Y');
+                $conflicts[] = "Anda sudah memiliki jadwal mengajar pada tanggal {$formattedDate} di jam tersebut.";
+            }
+
+            // Validation 2: Cek jadwal murid bentrok
+            $studentConflict = Schedule::where('student_id', $validated['student_id'])
+                ->where('date', $date)
+                ->where(function($query) use ($validated) {
+                    $query->where(function($q) use ($validated) {
+                        $q->where('start_time', '<', $validated['end_time'])
+                          ->where('end_time', '>', $validated['start_time']);
+                    });
+                })
+                ->where('status', 'scheduled')
+                ->exists();
+
+            if ($studentConflict) {
+                $formattedDate = \Carbon\Carbon::parse($date)->translatedFormat('d F Y');
+                $conflicts[] = "Murid ini sudah memiliki jadwal bimbel pada tanggal {$formattedDate} di jam tersebut.";
+            }
         }
 
-        Schedule::create([
-            'tutor_id' => $tutorId,
-            'student_id' => $validated['student_id'],
-            'subject_id' => $validated['subject_id'],
-            'date' => $validated['date'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'status' => 'scheduled',
-            'created_by' => Auth::id(),
-        ]);
+        if (!empty($conflicts)) {
+            array_unshift($conflicts, 'Gagal membuat jadwal berulang karena terdapat bentrok waktu.');
+            return back()->withInput()->withErrors(['time_conflict' => $conflicts]);
+        }
 
-        return redirect()->route('tutor.schedules.index')->with('success', 'Jadwal berhasil ditambahkan.');
+        \Illuminate\Support\Facades\DB::transaction(function () use ($datesToCreate, $validated, $tutorId) {
+            foreach ($datesToCreate as $date) {
+                Schedule::create([
+                    'tutor_id' => $tutorId,
+                    'student_id' => $validated['student_id'],
+                    'subject_id' => $validated['subject_id'],
+                    'date' => $date,
+                    'start_time' => $validated['start_time'],
+                    'end_time' => $validated['end_time'],
+                    'status' => 'scheduled',
+                    'created_by' => Auth::id(),
+                ]);
+            }
+        });
+
+        $message = $repeatWeeks > 0 
+            ? 'Jadwal berulang berhasil ditambahkan (' . count($datesToCreate) . ' sesi).' 
+            : 'Jadwal berhasil ditambahkan.';
+
+        return redirect()->route('tutor.schedules.index')->with('success', $message);
     }
 
     public function show(Schedule $schedule)

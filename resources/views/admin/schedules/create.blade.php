@@ -114,6 +114,23 @@
                             <input type="time" name="end_time" id="end_time" required value="{{ old('end_time') }}" class="input-premium mt-1">
                         </div>
                     </div>
+
+                    <div class="mt-5 pt-5 border-t border-gray-100">
+                        <label class="form-label" for="repeat_weeks">Ulangi Jadwal <span class="text-gray-400 font-normal">(opsional)</span></label>
+                        <select name="repeat_weeks" id="repeat_weeks" class="input-premium mt-1">
+                            <option value="0" {{ old('repeat_weeks') == '0' ? 'selected' : '' }}>Hanya Sekali (Tidak Diulang)</option>
+                            <option value="1" {{ old('repeat_weeks') == '1' ? 'selected' : '' }}>Ulangi +1 Minggu (Total 2 Sesi)</option>
+                            <option value="2" {{ old('repeat_weeks') == '2' ? 'selected' : '' }}>Ulangi +2 Minggu (Total 3 Sesi)</option>
+                            <option value="3" {{ old('repeat_weeks') == '3' ? 'selected' : '' }}>Ulangi +3 Minggu (Total 4 Sesi - Paket 1 Bulan)</option>
+                            <option value="4" {{ old('repeat_weeks') == '4' ? 'selected' : '' }}>Ulangi +4 Minggu (Total 5 Sesi)</option>
+                            <option value="7" {{ old('repeat_weeks') == '7' ? 'selected' : '' }}>Ulangi +7 Minggu (Total 8 Sesi - Paket 2 Bulan)</option>
+                            <option value="11" {{ old('repeat_weeks') == '11' ? 'selected' : '' }}>Ulangi +11 Minggu (Total 12 Sesi - Paket 3 Bulan)</option>
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1.5 flex items-start gap-1.5">
+                            <svg class="h-4 w-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Sistem akan otomatis membuat jadwal untuk hari dan jam yang sama pada minggu-minggu berikutnya sesuai pilihan Anda.</span>
+                        </p>
+                    </div>
                 </div>
 
                 {{-- Divider --}}
