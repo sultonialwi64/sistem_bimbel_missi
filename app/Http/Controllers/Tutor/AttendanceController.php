@@ -136,4 +136,61 @@ class AttendanceController extends Controller
                 ->with('success', 'Status jadwal berhasil diperbarui menjadi: ' . str_replace('_', ' ', $status));
         }
     }
+
+    /**
+     * Replace attendance photo for an existing attendance without changing captured_at
+     */
+    public function updatePhoto(Request $request, Schedule $schedule)
+    {
+        // Authorize
+        $tutor = Auth::user()->tutor;
+        if (!$tutor || $schedule->tutor_id != $tutor->id) {
+            abort(403, 'Unauthorized access: Jadwal ini bukan milik Anda.');
+        }
+
+        $attendance = $schedule->attendance;
+        if (!$attendance) {
+            return back()->with('error', 'Data absensi tidak ditemukan.');
+        }
+
+        $validated = $request->validate([
+            'photo_base64' => ['required', 'string'],
+        ]);
+
+        // Handle base64 decode
+        if (preg_match('/^data:image\/(\w+);base64,/', $validated['photo_base64'], $type)) {
+            $data = substr($validated['photo_base64'], strpos($validated['photo_base64'], ',') + 1);
+            $type = strtolower($type[1]); // jpg, png, dll
+
+            if (!in_array($type, ['jpg', 'jpeg', 'png', 'webp'])) {
+                return back()->with('error', 'Format gambar tidak valid.');
+            }
+
+            $data = base64_decode($data);
+            if ($data === false) {
+                return back()->with('error', 'Gagal memproses gambar foto.');
+            }
+
+            // Hapus foto lama jika ada
+            if ($attendance->photo_path && Storage::disk('public')->exists($attendance->photo_path)) {
+                Storage::disk('public')->delete($attendance->photo_path);
+            }
+
+            // Generate nama file unik
+            $fileName = now()->format('Ymd_His') . '_' . uniqid() . '.' . $type;
+            $photoPath = 'attendances/' . $fileName;
+
+            // Simpan ke storage
+            Storage::disk('public')->put($photoPath, $data);
+            
+            // Update photo path in DB
+            $attendance->update([
+                'photo_path' => $photoPath,
+            ]);
+
+            return redirect()->route('tutor.schedules.show', $schedule)->with('success', 'Foto bukti kehadiran berhasil diperbarui!');
+        } else {
+            return back()->with('error', 'Data foto rusak atau tidak valid.');
+        }
+    }
 }

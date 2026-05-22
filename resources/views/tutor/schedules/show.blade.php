@@ -181,7 +181,7 @@
                     </form>
                 @else
                     {{-- Completed Attendance View --}}
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">
+                    <div x-data="{ showReplaceForm: false }" class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -226,6 +226,62 @@
                             <div class="mt-4">
                                 <p class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Bukti Kehadiran</p>
                                 <img src="{{ Storage::url($attendance->photo_path) }}" alt="Bukti Hadir" class="w-full max-w-sm rounded-xl border-4 border-white shadow-md">
+                                
+                                <button @click="showReplaceForm = !showReplaceForm" class="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    Ganti Foto Bukti
+                                </button>
+                            </div>
+
+                            <div x-show="showReplaceForm" x-transition class="mt-4 pt-4 border-t border-green-200" style="display: none;">
+                                <div x-data="replacePhotoForm('{{ $attendance->captured_at ? $attendance->captured_at->format('Y/m/d H:i:s') : now()->format('Y/m/d H:i:s') }}', '{{ $attendance->tutor_subdistrict }}', '{{ $attendance->status }}')" class="space-y-4">
+                                    <form action="{{ route('tutor.attendance.update-photo', $schedule) }}" method="POST" @submit="isUpdating = true">
+                                        @csrf
+                                        
+                                        <div class="flex items-center gap-2 p-1 bg-white rounded-lg border border-gray-200">
+                                            <button type="button" @click="inputMode = 'upload'; stopCamera()" :class="inputMode === 'upload' ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-all">Upload File</button>
+                                            <button type="button" @click="inputMode = 'camera'; if(!photoCaptured) startCamera()" :class="inputMode === 'camera' ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-all">Kamera</button>
+                                        </div>
+
+                                        <div x-show="!photoCaptured && inputMode === 'camera'" class="relative bg-black rounded-xl overflow-hidden flex justify-center items-center shadow-inner" style="min-h: 200px;">
+                                            <video x-ref="replaceVideo" autoplay playsinline class="w-full max-h-[50vh] object-contain"></video>
+                                            <button type="button" @click="capturePhoto()" 
+                                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white text-indigo-600 rounded-full p-3 shadow-2xl border-4 border-indigo-100 hover:bg-indigo-50 transition-all hover:scale-105 active:scale-95">
+                                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div x-show="!photoCaptured && inputMode === 'upload'" class="border-2 border-dashed border-green-300 rounded-xl p-4 text-center hover:border-indigo-500 transition-colors bg-white">
+                                            <input type="file" id="replace_photo_file" accept="image/*" class="hidden" @change="handleFileUpload($event)">
+                                            <label for="replace_photo_file" class="cursor-pointer flex flex-col items-center justify-center gap-2">
+                                                <svg class="h-8 w-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                                </svg>
+                                                <span class="text-sm font-semibold text-indigo-600">Pilih foto pengganti</span>
+                                            </label>
+                                        </div>
+
+                                        <div x-show="photoCaptured" class="relative bg-white rounded-xl overflow-hidden flex flex-col justify-center items-center border border-gray-200" style="display: none;">
+                                            <canvas x-ref="replaceCanvas" class="w-full max-h-[50vh] object-contain"></canvas>
+                                            <div class="p-3 w-full flex justify-between items-center bg-gray-50 border-t border-gray-200">
+                                                <button type="button" @click="retakePhoto()" class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm flex items-center gap-1.5 transition-colors">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                    Ganti Lagi
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <input type="hidden" name="photo_base64" x-model="photoBase64">
+
+                                        <button type="submit" x-show="isSubmitReady" :disabled="isUpdating" class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all flex justify-center items-center gap-2 text-sm">
+                                            <span x-show="!isUpdating">Simpan Foto Baru</span>
+                                            <span x-show="isUpdating" style="display: none;">Menyimpan...</span>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -574,6 +630,151 @@ document.addEventListener('alpine:init', () => {
             const fileInput = document.getElementById('photo_file');
             if (fileInput) fileInput.value = '';
             
+            if(this.inputMode === 'camera') this.startCamera();
+        }
+    }));
+
+    Alpine.data('replacePhotoForm', (originalDate, originalAddress, originalStatus) => ({
+        inputMode: 'upload',
+        stream: null,
+        photoCaptured: false,
+        photoBase64: '',
+        isSubmitReady: false,
+        isUpdating: false,
+
+        async startCamera() {
+            this.stopCamera(); 
+            try {
+                this.stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                this.$refs.replaceVideo.srcObject = this.stream;
+            } catch (err) {
+                console.error("Camera access denied or error:", err);
+                alert("Tidak dapat mengakses kamera. Pastikan Anda memberikan izin kamera pada browser.");
+            }
+        },
+
+        stopCamera() {
+            if (this.stream) {
+                this.stream.getTracks().forEach(track => track.stop());
+                this.stream = null;
+            }
+        },
+
+        applyWatermark(canvas, ctx) {
+            // Use originalDate for watermark to preserve timestamp visually
+            const d = new Date(originalDate);
+            const dateStr = d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const timestampText = `${dateStr} ${timeStr}`;
+            const statusText = `STATUS: ${originalStatus.toUpperCase().replace('_', ' ')}`;
+            const locationText = originalAddress && originalAddress !== 'Mencari lokasi...' ? `LOC: ${originalAddress}` : '';
+
+            const scaleRatio = canvas.width / 800; 
+            const bgHeight = locationText ? (90 * scaleRatio) : (65 * scaleRatio);
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(0, canvas.height - bgHeight, canvas.width, bgHeight);
+
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 4 * scaleRatio;
+            ctx.fillStyle = '#ffffff';
+            
+            if (locationText) {
+                ctx.font = `bold ${Math.max(14, 24 * scaleRatio)}px sans-serif`;
+                ctx.fillText(timestampText, 20 * scaleRatio, canvas.height - (65 * scaleRatio));
+                
+                ctx.font = `bold ${Math.max(12, 18 * scaleRatio)}px sans-serif`;
+                ctx.fillStyle = '#4ade80'; 
+                ctx.fillText(statusText, 20 * scaleRatio, canvas.height - (40 * scaleRatio));
+                
+                ctx.font = `${Math.max(10, 16 * scaleRatio)}px sans-serif`;
+                ctx.fillStyle = '#cbd5e1'; 
+                ctx.fillText(locationText, 20 * scaleRatio, canvas.height - (15 * scaleRatio));
+            } else {
+                ctx.font = `bold ${Math.max(14, 24 * scaleRatio)}px sans-serif`;
+                ctx.fillText(timestampText, 20 * scaleRatio, canvas.height - (40 * scaleRatio));
+                
+                ctx.font = `bold ${Math.max(12, 18 * scaleRatio)}px sans-serif`;
+                ctx.fillStyle = '#4ade80';
+                ctx.fillText(statusText, 20 * scaleRatio, canvas.height - (15 * scaleRatio));
+            }
+
+            this.photoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            this.photoCaptured = true;
+            this.isSubmitReady = true;
+        },
+
+        capturePhoto() {
+            if (!this.$refs.replaceVideo.videoWidth) return;
+            const video = this.$refs.replaceVideo;
+            const canvas = this.$refs.replaceCanvas;
+            const ctx = canvas.getContext('2d');
+            const MAX_DIMENSION = 800; 
+            let drawWidth = video.videoWidth;
+            let drawHeight = video.videoHeight;
+            if (drawWidth > drawHeight) {
+                if (drawWidth > MAX_DIMENSION) {
+                    drawHeight *= MAX_DIMENSION / drawWidth;
+                    drawWidth = MAX_DIMENSION;
+                }
+            } else {
+                if (drawHeight > MAX_DIMENSION) {
+                    drawWidth *= MAX_DIMENSION / drawHeight;
+                    drawHeight = MAX_DIMENSION;
+                }
+            }
+            canvas.width = drawWidth;
+            canvas.height = drawHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            this.applyWatermark(canvas, ctx);
+            this.stopCamera();
+        },
+
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('File harus berupa gambar!');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = this.$refs.replaceCanvas;
+                    const ctx = canvas.getContext('2d');
+                    const MAX_DIMENSION = 800;
+                    let drawWidth = img.width;
+                    let drawHeight = img.height;
+                    if (drawWidth > drawHeight) {
+                        if (drawWidth > MAX_DIMENSION) {
+                            drawHeight *= MAX_DIMENSION / drawWidth;
+                            drawWidth = MAX_DIMENSION;
+                        }
+                    } else {
+                        if (drawHeight > MAX_DIMENSION) {
+                            drawWidth *= MAX_DIMENSION / drawHeight;
+                            drawHeight = MAX_DIMENSION;
+                        }
+                    }
+                    canvas.width = drawWidth;
+                    canvas.height = drawHeight;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    this.applyWatermark(canvas, ctx);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+
+        retakePhoto() {
+            this.photoCaptured = false;
+            this.photoBase64 = '';
+            this.isSubmitReady = false;
+            const fileInput = document.getElementById('replace_photo_file');
+            if (fileInput) fileInput.value = '';
             if(this.inputMode === 'camera') this.startCamera();
         }
     }));

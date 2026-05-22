@@ -128,6 +128,7 @@ Route::middleware('auth')->group(function () {
         
         // Attendance (Photo & Status)
         Route::post('/attendance/submit/{schedule}', [App\Http\Controllers\Tutor\AttendanceController::class, 'submitAttendance'])->name('attendance.submit');
+        Route::post('/attendance/update-photo/{schedule}', [App\Http\Controllers\Tutor\AttendanceController::class, 'updatePhoto'])->name('attendance.update-photo');
         
         // Session Reports
         Route::get('/reports', [App\Http\Controllers\Tutor\ReportController::class, 'index'])->name('reports.index');
