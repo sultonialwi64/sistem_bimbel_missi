@@ -37,7 +37,7 @@ class AttendanceController extends Controller
             'status' => ['required', 'string', 'in:hadir,libur_sakit,pindah_lokasi,batal'],
             'photo_base64' => ['nullable', 'string'],
             'captured_at' => ['nullable', 'date'],
-            'notes' => ['nullable', 'string', 'max:500'],
+            'notes' => ['nullable', 'string', 'max:5000'],
             'tutor_lat' => ['nullable', 'numeric'],
             'tutor_lng' => ['nullable', 'numeric'],
             'tutor_subdistrict' => ['nullable', 'string', 'max:255'],

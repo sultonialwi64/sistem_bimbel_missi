@@ -235,6 +235,26 @@
                     </div>
                 @endif
 
+                @if($errors->any())
+                    <div class="mb-6 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 p-5 rounded-2xl animate-fade-in-up">
+                        <div class="flex items-start gap-3">
+                            <div class="h-8 w-8 rounded-xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center flex-shrink-0">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-red-400 font-bold">Kesalahan Validasi</p>
+                                <ul class="list-disc list-inside text-red-300 text-sm mt-1 space-y-1">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 @yield('content')
             </main>
         </div>
