@@ -108,9 +108,13 @@
                         </div>
 
                         <div x-show="requiresPhoto" class="mb-4 space-y-4" style="display: none;">
-                            <p class="text-sm text-gray-600">Ambil foto sebagai bukti kehadiran (Kamera Belakang/Depan).</p>
+                            <div class="flex items-center gap-2 p-1 bg-gray-100 rounded-lg">
+                                <button type="button" @click="inputMode = 'camera'; if(!photoCaptured) startCamera()" :class="inputMode === 'camera' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2 text-sm font-semibold rounded-md transition-all">Gunakan Kamera</button>
+                                <button type="button" @click="inputMode = 'upload'; stopCamera()" :class="inputMode === 'upload' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2 text-sm font-semibold rounded-md transition-all">Upload File</button>
+                            </div>
+                            <p class="text-sm text-gray-600" x-show="inputMode === 'camera'">Ambil foto sebagai bukti kehadiran (Kamera Belakang/Depan).</p>
                             
-                            <div x-show="!photoCaptured" class="relative bg-black rounded-xl overflow-hidden flex justify-center items-center shadow-inner" style="min-h: 300px;">
+                            <div x-show="!photoCaptured && inputMode === 'camera'" class="relative bg-black rounded-xl overflow-hidden flex justify-center items-center shadow-inner" style="min-h: 300px;">
                                 <video x-ref="video" autoplay playsinline class="w-full max-h-[60vh] object-contain"></video>
                                 
                                 <!-- Loading Lokasi Overlay -->
@@ -118,19 +122,29 @@
                                     <svg class="animate-spin h-3 w-3 text-indigo-400" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                     Menunggu Lokasi...
                                 </div>
-                                <div x-show="locationLoaded" class="absolute top-4 left-4 bg-green-600/80 text-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-2 backdrop-blur-sm">
+                                <div x-show="locationLoaded && address !== ''" class="absolute top-4 left-4 bg-green-600/80 text-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-2 backdrop-blur-sm">
                                     <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                     Lokasi Terdeteksi
                                 </div>
 
-                                <button type="button" @click="capturePhoto()" :disabled="!locationLoaded" 
-                                        :class="{'opacity-50 cursor-not-allowed': !locationLoaded}"
+                                <button type="button" @click="capturePhoto()" 
                                         class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-white text-indigo-600 rounded-full p-4 shadow-2xl border-4 border-indigo-100 hover:bg-indigo-50 transition-all hover:scale-105 active:scale-95">
                                     <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     </svg>
                                 </button>
+                            </div>
+
+                            <div x-show="!photoCaptured && inputMode === 'upload'" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-indigo-500 transition-colors bg-white">
+                                <input type="file" id="photo_file" accept="image/*" class="hidden" @change="handleFileUpload($event)">
+                                <label for="photo_file" class="cursor-pointer flex flex-col items-center justify-center gap-2">
+                                    <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    <span class="text-sm font-semibold text-indigo-600">Pilih file gambar</span>
+                                    <span class="text-xs text-gray-500">Mendukung JPEG, PNG, WEBP</span>
+                                </label>
                             </div>
 
                             <div x-show="photoCaptured" class="relative bg-gray-100 rounded-xl overflow-hidden flex flex-col justify-center items-center border border-gray-200" style="display: none;">
@@ -284,6 +298,7 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('attendanceForm', () => ({
         status: '',
+        inputMode: 'camera',
         stream: null,
         photoCaptured: false,
         photoBase64: '',
@@ -314,7 +329,7 @@ document.addEventListener('alpine:init', () => {
                 this.address = 'Mencari lokasi...';
                 this.locationLoaded = false;
                 this.getLocation();
-                await this.startCamera();
+                if(this.inputMode === 'camera') await this.startCamera();
             } else {
                 this.stopCamera();
             }
@@ -322,18 +337,35 @@ document.addEventListener('alpine:init', () => {
 
         getLocation() {
             if (navigator.geolocation) {
+                const gpsTimeout = setTimeout(() => {
+                    if (!this.locationLoaded) {
+                        console.warn("GPS timeout");
+                        this.address = '';
+                        this.subdistrict = '';
+                        this.locationLoaded = true;
+                    }
+                }, 5000);
+
                 navigator.geolocation.getCurrentPosition(
                     async (pos) => {
+                        clearTimeout(gpsTimeout);
                         this.latitude = pos.coords.latitude;
                         this.longitude = pos.coords.longitude;
                         await this.reverseGeocode(this.latitude, this.longitude);
                     },
                     (err) => {
+                        clearTimeout(gpsTimeout);
                         console.warn("Location error:", err);
-                        this.address = 'Izin Lokasi Ditolak';
+                        this.address = '';
+                        this.subdistrict = '';
+                        this.locationLoaded = true;
                     },
-                    { enableHighAccuracy: true, timeout: 8000 }
+                    { enableHighAccuracy: true, timeout: 4500 }
                 );
+            } else {
+                this.address = '';
+                this.subdistrict = '';
+                this.locationLoaded = true;
             }
         },
 
@@ -367,8 +399,8 @@ document.addEventListener('alpine:init', () => {
                 }
             } catch (err) {
                 console.error('Reverse geocoding error:', err);
-                this.address = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                this.subdistrict = this.address;
+                this.address = '';
+                this.subdistrict = '';
             } finally {
                 this.locationLoaded = true;
             }
@@ -393,6 +425,66 @@ document.addEventListener('alpine:init', () => {
                 this.stream.getTracks().forEach(track => track.stop());
                 this.stream = null;
             }
+        },
+
+        applyWatermark(canvas, ctx) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const timestampText = `${dateStr} ${timeStr}`;
+            const statusText = `STATUS: ${this.status.toUpperCase().replace('_', ' ')}`;
+            const locationText = this.address && this.address !== 'Mencari lokasi...' ? `LOC: ${this.address}` : '';
+
+            // Responsif font dan background berdasarkan lebar canvas
+            const scaleRatio = canvas.width / 800; // base ratio
+            const bgHeight = locationText ? (90 * scaleRatio) : (65 * scaleRatio);
+            
+            // Background hitam transparan untuk teks
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(0, canvas.height - bgHeight, canvas.width, bgHeight);
+
+            // Teks watermark
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 4 * scaleRatio;
+            ctx.fillStyle = '#ffffff';
+            
+            if (locationText) {
+                // Baris 1: Waktu
+                ctx.font = `bold ${Math.max(14, 24 * scaleRatio)}px sans-serif`;
+                ctx.fillText(timestampText, 20 * scaleRatio, canvas.height - (65 * scaleRatio));
+                
+                // Baris 2: Status
+                ctx.font = `bold ${Math.max(12, 18 * scaleRatio)}px sans-serif`;
+                ctx.fillStyle = '#4ade80'; // Hijau
+                ctx.fillText(statusText, 20 * scaleRatio, canvas.height - (40 * scaleRatio));
+                
+                // Baris 3: Lokasi (Alamat)
+                ctx.font = `${Math.max(10, 16 * scaleRatio)}px sans-serif`;
+                ctx.fillStyle = '#cbd5e1'; // Abu-abu terang
+                ctx.fillText(locationText, 20 * scaleRatio, canvas.height - (15 * scaleRatio));
+            } else {
+                // Tanpa lokasi
+                ctx.font = `bold ${Math.max(14, 24 * scaleRatio)}px sans-serif`;
+                ctx.fillText(timestampText, 20 * scaleRatio, canvas.height - (40 * scaleRatio));
+                
+                ctx.font = `bold ${Math.max(12, 18 * scaleRatio)}px sans-serif`;
+                ctx.fillStyle = '#4ade80';
+                ctx.fillText(statusText, 20 * scaleRatio, canvas.height - (15 * scaleRatio));
+            }
+
+            // Konversi ke base64 (JPEG quality 70% untuk kompresi ekstra)
+            this.photoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            
+            // Format ISO datetime untuk backend
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            
+            this.capturedAt = `${y}-${m}-${d} ${h}:${min}:${s}`;
+            this.photoCaptured = true;
         },
 
         capturePhoto() {
@@ -426,62 +518,63 @@ document.addEventListener('alpine:init', () => {
             // Gambar frame video ke canvas dengan ukuran yang sudah di-resize
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Watermark Waktu, Status & Lokasi
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const timestampText = `${dateStr} ${timeStr}`;
-            const statusText = `STATUS: ${this.status.toUpperCase().replace('_', ' ')}`;
-            const locationText = `LOC: ${this.address}`;
-
-            // Background hitam transparan untuk teks
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            
-            // Responsif font dan background berdasarkan lebar canvas
-            const scaleRatio = canvas.width / 800; // base ratio
-            const bgHeight = 90 * scaleRatio;
-            ctx.fillRect(0, canvas.height - bgHeight, canvas.width, bgHeight);
-
-            // Teks watermark
-            ctx.shadowColor = "rgba(0,0,0,0.5)";
-            ctx.shadowBlur = 4 * scaleRatio;
-            ctx.fillStyle = '#ffffff';
-            
-            // Baris 1: Waktu
-            ctx.font = `bold ${Math.max(14, 24 * scaleRatio)}px sans-serif`;
-            ctx.fillText(timestampText, 20 * scaleRatio, canvas.height - (65 * scaleRatio));
-            
-            // Baris 2: Status
-            ctx.font = `bold ${Math.max(12, 18 * scaleRatio)}px sans-serif`;
-            ctx.fillStyle = '#4ade80'; // Hijau
-            ctx.fillText(statusText, 20 * scaleRatio, canvas.height - (40 * scaleRatio));
-            
-            // Baris 3: Lokasi (Alamat)
-            ctx.font = `${Math.max(10, 16 * scaleRatio)}px sans-serif`;
-            ctx.fillStyle = '#cbd5e1'; // Abu-abu terang
-            ctx.fillText(locationText, 20 * scaleRatio, canvas.height - (15 * scaleRatio));
-
-            // Konversi ke base64 (JPEG quality 70% untuk kompresi ekstra)
-            this.photoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-            
-            // Format ISO datetime untuk backend
-            const y = now.getFullYear();
-            const m = String(now.getMonth() + 1).padStart(2, '0');
-            const d = String(now.getDate()).padStart(2, '0');
-            const h = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            
-            this.capturedAt = `${y}-${m}-${d} ${h}:${min}:${s}`;
-            this.photoCaptured = true;
+            this.applyWatermark(canvas, ctx);
             this.stopCamera();
+        },
+
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('File harus berupa gambar!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = this.$refs.canvas;
+                    const ctx = canvas.getContext('2d');
+
+                    const MAX_DIMENSION = 800;
+                    let drawWidth = img.width;
+                    let drawHeight = img.height;
+
+                    if (drawWidth > drawHeight) {
+                        if (drawWidth > MAX_DIMENSION) {
+                            drawHeight *= MAX_DIMENSION / drawWidth;
+                            drawWidth = MAX_DIMENSION;
+                        }
+                    } else {
+                        if (drawHeight > MAX_DIMENSION) {
+                            drawWidth *= MAX_DIMENSION / drawHeight;
+                            drawHeight = MAX_DIMENSION;
+                        }
+                    }
+
+                    canvas.width = drawWidth;
+                    canvas.height = drawHeight;
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    this.applyWatermark(canvas, ctx);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         },
 
         retakePhoto() {
             this.photoCaptured = false;
             this.photoBase64 = '';
             this.capturedAt = '';
-            this.startCamera();
+            
+            const fileInput = document.getElementById('photo_file');
+            if (fileInput) fileInput.value = '';
+            
+            if(this.inputMode === 'camera') this.startCamera();
         }
     }));
 });
