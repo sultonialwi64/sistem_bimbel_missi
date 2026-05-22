@@ -30,6 +30,60 @@
     </style>
     
     @stack('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        /* ===== FLATPICKR - Clean & Simple ===== */
+        .flatpickr-input[readonly] { background-color: transparent; cursor: pointer; }
+
+        .flatpickr-calendar {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 8px;
+        }
+
+        /* Kontainer waktu */
+        .flatpickr-time {
+            border-top: none;
+            height: auto;
+        }
+        .flatpickr-time input {
+            color: #1e293b;
+            font-size: 1.6rem;
+            font-weight: 700;
+            height: 48px;
+            line-height: 48px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+        .flatpickr-time input:focus,
+        .flatpickr-time input:hover {
+            border-color: #6366f1;
+            background: #eef2ff;
+            outline: none;
+        }
+        .flatpickr-time .flatpickr-time-separator {
+            color: #94a3b8;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 48px;
+            height: 48px;
+        }
+        
+        /* Chevron arrow */
+        .flatpickr-time .numInputWrapper span {
+            border: none;
+        }
+        .flatpickr-time .numInputWrapper span:hover {
+            background: #eef2ff;
+        }
+        .flatpickr-time .numInputWrapper span.arrowUp:after  { border-bottom-color: #6366f1; }
+        .flatpickr-time .numInputWrapper span.arrowDown:after { border-top-color: #6366f1; }
+    </style>
 </head>
 <body class="bg-slate-900 font-sans antialiased overflow-x-hidden w-full relative" x-data="{ sidebarOpen: false }">
     <div class="min-h-screen flex">
@@ -187,5 +241,19 @@
     </div>
 
     @stack('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll("input[type=time]").forEach(function (el) {
+                flatpickr(el, {
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: "H:i",
+                    time_24hr: true,
+                    minuteIncrement: 5
+                });
+            });
+        });
+    </script>
 </body>
 </html>
