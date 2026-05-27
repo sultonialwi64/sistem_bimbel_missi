@@ -73,7 +73,7 @@
                 Riwayat Gaji
             </h3>
             <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold border border-white/30">
-                {{ $salaries->total() }} periode
+                {{ $salariesFromDb->count() + ($currentMonthVirtual ? 1 : 0) }} periode
             </span>
         </div>
 
@@ -92,7 +92,37 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    @forelse($salaries as $salary)
+                    {{-- Virtual row: bulan berjalan belum dibayar --}}
+                    @if($currentMonthVirtual)
+                        <tr class="hover:bg-amber-50/40 transition-colors bg-amber-50/20">
+                            <td class="py-4 px-6">
+                                <span class="text-sm font-semibold text-gray-900">
+                                    {{ $currentMonthVirtual->period_start->format('d M') }} - {{ $currentMonthVirtual->period_end->format('d M Y') }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="badge badge-indigo">{{ $currentMonthVirtual->total_sessions }}</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="text-sm text-gray-700">Rp {{ number_format($currentMonthVirtual->rate_per_session, 0, ',', '.') }}</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="text-sm text-gray-700">Rp {{ number_format($currentMonthVirtual->base_salary, 0, ',', '.') }}</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="text-base font-black text-gray-900">Rp {{ number_format($currentMonthVirtual->total_amount, 0, ',', '.') }}</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="badge badge-amber">Unpaid</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="text-sm text-gray-400">Menunggu admin</span>
+                            </td>
+                        </tr>
+                    @endif
+
+                    {{-- Record gaji dari database --}}
+                    @forelse($salariesFromDb as $salary)
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="py-4 px-6">
                                 <span class="text-sm font-semibold text-gray-900">
@@ -114,9 +144,9 @@
                             <td class="py-4 px-6">
                                 <span class="badge
                                     @if($salary->status === 'paid') badge-green
-                                    @elseif($salary->status === 'pending') badge-amber
+                                    @elseif(in_array($salary->status, ['pending','unpaid'])) badge-amber
                                     @else badge-gray @endif">
-                                    {{ ucfirst($salary->status) }}
+                                    {{ $salary->status === 'unpaid' || $salary->status === 'pending' ? 'Unpaid' : ucfirst($salary->status) }}
                                 </span>
                             </td>
                             <td class="py-4 px-6">
@@ -126,6 +156,7 @@
                             </td>
                         </tr>
                     @empty
+                        @if(!$currentMonthVirtual)
                         <tr>
                             <td colspan="7">
                                 <div class="empty-state py-12">
@@ -136,6 +167,7 @@
                                 </div>
                             </td>
                         </tr>
+                        @endif
                     @endforelse
                 </tbody>
             </table>
@@ -143,9 +175,45 @@
 
         {{-- Mobile Cards --}}
         <div class="sm:hidden divide-y divide-slate-100">
-            @forelse($salaries as $salary)
+            {{-- Virtual row bulan berjalan --}}
+            @if($currentMonthVirtual)
+                <div class="p-4 space-y-3 bg-amber-50/30">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Periode</div>
+                            <p class="font-bold text-slate-800 text-sm">
+                                {{ $currentMonthVirtual->period_start->format('d M') }} – {{ $currentMonthVirtual->period_end->format('d M Y') }}
+                            </p>
+                        </div>
+                        <span class="badge badge-amber flex-shrink-0">Unpaid</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-indigo-50 rounded-xl p-2.5 text-center">
+                            <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Sesi</div>
+                            <div class="text-lg font-black text-indigo-700 mt-0.5">{{ $currentMonthVirtual->total_sessions }}</div>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-2.5 text-center border border-slate-100">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rate/Sesi</div>
+                            <div class="text-xs font-bold text-slate-700 mt-1 leading-tight">Rp {{ number_format($currentMonthVirtual->rate_per_session, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="bg-green-50 rounded-xl p-2.5 text-center border border-green-100">
+                            <div class="text-[10px] font-bold text-green-500 uppercase tracking-wider">Total</div>
+                            <div class="text-xs font-black text-green-700 mt-1 leading-tight">Rp {{ number_format($currentMonthVirtual->total_amount, 0, ',', '.') }}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-xs bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+                        <div>
+                            <span class="text-slate-400 font-semibold">Gaji Pokok: </span>
+                            <span class="font-bold text-slate-700">Rp {{ number_format($currentMonthVirtual->base_salary, 0, ',', '.') }}</span>
+                        </div>
+                        <span class="text-slate-400 italic text-[10px]">Menunggu admin</span>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Record dari DB --}}
+            @forelse($salariesFromDb as $salary)
                 <div class="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
-                    {{-- Period + Status --}}
                     <div class="flex items-center justify-between gap-3">
                         <div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Periode</div>
@@ -155,13 +223,11 @@
                         </div>
                         <span class="badge flex-shrink-0
                             @if($salary->status === 'paid') badge-green
-                            @elseif($salary->status === 'pending') badge-amber
+                            @elseif(in_array($salary->status, ['pending','unpaid'])) badge-amber
                             @else badge-gray @endif">
-                            {{ ucfirst($salary->status) }}
+                            {{ $salary->status === 'unpaid' || $salary->status === 'pending' ? 'Unpaid' : ucfirst($salary->status) }}
                         </span>
                     </div>
-
-                    {{-- Stats Grid --}}
                     <div class="grid grid-cols-3 gap-2">
                         <div class="bg-indigo-50 rounded-xl p-2.5 text-center">
                             <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Sesi</div>
@@ -176,8 +242,6 @@
                             <div class="text-xs font-black text-green-700 mt-1 leading-tight">Rp {{ number_format($salary->total_amount, 0, ',', '.') }}</div>
                         </div>
                     </div>
-
-                    {{-- Gaji Pokok + Tgl Bayar --}}
                     <div class="flex items-center justify-between text-xs bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
                         <div>
                             <span class="text-slate-400 font-semibold">Gaji Pokok: </span>
@@ -194,6 +258,7 @@
                     </div>
                 </div>
             @empty
+                @if(!$currentMonthVirtual)
                 <div class="py-12 text-center text-slate-500">
                     <div class="flex flex-col items-center gap-3">
                         <svg class="h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,14 +267,9 @@
                         <p class="font-semibold italic text-sm">Belum ada catatan gaji</p>
                     </div>
                 </div>
+                @endif
             @endforelse
         </div>
-
-        @if($salaries->hasPages())
-            <div class="px-6 py-4 border-t border-gray-100 bg-slate-50">
-                {{ $salaries->links() }}
-            </div>
-        @endif
     </div>
 </div>
 @endsection
