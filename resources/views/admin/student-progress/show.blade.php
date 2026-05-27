@@ -108,13 +108,13 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($sessionReports as $report)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 align-top">
                                 <div class="text-sm font-bold text-gray-900">{{ $report->created_at->format('d M Y') }}</div>
                                 <div class="text-xs text-gray-500">{{ $report->schedule->subject->name ?? '-' }}</div>
                                 <div class="text-[10px] text-indigo-600 mt-1">oleh {{ $report->tutor->user->name }}</div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm text-gray-900 mb-1"><strong>Materi:</strong> {{ \Illuminate\Support\Str::limit($report->material_covered, 50) }}</div>
+                            <td class="px-6 py-4 align-top">
+                                <div class="text-sm text-gray-900 mb-2"><strong>Materi:</strong><br>{!! nl2br(e($report->material_covered)) !!}</div>
                                 <div class="flex items-center gap-1">
                                     <span class="text-xs text-gray-500">Pemahaman:</span>
                                     <div class="flex text-yellow-400">
@@ -124,8 +124,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">
-                                {{ \Illuminate\Support\Str::limit($report->notes_for_parent ?? 'Tidak ada catatan', 100) }}
+                            <td class="px-6 py-4 text-sm text-gray-700 align-top">
+                                {!! nl2br(e($report->notes_for_parent ?? 'Tidak ada catatan')) !!}
                             </td>
                         </tr>
                         @empty

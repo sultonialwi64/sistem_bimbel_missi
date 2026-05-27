@@ -13,7 +13,7 @@
         .info-label { font-weight: bold; width: 120px; color: #475569; }
         .section-title { font-size: 14px; font-weight: bold; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-top: 30px; margin-bottom: 10px; }
         .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .table th, .table td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+        .table th, .table td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; vertical-align: top; }
         .table th { background-color: #f8fafc; font-weight: bold; color: #475569; }
         .rating { color: #eab308; font-weight: bold; }
         .summary-box { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
@@ -60,22 +60,23 @@
     <table class="table">
         <thead>
             <tr>
-                <th width="10%">Tanggal</th>
-                <th width="12%">Mata Pelajaran</th>
-                <th width="25%">Materi yang Diajarkan</th>
-                <th width="8%">Pemahaman</th>
-                <th width="25%">Catatan</th>
-                <th width="20%">Foto Kegiatan</th>
+                <th width="15%">Tanggal & Mapel</th>
+                <th width="35%">Materi yang Diajarkan</th>
+                <th width="30%">Catatan</th>
+                <th width="10%">Pemahaman</th>
+                <th width="10%">Foto</th>
             </tr>
         </thead>
         <tbody>
             @forelse($sessionReports as $report)
                 <tr>
-                    <td>{{ $report->created_at->format('d/m/Y') }}</td>
-                    <td>{{ $report->schedule->subject->name ?? '-' }}</td>
-                    <td>{{ $report->material_covered }}</td>
+                    <td>
+                        <strong>{{ $report->created_at->format('d/m/Y') }}</strong><br>
+                        {{ $report->schedule->subject->name ?? '-' }}
+                    </td>
+                    <td>{!! nl2br(e($report->material_covered)) !!}</td>
+                    <td>{!! nl2br(e($report->notes_for_parent ?? '-')) !!}</td>
                     <td align="center"><span class="rating">{{ $report->student_understanding }}</span> / 5</td>
-                    <td>{{ $report->notes_for_parent ?? '-' }}</td>
                     <td align="center">
                         @php
                             $base64 = null;
