@@ -77,27 +77,21 @@
             </span>
         </div>
 
-        <!-- 5. Estimated Profit -->
+        <!-- 5. Net Income (Pendapatan Bersih) -->
         <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div class="flex items-start justify-between mb-3">
-                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Est. Profit</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Pendapatan Bersih</p>
                 <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-green-500/20 border border-green-400/30 flex items-center justify-center group-hover:bg-green-600 transition-colors">
                     <svg class="h-5 w-5 text-green-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                     </svg>
                 </div>
             </div>
-            <p class="text-2xl font-black text-white leading-none mb-4 whitespace-nowrap">Rp {{ number_format($stats['estimated_profit'], 0, ',', '.') }}</p>
-            <div class="flex flex-col gap-1">
-                <span class="inline-flex items-center gap-1 text-xs font-semibold text-green-300">
-                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                    In: Rp {{ number_format($stats['projected_revenue'], 0, ',', '.') }}
-                </span>
-                <span class="inline-flex items-center gap-1 text-xs font-semibold text-red-300">
-                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                    Out: Rp {{ number_format($stats['projected_expenses'], 0, ',', '.') }}
-                </span>
-            </div>
+            <p class="text-2xl font-black text-white leading-none mb-4 whitespace-nowrap">Rp {{ number_format($stats['net_income'], 0, ',', '.') }}</p>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ $stats['net_income_sessions'] }} sesi × Rp {{ number_format($stats['net_income_rate'], 0, ',', '.') }}
+            </span>
         </div>
 
     </div>
