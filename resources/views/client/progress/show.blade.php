@@ -115,11 +115,11 @@
                                     </span>
                                 </div>
                                 <p class="text-sm text-gray-700">
-                                    <span class="font-bold text-gray-900">Materi:</span> {{ $report->material_covered }}
+                                    <span class="font-bold text-gray-900">Materi:</span><br>{!! nl2br(e($report->material_covered)) !!}
                                 </p>
                                 @if($report->notes_for_parent)
                                     <p class="text-sm text-gray-500 mt-2 italic border-l-2 border-indigo-200 pl-3 bg-indigo-50/30 py-2 rounded-r-lg">
-                                        "{{ $report->notes_for_parent }}"
+                                        "{!! nl2br(e($report->notes_for_parent)) !!}"
                                     </p>
                                 @endif
                             </div>
