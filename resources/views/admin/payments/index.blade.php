@@ -122,7 +122,7 @@
                                 <div class="flex items-center justify-end gap-2">
                                     @if($payment->status !== 'paid' && $payment->client->user->phone)
                                         @php
-                                            $month        = $payment->due_date->format('Y-m');
+                                            $month        = $periodMonth->format('Y-m');
                                             $downloadLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $month]);
                                             $waNumber     = preg_replace('/[^0-9]/', '', $payment->client->user->phone);
                                             if (!str_starts_with($waNumber, '62')) {
@@ -218,7 +218,7 @@
                     <div class="flex items-center gap-2">
                         @if($payment->status !== 'paid' && $payment->client->user->phone)
                             @php
-                                $month        = $payment->due_date->format('Y-m');
+                                $month        = $periodMonth->format('Y-m');
                                 $downloadLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $month]);
                                 $waNumber     = preg_replace('/[^0-9]/', '', $payment->client->user->phone);
                                 if (!str_starts_with($waNumber, '62')) {
