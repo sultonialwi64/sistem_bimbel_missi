@@ -103,13 +103,7 @@
         </tbody>
     </table>
 
-    <div class="footer">
-        <p>Mengetahui,</p>
-        <p><strong>Admin / Management Bimbel</strong></p>
-        <div class="signature-line">
-            &nbsp;
-        </div>
-    </div>
+
 
 </body>
 </html>
