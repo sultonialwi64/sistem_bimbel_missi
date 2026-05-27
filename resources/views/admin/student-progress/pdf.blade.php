@@ -88,7 +88,7 @@
         <p>Mengetahui,</p>
         <p><strong>Admin / Management Bimbel</strong></p>
         <div class="signature-line">
-            {{ auth()->user()->name }}
+            {{ optional(auth()->user())->name ?? 'Admin Bimbel Missi' }}
         </div>
     </div>
 
