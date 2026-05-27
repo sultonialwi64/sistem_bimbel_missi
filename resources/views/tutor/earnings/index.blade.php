@@ -50,7 +50,7 @@
                 <div class="flex items-center justify-between mb-2">
                     <div>
                         <p class="stat-label">Total Catatan</p>
-                        <p class="stat-value">{{ $salaries->total() }}</p>
+                        <p class="stat-value">{{ $salariesFromDb->count() + ($currentMonthVirtual ? 1 : 0) }}</p>
                     </div>
                     <div class="h-12 w-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30">
                         <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
