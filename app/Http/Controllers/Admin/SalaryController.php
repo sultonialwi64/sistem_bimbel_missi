@@ -45,7 +45,7 @@ class SalaryController extends Controller
                     'total_sessions' => $salaryRecord->total_sessions,
                     'base_salary' => $salaryRecord->base_salary,
                     'total_amount' => $salaryRecord->total_amount,
-                    'status' => $salaryRecord->status,
+                    'status' => $salaryRecord->status === 'pending' ? 'unpaid' : $salaryRecord->status,
                     'salary_id' => $salaryRecord->id,
                 ]);
             } else {
