@@ -71,10 +71,8 @@ class SalaryController extends Controller
             }
         }
 
-        // Sort: unpaid first
-        $tutorSalaries = $tutorSalaries->sortBy(function($item) {
-            return $item->status === 'unpaid' ? 0 : 1;
-        });
+        // Sort: total_amount descending (dari terbanyak ke terkecil)
+        $tutorSalaries = $tutorSalaries->sortByDesc('total_amount');
 
         // Hitung total pendapatan perusahaan dari semua salary yang ada
         $companyRatePerSession = config('bimbel.salary.session_rate_company', 10000);
