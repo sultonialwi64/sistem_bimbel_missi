@@ -7,100 +7,99 @@
 @section('content')
 <div class="space-y-8">
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Tutors Card -->
-        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <p class="text-sm font-bold uppercase tracking-wide" style="color: rgba(255, 255, 255, 0.9) !important;">Total Tutors</p>
-                        <p class="text-4xl font-black text-white mt-2">{{ $stats['total_tutors'] }}</p>
-                    </div>
-                    <div class="h-12 w-12 rounded-xl bg-indigo-500/20 flex items-center justify-center border border-indigo-400/30 group-hover:bg-indigo-600 transition-colors duration-300">
-                        <svg class="h-6 w-6 text-indigo-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6">
+
+        {{-- Card Template: [Label + Icon] / [Value] / [Sub-badge] --}}
+
+        <!-- 1. Total Tutors -->
+        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-start justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Total Tutors</p>
+                <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center group-hover:bg-indigo-600 transition-colors">
+                    <svg class="h-5 w-5 text-indigo-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
                 </div>
-                
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
-                        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"/></svg>
-                        {{ $stats['active_tutors'] }} Active
-                    </span>
+            </div>
+            <p class="text-4xl font-black text-white leading-none mb-4">{{ $stats['total_tutors'] }}</p>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"/></svg>
+                {{ $stats['active_tutors'] }} Active
+            </span>
+        </div>
+
+        <!-- 2. Total Students -->
+        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-start justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Total Students</p>
+                <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                    <svg class="h-5 w-5 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
                 </div>
+            </div>
+            <p class="text-4xl font-black text-white leading-none mb-4">{{ $stats['total_students'] }}</p>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                {{ $stats['total_clients'] }} Clients
+            </span>
+        </div>
+
+        <!-- 3. Today's Sessions -->
+        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-start justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Today's Sessions</p>
+                <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center group-hover:bg-indigo-600 transition-colors">
+                    <svg class="h-5 w-5 text-indigo-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-4xl font-black text-white leading-none mb-4">{{ $stats['today_schedules'] }}</p>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
+                {{ $stats['total_schedules'] }} Total
+            </span>
+        </div>
+
+        <!-- 4. Monthly Revenue -->
+        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-start justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Monthly Revenue</p>
+                <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                    <svg class="h-5 w-5 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-2xl font-black text-white leading-none mb-4 whitespace-nowrap">Rp {{ number_format($stats['monthly_revenue'], 0, ',', '.') }}</p>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold whitespace-nowrap">
+                <svg class="h-3 w-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/></svg>
+                Pending: Rp {{ number_format($stats['pending_payments'], 0, ',', '.') }}
+            </span>
+        </div>
+
+        <!-- 5. Estimated Profit -->
+        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-start justify-between mb-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Est. Profit</p>
+                <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-green-500/20 border border-green-400/30 flex items-center justify-center group-hover:bg-green-600 transition-colors">
+                    <svg class="h-5 w-5 text-green-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-2xl font-black text-white leading-none mb-4 whitespace-nowrap">Rp {{ number_format($stats['estimated_profit'], 0, ',', '.') }}</p>
+            <div class="flex flex-col gap-1">
+                <span class="inline-flex items-center gap-1 text-xs font-semibold text-green-300">
+                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                    In: Rp {{ number_format($stats['projected_revenue'], 0, ',', '.') }}
+                </span>
+                <span class="inline-flex items-center gap-1 text-xs font-semibold text-red-300">
+                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                    Out: Rp {{ number_format($stats['projected_expenses'], 0, ',', '.') }}
+                </span>
             </div>
         </div>
 
-        <!-- Students Card -->
-        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <p class="text-sm font-bold uppercase tracking-wide" style="color: rgba(255, 255, 255, 0.9) !important;">Total Students</p>
-                        <p class="text-4xl font-black text-white mt-2">{{ $stats['total_students'] }}</p>
-                    </div>
-                    <div class="h-12 w-12 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-400/30 group-hover:bg-blue-600 transition-colors duration-300">
-                        <svg class="h-6 w-6 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
-                        {{ $stats['total_clients'] }} Clients
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sessions Card -->
-        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <p class="text-sm font-bold uppercase tracking-wide" style="color: rgba(255, 255, 255, 0.9) !important;">Today's Sessions</p>
-                        <p class="text-4xl font-black text-white mt-2">{{ $stats['today_schedules'] }}</p>
-                    </div>
-                    <div class="h-12 w-12 rounded-xl bg-indigo-500/20 flex items-center justify-center border border-indigo-400/30 group-hover:bg-indigo-600 transition-colors duration-300">
-                        <svg class="h-6 w-6 text-indigo-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
-                        {{ $stats['total_schedules'] }} Total
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Revenue Card -->
-        <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <p class="text-sm font-bold uppercase tracking-wide" style="color: rgba(255, 255, 255, 0.9) !important;">Monthly Revenue</p>
-                        <p class="text-2xl font-black text-white mt-2">Rp {{ number_format($stats['monthly_revenue'], 0, ',', '.') }}</p>
-                    </div>
-                    <div class="h-12 w-12 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-400/30 group-hover:bg-blue-600 transition-colors duration-300">
-                        <svg class="h-6 w-6 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">
-                        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/></svg>
-                        Pending: Rp {{ number_format($stats['pending_payments'], 0, ',', '.') }}
-                    </span>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Content Grid -->

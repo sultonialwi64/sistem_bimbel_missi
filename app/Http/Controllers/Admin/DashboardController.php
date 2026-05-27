@@ -24,6 +24,24 @@ class DashboardController extends Controller
                 ->sum('amount'),
         ];
 
+        // Hitung estimasi profit bulan ini
+        // Pemasukan: semua tagihan yang ter-generate bulan ini (termasuk yang belum dibayar)
+        $projectedRevenue = Payment::whereMonth('created_at', now()->month)->sum('amount');
+        
+        // Pengeluaran: total sesi valid bulan ini dikali rate tutor
+        $tutorRate = config('bimbel.salary.session_rate_tutor', 40000);
+        $validSessionsThisMonth = Schedule::whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->where('status', 'completed')
+            ->whereHas('attendance', function($q) {
+                $q->whereIn('status', ['hadir', 'pindah_lokasi']);
+            })->count();
+        
+        $projectedExpenses = $validSessionsThisMonth * $tutorRate;
+        $stats['estimated_profit'] = $projectedRevenue - $projectedExpenses;
+        $stats['projected_revenue'] = $projectedRevenue;
+        $stats['projected_expenses'] = $projectedExpenses;
+
         $recentSchedules = Schedule::with(['tutor.user', 'student', 'subject'])
             ->latest()
             ->take(10)
