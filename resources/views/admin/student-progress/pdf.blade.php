@@ -107,7 +107,7 @@
         <p>Mengetahui,</p>
         <p><strong>Admin / Management Bimbel</strong></p>
         <div class="signature-line">
-            {{ optional(auth()->user())->name ?? 'Admin Bimbel Missi' }}
+            &nbsp;
         </div>
     </div>
 
