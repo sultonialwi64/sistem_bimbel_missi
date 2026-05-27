@@ -80,7 +80,7 @@
                         @php
                             $base64 = null;
                             if(isset($report->schedule->attendance) && $report->schedule->attendance->photo_path) {
-                                $path = storage_path('app/public/' . $report->schedule->attendance->photo_path);
+                                $path = \Illuminate\Support\Facades\Storage::disk('public')->path($report->schedule->attendance->photo_path);
                                 if (file_exists($path)) {
                                     $type = pathinfo($path, PATHINFO_EXTENSION);
                                     $data = file_get_contents($path);
