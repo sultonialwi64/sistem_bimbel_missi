@@ -16,14 +16,65 @@ class SalaryController extends Controller
      *  - Bagian Perusahaan : Rp 10.000  ← margin perusahaan
      */
 
-    public function index()
+    public function index(Request $request)
     {
-        $salaries = Salary::with(['tutor.user', 'approvedBy'])
-            ->latest()
-            ->paginate(15);
+        $month = $request->get('month', date('Y-m'));
+        $periodStart = \Carbon\Carbon::parse($month)->startOfMonth();
+        $periodEnd = \Carbon\Carbon::parse($month)->endOfMonth();
 
-        // Daftar tutor aktif untuk form generate
+        // Daftar tutor aktif
         $tutors = Tutor::with('user')->where('status', 'active')->get();
+
+        $tutorRatePerSession = config('bimbel.salary.session_rate_tutor', 40000);
+
+        // Ambil salary yang sudah ada di bulan ini
+        $existingSalaries = Salary::whereBetween('period_start', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
+            ->get()
+            ->keyBy('tutor_id');
+
+        $tutorSalaries = collect();
+
+        foreach ($tutors as $tutor) {
+            $salaryRecord = $existingSalaries->get($tutor->id);
+            
+            if ($salaryRecord) {
+                $tutorSalaries->push((object)[
+                    'tutor' => $tutor,
+                    'period_start' => $periodStart,
+                    'period_end' => $periodEnd,
+                    'total_sessions' => $salaryRecord->total_sessions,
+                    'base_salary' => $salaryRecord->base_salary,
+                    'total_amount' => $salaryRecord->total_amount,
+                    'status' => $salaryRecord->status,
+                    'salary_id' => $salaryRecord->id,
+                ]);
+            } else {
+                $completedSessions = Schedule::where('tutor_id', $tutor->id)
+                    ->whereBetween('date', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
+                    ->whereHas('attendance', function ($query) {
+                        $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+                    })
+                    ->count();
+
+                $baseSalary = $completedSessions * $tutorRatePerSession;
+                
+                $tutorSalaries->push((object)[
+                    'tutor' => $tutor,
+                    'period_start' => $periodStart,
+                    'period_end' => $periodEnd,
+                    'total_sessions' => $completedSessions,
+                    'base_salary' => $baseSalary,
+                    'total_amount' => $baseSalary,
+                    'status' => 'unpaid',
+                    'salary_id' => null,
+                ]);
+            }
+        }
+
+        // Sort: unpaid first
+        $tutorSalaries = $tutorSalaries->sortBy(function($item) {
+            return $item->status === 'unpaid' ? 0 : 1;
+        });
 
         // Hitung total pendapatan perusahaan dari semua salary yang ada
         $companyRatePerSession = config('bimbel.salary.session_rate_company', 10000);
@@ -31,7 +82,7 @@ class SalaryController extends Controller
             \DB::raw('total_sessions * ' . $companyRatePerSession)
         );
 
-        return view('admin.salaries.index', compact('salaries', 'tutors', 'totalCompanyRevenue', 'companyRatePerSession'));
+        return view('admin.salaries.index', compact('tutorSalaries', 'month', 'totalCompanyRevenue', 'companyRatePerSession'));
     }
 
     public function show(Salary $salary)
@@ -64,64 +115,51 @@ class SalaryController extends Controller
             'approved_by'  => auth()->id(),
         ]);
 
-        return redirect()->route('admin.salaries.index')
-            ->with('success', 'Gaji berhasil ditandai sudah dibayar!');
+        return redirect()->back()->with('success', 'Gaji berhasil ditandai sudah dibayar!');
     }
 
-    public function generate()
+    public function payDynamic(Request $request)
     {
-        $validated = request()->validate([
-            'tutor_id'     => ['required', 'exists:tutors,id'],
-            'period_start' => ['required', 'date'],
-            'period_end'   => ['required', 'date', 'after:period_start'],
+        $validated = $request->validate([
+            'tutor_id' => ['required', 'exists:tutors,id'],
+            'month'    => ['required', 'date_format:Y-m'],
         ]);
 
-        // Cegah generate ganda untuk tutor & period yang sama
-        $duplicate = Salary::where('tutor_id', $validated['tutor_id'])
-            ->where('period_start', $validated['period_start'])
-            ->where('period_end', $validated['period_end'])
-            ->exists();
+        $periodStart = \Carbon\Carbon::parse($validated['month'])->startOfMonth();
+        $periodEnd   = \Carbon\Carbon::parse($validated['month'])->endOfMonth();
 
-        if ($duplicate) {
-            return back()
-                ->withErrors(['period_start' => 'Gaji untuk tutor ini pada periode tersebut sudah pernah digenerate.'])
-                ->withInput();
-        }
-
-        // Rate tutor dari config (Rp 40.000/sesi)
-        $tutorRatePerSession = config('bimbel.salary.session_rate_tutor', 40000);
-
-        // Hitung sesi berdasarkan kehadiran (Hanya hitung yang status 'hadir' atau 'pindah_lokasi')
         $completedSessions = Schedule::where('tutor_id', $validated['tutor_id'])
-            ->whereBetween('date', [$validated['period_start'], $validated['period_end']])
+            ->whereBetween('date', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
             ->whereHas('attendance', function ($query) {
                 $query->whereIn('status', ['hadir', 'pindah_lokasi']);
             })
             ->count();
 
-        // Rumus sederhana: Total = Sesi Selesai × Rate Tutor
-        $baseSalary  = $completedSessions * $tutorRatePerSession;
+        $tutorRatePerSession = config('bimbel.salary.session_rate_tutor', 40000);
+        $baseSalary = $completedSessions * $tutorRatePerSession;
 
-        $salary = Salary::create([
-            'tutor_id'         => $validated['tutor_id'],
-            'period_start'     => $validated['period_start'],
-            'period_end'       => $validated['period_end'],
-            'total_sessions'   => $completedSessions,
-            'rate_per_session' => $tutorRatePerSession,
-            'base_salary'      => $baseSalary,
-            'bonus'            => 0,
-            'bonus_reason'     => null,
-            'deduction'        => 0,
-            'deduction_reason' => null,
-            'total_amount'     => $baseSalary,
-            'status'           => 'pending',
-        ]);
+        $salary = Salary::updateOrCreate(
+            [
+                'tutor_id'     => $validated['tutor_id'],
+                'period_start' => $periodStart->format('Y-m-d'),
+                'period_end'   => $periodEnd->format('Y-m-d'),
+            ],
+            [
+                'total_sessions'   => $completedSessions,
+                'rate_per_session' => $tutorRatePerSession,
+                'base_salary'      => $baseSalary,
+                'bonus'            => 0,
+                'bonus_reason'     => null,
+                'deduction'        => 0,
+                'deduction_reason' => null,
+                'total_amount'     => $baseSalary,
+                'status'           => 'paid',
+                'payment_date'     => now(),
+                'approved_by'      => auth()->id(),
+            ]
+        );
 
-        return redirect()->route('admin.salaries.show', $salary)
-            ->with('success',
-                "✅ Gaji berhasil digenerate! " .
-                "{$completedSessions} sesi × Rp " . number_format($tutorRatePerSession, 0, ',', '.') .
-                " = Rp " . number_format($baseSalary, 0, ',', '.')
-            );
+        return redirect()->route('admin.salaries.index', ['month' => $validated['month']])
+            ->with('success', 'Gaji tutor berhasil dibayar!');
     }
 }

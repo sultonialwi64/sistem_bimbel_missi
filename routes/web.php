@@ -91,9 +91,9 @@ Route::middleware('auth')->group(function () {
         
         // Salaries management
         Route::get('/salaries', [App\Http\Controllers\Admin\SalaryController::class, 'index'])->name('salaries.index');
-        Route::post('/salaries/generate', [App\Http\Controllers\Admin\SalaryController::class, 'generate'])->name('salaries.generate');
         Route::get('/salaries/{salary}', [App\Http\Controllers\Admin\SalaryController::class, 'show'])->name('salaries.show');
         Route::post('/salaries/{salary}/pay', [App\Http\Controllers\Admin\SalaryController::class, 'pay'])->name('salaries.pay');
+        Route::post('/salaries/pay-dynamic', [App\Http\Controllers\Admin\SalaryController::class, 'payDynamic'])->name('salaries.pay-dynamic');
         
         // Payments management
         Route::get('/payments', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
