@@ -60,11 +60,12 @@
     <table class="table">
         <thead>
             <tr>
-                <th width="15%">Tanggal</th>
-                <th width="20%">Mata Pelajaran</th>
-                <th width="35%">Materi yang Diajarkan</th>
-                <th width="15%">Pemahaman (1-5)</th>
-                <th width="15%">Catatan</th>
+                <th width="10%">Tanggal</th>
+                <th width="12%">Mata Pelajaran</th>
+                <th width="25%">Materi yang Diajarkan</th>
+                <th width="8%">Pemahaman</th>
+                <th width="25%">Catatan</th>
+                <th width="20%">Foto Kegiatan</th>
             </tr>
         </thead>
         <tbody>
@@ -75,10 +76,28 @@
                     <td>{{ $report->material_covered }}</td>
                     <td align="center"><span class="rating">{{ $report->student_understanding }}</span> / 5</td>
                     <td>{{ $report->notes_for_parent ?? '-' }}</td>
+                    <td align="center">
+                        @php
+                            $base64 = null;
+                            if(isset($report->schedule->attendance) && $report->schedule->attendance->photo_path) {
+                                $path = storage_path('app/public/' . $report->schedule->attendance->photo_path);
+                                if (file_exists($path)) {
+                                    $type = pathinfo($path, PATHINFO_EXTENSION);
+                                    $data = file_get_contents($path);
+                                    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                }
+                            }
+                        @endphp
+                        @if($base64)
+                            <img src="{{ $base64 }}" style="max-width: 80px; max-height: 80px; border-radius: 4px; object-fit: contain;">
+                        @else
+                            <span style="font-size: 10px; color: #999;">Tidak ada foto</span>
+                        @endif
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" align="center">Tidak ada sesi pembelajaran pada periode ini.</td>
+                    <td colspan="6" align="center">Tidak ada sesi pembelajaran pada periode ini.</td>
                 </tr>
             @endforelse
         </tbody>

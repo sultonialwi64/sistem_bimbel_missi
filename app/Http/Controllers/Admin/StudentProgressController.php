@@ -59,7 +59,7 @@ class StudentProgressController extends Controller
         // Get session reports for that month
         $sessionReports = SessionReport::where('student_id', $student->id)
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->with(['schedule.subject', 'tutor.user'])
+            ->with(['schedule.subject', 'tutor.user', 'schedule.attendance'])
             ->latest()
             ->get();
 
