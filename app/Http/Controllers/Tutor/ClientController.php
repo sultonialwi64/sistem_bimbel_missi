@@ -23,12 +23,13 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'address' => ['required', 'string'],
+            'name'              => ['required', 'string', 'max:255'],
+            'email'             => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'          => ['required', 'string', 'min:8'],
+            'phone'             => ['nullable', 'string', 'max:20'],
+            'address'           => ['required', 'string'],
             'emergency_contact' => ['nullable', 'string', 'max:20'],
+            'client_type'       => ['required', 'in:tipe_1,tipe_2'],
         ]);
 
         $user = User::create([
@@ -41,9 +42,10 @@ class ClientController extends Controller
         ]);
 
         Client::create([
-            'user_id' => $user->id,
-            'address' => $validated['address'],
+            'user_id'           => $user->id,
+            'address'           => $validated['address'],
             'emergency_contact' => $validated['emergency_contact'] ?? null,
+            'client_type'       => $validated['client_type'],
         ]);
 
         return redirect()->route('tutor.clients.index')
@@ -64,12 +66,13 @@ class ClientController extends Controller
     public function update(Request $request, Client $client)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($client->user_id)],
-            'password' => ['nullable', 'string', 'min:8'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'address' => ['required', 'string'],
+            'name'              => ['required', 'string', 'max:255'],
+            'email'             => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($client->user_id)],
+            'password'          => ['nullable', 'string', 'min:8'],
+            'phone'             => ['nullable', 'string', 'max:20'],
+            'address'           => ['required', 'string'],
             'emergency_contact' => ['nullable', 'string', 'max:20'],
+            'client_type'       => ['required', 'in:tipe_1,tipe_2'],
         ]);
 
         $client->user->update([
@@ -84,8 +87,9 @@ class ClientController extends Controller
         }
 
         $client->update([
-            'address' => $validated['address'],
+            'address'           => $validated['address'],
             'emergency_contact' => $validated['emergency_contact'] ?? null,
+            'client_type'       => $validated['client_type'],
         ]);
 
         return redirect()->route('tutor.clients.index')

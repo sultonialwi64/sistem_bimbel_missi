@@ -20,7 +20,21 @@ class SessionReportController extends Controller
             $query->where('student_id', $request->student_id);
         }
 
-        $reports = $query->latest()->paginate(15);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('student', function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%')
+                          ->orWhereHas('client.user', function ($query) use ($search) {
+                              $query->where('name', 'like', '%' . $search . '%');
+                          });
+                })->orWhereHas('tutor.user', function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%');
+                });
+            });
+        }
+
+        $reports = $query->latest()->paginate(15)->withQueryString();
 
         // Required for filters if we add them later
         $tutors = \App\Models\Tutor::with('user')->get();

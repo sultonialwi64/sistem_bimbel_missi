@@ -62,6 +62,16 @@
                     </div>
                 </div>
 
+                <!-- Tipe Klien -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tipe Klien <span class="text-red-500">*</span></label>
+                    <select name="client_type" required
+                            class="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="tipe_2" {{ old('client_type', $client->client_type) == 'tipe_2' ? 'selected' : '' }}>Tipe 2</option>
+                        <option value="tipe_1" {{ old('client_type', $client->client_type) == 'tipe_1' ? 'selected' : '' }}>Tipe 1</option>
+                    </select>
+                </div>
+
                 <!-- Actions -->
                 <div class="flex justify-end gap-3 pt-4 border-t">
                     <a href="{{ route('tutor.clients.index') }}" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
