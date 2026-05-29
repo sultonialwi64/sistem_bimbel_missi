@@ -29,7 +29,7 @@
             </div>
             <div>
                 <p class="text-xs text-gray-400 font-semibold uppercase tracking-widest">Harga ke Client</p>
-                <p class="text-xl font-black text-gray-900">Rp 50.000<span class="text-sm text-gray-400 font-normal">/sesi</span></p>
+                <p class="text-xl font-black text-gray-900">Rp 45k - 50k<span class="text-sm text-gray-400 font-normal">/sesi</span></p>
             </div>
         </div>
         <div class="card-premium p-5 flex items-center gap-4">
@@ -51,7 +51,7 @@
             </div>
             <div>
                 <p class="text-xs text-gray-400 font-semibold uppercase tracking-widest">Margin Perusahaan</p>
-                <p class="text-xl font-black text-amber-600">Rp 10.000<span class="text-sm text-gray-400 font-normal">/sesi</span></p>
+                <p class="text-xl font-black text-amber-600">Rp 5k - 10k<span class="text-sm text-gray-400 font-normal">/sesi</span></p>
                 @if(isset($totalCompanyRevenue) && $totalCompanyRevenue > 0)
                     <p class="text-xs text-gray-400 mt-0.5">Total: Rp {{ number_format($totalCompanyRevenue, 0, ',', '.') }}</p>
                 @endif

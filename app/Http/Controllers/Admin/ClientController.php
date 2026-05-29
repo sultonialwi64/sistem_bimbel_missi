@@ -29,6 +29,7 @@ class ClientController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['required', 'string'],
             'emergency_contact' => ['nullable', 'string', 'max:20'],
+            'client_type' => ['required', 'in:tipe_1,tipe_2'],
         ]);
 
         $user = User::create([
@@ -44,6 +45,7 @@ class ClientController extends Controller
             'user_id' => $user->id,
             'address' => $validated['address'],
             'emergency_contact' => $validated['emergency_contact'] ?? null,
+            'client_type' => $validated['client_type'],
         ]);
 
         return redirect()->route('admin.clients.index')
@@ -70,6 +72,7 @@ class ClientController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['required', 'string'],
             'emergency_contact' => ['nullable', 'string', 'max:20'],
+            'client_type' => ['required', 'in:tipe_1,tipe_2'],
         ]);
 
         $client->user->update([
@@ -86,6 +89,7 @@ class ClientController extends Controller
         $client->update([
             'address' => $validated['address'],
             'emergency_contact' => $validated['emergency_contact'] ?? null,
+            'client_type' => $validated['client_type'],
         ]);
 
         return redirect()->route('admin.clients.index')

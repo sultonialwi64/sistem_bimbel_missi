@@ -18,7 +18,6 @@ class PaymentController extends Controller
         $periodEnd = $date->copy()->endOfMonth();
 
         // 2. AUTO-GENERATE TAGIHAN (Tanpa perlu klik tombol)
-        $clientPricePerSession = 50000;
         $students = \App\Models\Student::with('client')->get();
 
         foreach ($students as $student) {
@@ -38,6 +37,7 @@ class PaymentController extends Controller
 
                 // Kalau ada sesi, buatkan tagihannya diam-diam
                 if ($sessionCount > 0) {
+                    $clientPricePerSession = $student->client->session_price;
                     Payment::create([
                         'client_id' => $student->client_id,
                         'student_id' => $student->id,

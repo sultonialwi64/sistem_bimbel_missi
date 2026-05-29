@@ -25,18 +25,22 @@ class DashboardController extends Controller
         ];
 
         // Pendapatan bersih perusahaan bulan ini
-        // = jumlah sesi terlaksana (kehadiran terverifikasi) × margin perusahaan per sesi
-        $companyRate = config('bimbel.salary.session_rate_company', 10000);
-        $validSessionsThisMonth = Schedule::whereMonth('date', now()->month)
+        // = jumlah sesi terlaksana (kehadiran terverifikasi) × margin perusahaan per sesi (berdasarkan tipe klien)
+        $validSessionsThisMonth = Schedule::with('student.client')
+            ->whereMonth('date', now()->month)
             ->whereYear('date', now()->year)
             ->where('status', 'completed')
             ->whereHas('attendance', function($q) {
                 $q->whereIn('status', ['hadir', 'pindah_lokasi']);
-            })->count();
+            })->get();
 
-        $stats['net_income']              = $validSessionsThisMonth * $companyRate;
-        $stats['net_income_sessions']     = $validSessionsThisMonth;
-        $stats['net_income_rate']         = $companyRate;
+        $netIncome = $validSessionsThisMonth->sum(function($schedule) {
+            return $schedule->student->client->company_margin ?? 10000;
+        });
+
+        $stats['net_income']              = $netIncome;
+        $stats['net_income_sessions']     = $validSessionsThisMonth->count();
+        $stats['net_income_rate']         = null; // Dinamis
 
         $recentSchedules = Schedule::with(['tutor.user', 'student', 'subject'])
             ->latest()

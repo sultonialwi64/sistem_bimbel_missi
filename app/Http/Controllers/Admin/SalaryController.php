@@ -74,11 +74,19 @@ class SalaryController extends Controller
         // Sort: total_amount descending (dari terbanyak ke terkecil)
         $tutorSalaries = $tutorSalaries->sortByDesc('total_amount');
 
-        // Hitung total pendapatan perusahaan dari semua salary yang ada
-        $companyRatePerSession = config('bimbel.salary.session_rate_company', 10000);
-        $totalCompanyRevenue = Salary::sum(
-            \DB::raw('total_sessions * ' . $companyRatePerSession)
-        );
+        // Hitung total pendapatan perusahaan dari sesi-sesi di bulan ini
+        $completedSchedules = Schedule::with('student.client')
+            ->whereBetween('date', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
+            ->whereHas('attendance', function ($query) {
+                $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+            })
+            ->get();
+
+        $totalCompanyRevenue = $completedSchedules->sum(function($schedule) {
+            return $schedule->student->client->company_margin ?? 10000;
+        });
+
+        $companyRatePerSession = null; // Dinamis
 
         return view('admin.salaries.index', compact('tutorSalaries', 'month', 'totalCompanyRevenue', 'companyRatePerSession'));
     }
@@ -89,16 +97,30 @@ class SalaryController extends Controller
 
         // Hitung breakdown untuk salary ini
         $tutorRate    = config('bimbel.salary.session_rate_tutor', 40000);
-        $companyRate  = config('bimbel.salary.session_rate_company', 10000);
-        $clientPrice  = config('bimbel.salary.session_price_client', 50000);
+        
+        $schedules = Schedule::with('student.client')
+            ->where('tutor_id', $salary->tutor_id)
+            ->whereBetween('date', [$salary->period_start, $salary->period_end])
+            ->whereHas('attendance', function ($q) {
+                $q->whereIn('status', ['hadir', 'pindah_lokasi']);
+            })
+            ->get();
+
+        $totalClientPaid = $schedules->sum(function($s) {
+            return $s->student->client->session_price ?? 50000;
+        });
+        
+        $companyEarned = $schedules->sum(function($s) {
+            return $s->student->client->company_margin ?? 10000;
+        });
 
         $breakdown = [
-            'client_price'      => $clientPrice,
+            'client_price'      => 'Dinamis (Tipe 1: 45rb, Tipe 2: 50rb)',
             'tutor_rate'        => $tutorRate,
-            'company_rate'      => $companyRate,
-            'total_client_paid' => $salary->total_sessions * $clientPrice,
+            'company_rate'      => 'Dinamis (Tipe 1: 5rb, Tipe 2: 10rb)',
+            'total_client_paid' => $totalClientPaid,
             'tutor_earned'      => $salary->total_sessions * $tutorRate,
-            'company_earned'    => $salary->total_sessions * $companyRate,
+            'company_earned'    => $companyEarned,
         ];
 
         return view('admin.salaries.show', compact('salary', 'breakdown'));

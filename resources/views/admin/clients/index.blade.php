@@ -62,6 +62,17 @@
                                 @if($client->emergency_contact)
                                     <p class="text-xs text-gray-500 mt-1">Emergency: {{ $client->emergency_contact }}</p>
                                 @endif
+                                <div class="mt-2">
+                                    @if($client->client_type == 'tipe_1')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                            Tipe 1 (Rp 45rb)
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            Tipe 2 (Rp 50rb)
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="py-4 px-6">
                                 <p class="text-sm text-gray-900 max-w-xs truncate">{{ $client->address }}</p>
@@ -145,6 +156,14 @@
                                 <span class="text-red-600">Emergency: {{ $client->emergency_contact }}</span>
                             </div>
                         @endif
+                        <div class="flex items-center gap-2">
+                            <svg class="h-3.5 w-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            @if($client->client_type == 'tipe_1')
+                                <span class="text-green-700 font-medium">Tipe 1 (Rp 45.000)</span>
+                            @else
+                                <span class="text-blue-700 font-medium">Tipe 2 (Rp 50.000)</span>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-2 pt-3 border-t border-gray-50">

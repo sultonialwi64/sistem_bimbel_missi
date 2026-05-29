@@ -15,6 +15,7 @@ class Client extends Model
         'user_id',
         'address',
         'emergency_contact',
+        'client_type',
     ];
 
     protected function casts(): array
@@ -48,6 +49,22 @@ class Client extends Model
     public function getFullAddressAttribute(): string
     {
         return $this->address;
+    }
+
+    /**
+     * Get price based on client type
+     */
+    public function getSessionPriceAttribute(): int
+    {
+        return $this->client_type === 'tipe_1' ? 45000 : 50000;
+    }
+
+    /**
+     * Get company margin based on client type
+     */
+    public function getCompanyMarginAttribute(): int
+    {
+        return $this->client_type === 'tipe_1' ? 5000 : 10000;
     }
 
 

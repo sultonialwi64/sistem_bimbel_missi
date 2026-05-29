@@ -140,7 +140,9 @@
                                             $waText .= "_(Klik link di atas untuk membuka & mengunduh laporan. Tidak perlu login)_\n\n";
                                             $waText .= "Bersamaan dengan ini, kami informasikan total tagihan biaya bimbingan belajar bulan ini adalah sebesar *{$tagihan}*.\n\n";
                                             $waText .= "Mohon berkenan untuk melakukan pembayaran melalui rekening:\n";
-                                            $waText .= "*BCA: 123456789 a.n Missi Course*\n\n";
+                                            $waText .= "*Bank BRI*\n";
+                                            $waText .= "*No. Rekening: 011201074931505*\n";
+                                            $waText .= "*Atas Nama: Ike Indah Pratiwi*\n\n";
                                             $waText .= "Jika sudah melakukan transfer, silakan balas pesan ini beserta foto bukti transfernya ya.\n\n";
                                             $waText .= "Terima kasih banyak! 🙏";
                                             $waUrl = "https://wa.me/" . $waNumber . "?text=" . urlencode($waText);
@@ -228,7 +230,7 @@
                                 $clientName  = $payment->client->user->name;
                                 $bulan       = \Carbon\Carbon::parse($month)->translatedFormat('F Y');
                                 $tagihan     = 'Rp ' . number_format($payment->amount, 0, ',', '.');
-                                $waText  = "Halo Bapak/Ibu *{$clientName}*,\n\nBerikut adalah rekap laporan belajar ananda *{$studentName}* selama bulan *{$bulan}*.\n\n📄 *Laporan Belajar (PDF):*\n{$downloadLink}\n\n_(Klik link di atas untuk membuka & mengunduh laporan)_\n\nTagihan bulan ini: *{$tagihan}*.\nRekening: *BCA: 123456789 a.n Missi Course*\n\nTerima kasih! 🙏";
+                                $waText  = "Halo Bapak/Ibu *{$clientName}*,\n\nBerikut adalah rekap laporan belajar ananda *{$studentName}* selama bulan *{$bulan}*.\n\n📄 *Laporan Belajar (PDF):*\n{$downloadLink}\n\n_(Klik link di atas untuk membuka & mengunduh laporan)_\n\nTagihan bulan ini: *{$tagihan}*.\nMohon pembayaran melalui rekening:\n*Bank BRI*\n*No. Rekening: 011201074931505*\n*Atas Nama: Ike Indah Pratiwi*\n\nTerima kasih! 🙏";
                                 $waUrl = "https://wa.me/" . $waNumber . "?text=" . urlencode($waText);
                             @endphp
                             <a href="{{ $waUrl }}" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-green-600 text-white rounded-xl font-bold text-xs hover:bg-green-700 transition-all">
