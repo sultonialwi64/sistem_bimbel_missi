@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{User, Tutor, Client, Student, Schedule, Attendance, Payment, Salary};
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Client;
+use App\Models\Payment;
+use App\Models\Schedule;
+use App\Models\Student;
+use App\Models\Tutor;
 
 class DashboardController extends Controller
 {
@@ -20,7 +22,7 @@ class DashboardController extends Controller
             'today_schedules' => Schedule::whereDate('date', today())->count(),
             'pending_payments' => Payment::where('status', 'pending')->sum('amount'),
             'monthly_revenue' => Payment::where('status', 'paid')
-                ->whereMonth('created_at', now()->month)
+                ->whereMonth('payment_date', now()->month)
                 ->sum('amount'),
         ];
 
@@ -30,17 +32,17 @@ class DashboardController extends Controller
             ->whereMonth('date', now()->month)
             ->whereYear('date', now()->year)
             ->where('status', 'completed')
-            ->whereHas('attendance', function($q) {
+            ->whereHas('attendance', function ($q) {
                 $q->whereIn('status', ['hadir', 'pindah_lokasi']);
             })->get();
 
-        $netIncome = $validSessionsThisMonth->sum(function($schedule) {
+        $netIncome = $validSessionsThisMonth->sum(function ($schedule) {
             return $schedule->student->client->company_margin ?? 10000;
         });
 
-        $stats['net_income']              = $netIncome;
-        $stats['net_income_sessions']     = $validSessionsThisMonth->count();
-        $stats['net_income_rate']         = null; // Dinamis
+        $stats['net_income'] = $netIncome;
+        $stats['net_income_sessions'] = $validSessionsThisMonth->count();
+        $stats['net_income_rate'] = null; // Dinamis
 
         $recentSchedules = Schedule::with(['tutor.user', 'student', 'subject'])
             ->latest()

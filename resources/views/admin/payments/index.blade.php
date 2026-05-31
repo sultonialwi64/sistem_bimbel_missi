@@ -52,6 +52,13 @@
                             <a href="{{ route('admin.payments.index') }}" class="text-indigo-200 hover:text-white text-xs font-bold underline">Clear</a>
                         @endif
                     </form>
+                    <form action="{{ route('admin.payments.generate') }}" method="POST" class="inline">
+                        @csrf
+                        <input type="hidden" name="filter_month" value="{{ request('filter_month', \Carbon\Carbon::now()->subMonth()->format('Y-m')) }}">
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-sm font-bold transition-colors" onclick="return confirm('Generate tagihan untuk periode ini?')">
+                            + Generate
+                        </button>
+                    </form>
                     <span class="text-indigo-200 text-sm font-semibold hidden sm:inline-block">Total: {{ $payments->total() }}</span>
                 </div>
             </div>
