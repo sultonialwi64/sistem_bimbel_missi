@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Tutor;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Schedule, Attendance, SessionReport, Salary};
-use Illuminate\Http\Request;
+use App\Models\Salary;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -13,8 +13,9 @@ class DashboardController extends Controller
     {
         $tutor = Auth::user()->tutor;
 
-        if (!$tutor) {
+        if (! $tutor) {
             Auth::logout();
+
             return redirect()->route('login')->with('error', 'Akun Anda tidak memiliki profil tutor yang valid. Silakan hubungi admin.');
         }
 
@@ -24,33 +25,33 @@ class DashboardController extends Controller
         $sessionsThisMonth = Schedule::where('tutor_id', $tutor->id)
             ->whereYear('date', now()->year)
             ->whereMonth('date', now()->month)
-            ->whereHas('attendance', fn($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
+            ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
             ->count();
 
-        // Jika sudah ada record gaji bulan ini, pakai angkanya langsung agar sinkron dengan My Earnings
-        $existingSalaryThisMonth = Salary::where('tutor_id', $tutor->id)
-            ->whereYear('period_start', now()->year)
-            ->whereMonth('period_start', now()->month)
-            ->first();
-
-        $monthlyEarnings = $existingSalaryThisMonth
-            ? (float) $existingSalaryThisMonth->total_amount
-            : $sessionsThisMonth * $tutorRatePerSession;
+        $monthlyEarnings = $sessionsThisMonth * $tutorRatePerSession;
 
         $stats = [
-            'total_sessions'      => $tutor->total_sessions,
-            'rating_avg'          => $tutor->rating_avg,
-            'pending_salary'      => Salary::where('tutor_id', $tutor->id)
+            'total_sessions' => $tutor->total_sessions,
+            'rating_avg' => $tutor->rating_avg,
+            'pending_salary' => Salary::where('tutor_id', $tutor->id)
                 ->whereIn('status', ['pending', 'unpaid'])
-                ->sum('total_amount'),
-            'completed_sessions'  => Schedule::where('tutor_id', $tutor->id)
-                ->whereHas('attendance', fn($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
+                ->get()
+                ->sum(function ($salary) use ($tutor) {
+                    $freshSessions = Schedule::where('tutor_id', $tutor->id)
+                        ->whereBetween('date', [$salary->period_start->format('Y-m-d'), $salary->period_end->format('Y-m-d')])
+                        ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
+                        ->count();
+
+                    return ($freshSessions * $salary->rate_per_session) + $salary->bonus - $salary->deduction;
+                }),
+            'completed_sessions' => Schedule::where('tutor_id', $tutor->id)
+                ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
                 ->count(),
             'sessions_this_month' => $sessionsThisMonth,
-            'monthly_earnings'    => $monthlyEarnings,
-            'reports_pending'     => Schedule::where('tutor_id', $tutor->id)
+            'monthly_earnings' => $monthlyEarnings,
+            'reports_pending' => Schedule::where('tutor_id', $tutor->id)
                 ->where('status', 'completed')
-                ->whereHas('attendance', fn($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
+                ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
                 ->whereDoesntHave('sessionReport')
                 ->count(),
         ];

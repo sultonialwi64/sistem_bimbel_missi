@@ -67,13 +67,9 @@ class EarningController extends Controller
             }
         }
 
-        $totalEarned = Salary::where('tutor_id', $tutor->id)
-            ->where('status', 'paid')
-            ->sum('total_amount');
+        $totalEarned = $salariesFromDb->where('status', 'paid')->sum('total_amount');
 
-        $pendingAmount = Salary::where('tutor_id', $tutor->id)
-            ->whereIn('status', ['pending', 'unpaid'])
-            ->sum('total_amount');
+        $pendingAmount = $salariesFromDb->whereIn('status', ['pending', 'unpaid'])->sum('total_amount');
 
         // Kalau ada virtual row bulan ini, masukkan ke pending amount display
         if ($currentMonthVirtual) {
