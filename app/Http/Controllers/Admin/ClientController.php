@@ -9,10 +9,23 @@ use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::with('user')->latest()->paginate(10);
-        return view('admin.clients.index', compact('clients'));
+        $search = $request->input('search');
+        
+        $clients = Client::with('user')
+            ->when($search, function($query) use ($search) {
+                $query->whereHas('user', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+            
+        return view('admin.clients.index', compact('clients', 'search'));
     }
 
     public function create()
@@ -91,6 +104,10 @@ class ClientController extends Controller
             'emergency_contact' => $validated['emergency_contact'] ?? null,
             'client_type' => $validated['client_type'],
         ]);
+
+        if ($client->wasChanged('client_type')) {
+            \Illuminate\Support\Facades\Artisan::call('payments:recalculate');
+        }
 
         return redirect()->route('admin.clients.index')
             ->with('success', 'Data client berhasil diupdate!');
