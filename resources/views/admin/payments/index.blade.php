@@ -72,6 +72,7 @@
                         <th class="text-left py-4 px-6">Klien</th>
                         <th class="text-left py-4 px-6">Siswa</th>
                         <th class="text-left py-4 px-6">Periode</th>
+                        <th class="text-left py-4 px-6">Diskon</th>
                         <th class="text-left py-4 px-6">Tagihan</th>
                         <th class="text-left py-4 px-6">Tanggal Bayar</th>
                         <th class="text-left py-4 px-6">Status</th>
@@ -103,6 +104,19 @@
                                     <p class="text-sm font-bold text-gray-800">{{ $periodMonth->translatedFormat('F Y') }}</p>
                                     <p class="text-xs text-gray-400">{{ $periodMonth->format('01 M') }} – {{ $periodMonth->endOfMonth()->format('d M Y') }}</p>
                                 </div>
+                            </td>
+                            <td class="py-4 px-6">
+                                @if($payment->discount > 0)
+                                    @php $countAnak = $clientDiscountCounts[$payment->client_id] ?? 0; @endphp
+                                    <div>
+                                        <p class="text-sm font-semibold text-red-600">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
+                                        @if($countAnak > 0)
+                                            <p class="text-[10px] text-gray-400 leading-tight">{{ $countAnak }} anak</p>
+                                        @endif
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-400">-</p>
+                                @endif
                             </td>
                             <td class="py-4 px-6">
                                 <p class="text-lg font-black text-gray-900">Rp {{ number_format($payment->amount, 0, ',', '.') }}</p>
@@ -168,7 +182,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-12 text-center">
+                            <td colspan="8" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
                                         <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm11 0a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
@@ -213,6 +227,16 @@
                             <p class="text-[10px] text-gray-400 uppercase font-bold">Periode</p>
                             <p class="text-xs font-semibold text-gray-700">{{ $periodMonth->translatedFormat('F Y') }}</p>
                         </div>
+                        @if($payment->discount > 0)
+                        <div class="text-center">
+                            <p class="text-[10px] text-gray-400 uppercase font-bold">Diskon</p>
+                            <p class="text-xs font-bold text-red-600">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
+                            @php $countAnak = $clientDiscountCounts[$payment->client_id] ?? 0; @endphp
+                            @if($countAnak > 0)
+                                <p class="text-[9px] text-gray-400">{{ $countAnak }} anak</p>
+                            @endif
+                        </div>
+                        @endif
                         <div class="text-right">
                             <p class="text-[10px] text-gray-400 uppercase font-bold">Tagihan</p>
                             <p class="text-base font-black text-gray-900">Rp {{ number_format($payment->amount, 0, ',', '.') }}</p>

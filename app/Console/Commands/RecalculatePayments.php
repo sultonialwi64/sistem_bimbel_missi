@@ -11,13 +11,16 @@ class RecalculatePayments extends Command
 {
     protected $signature = 'payments:recalculate';
 
-    protected $description = 'Recalculate all pending payment amounts based on the current client_type prices';
+    protected $description = 'Recalculate pending payment amounts & discounts based on current pricing';
 
     public function handle()
     {
-        $this->info('Fetching all pending payments...');
-        $payments = Payment::with(['client', 'student'])->where('status', 'pending')->get();
-        $count = 0;
+        $this->info('Fetching payments...');
+        $payments = Payment::with(['client', 'student'])
+            ->where('status', 'pending')
+            ->get();
+
+        $updated = 0;
 
         foreach ($payments as $payment) {
             if (! $payment->client || ! $payment->student) {
@@ -29,36 +32,41 @@ class RecalculatePayments extends Command
 
             $sessionCount = Schedule::where('student_id', $payment->student_id)
                 ->whereBetween('date', [$periodStart, $periodEnd])
-                ->whereHas('attendance', function ($query) {
-                    $query->whereIn('status', ['hadir', 'pindah_lokasi']);
-                })
+                ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
                 ->count();
 
-            $pricePerSession = $payment->client->session_price;
-
-            if ($sessionCount > 0) {
-                $correctAmount = $sessionCount * $pricePerSession;
-                if ($payment->amount != $correctAmount) {
-                    $this->warn("Updating Payment ID {$payment->id} ({$payment->student->name}) | Old: {$payment->amount} -> New: {$correctAmount}");
-                    $payment->amount = $correctAmount;
-                    $payment->save();
-                    $count++;
-                }
-            } else {
+            if ($sessionCount === 0) {
                 preg_match('/\((\d+)\s*sesi\)/i', $payment->notes, $matches);
-                if (isset($matches[1])) {
-                    $noteSessionCount = (int) $matches[1];
-                    $correctAmountByNote = $noteSessionCount * $pricePerSession;
-                    if ($payment->amount != $correctAmountByNote) {
-                        $this->warn("Updating Payment ID {$payment->id} ({$payment->student->name}) via Notes | Old: {$payment->amount} -> New: {$correctAmountByNote}");
-                        $payment->amount = $correctAmountByNote;
-                        $payment->save();
-                        $count++;
-                    }
-                }
+                $sessionCount = isset($matches[1]) ? (int) $matches[1] : 0;
+            }
+
+            $pricePerSession = $payment->client->session_price;
+            $baseAmount = $sessionCount * $pricePerSession;
+
+            $discount = 0;
+            if ($sessionCount >= config('bimbel.discount.threshold', 8)) {
+                $discount = $payment->client->discount;
+            }
+
+            $newAmount = $baseAmount - $discount;
+
+            if ($payment->amount != $newAmount || $payment->discount != $discount) {
+                $this->warn(sprintf(
+                    'Updating Payment #%d (%s) | Amount: %s -> %s | Discount: %s -> %s',
+                    $payment->id,
+                    $payment->student->name,
+                    number_format($payment->amount, 0, ',', '.'),
+                    number_format($newAmount, 0, ',', '.'),
+                    number_format($payment->discount ?? 0, 0, ',', '.'),
+                    number_format($discount, 0, ',', '.')
+                ));
+                $payment->amount = $newAmount;
+                $payment->discount = $discount;
+                $payment->save();
+                $updated++;
             }
         }
 
-        $this->info("Recalculation complete. {$count} payments updated.");
+        $this->info("Done. {$updated} payments updated.");
     }
 }

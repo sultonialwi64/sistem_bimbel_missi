@@ -66,4 +66,14 @@ class Client extends Model
     {
         return $this->client_type === 'tipe_1' ? 5000 : 10000;
     }
+
+    /**
+     * Get flat monthly discount amount based on client type
+     */
+    public function getDiscountAttribute(): int
+    {
+        return $this->client_type === 'tipe_1'
+            ? config('bimbel.discount.tipe_1', 10000)
+            : config('bimbel.discount.tipe_2', 20000);
+    }
 }

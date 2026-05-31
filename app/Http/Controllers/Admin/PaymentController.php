@@ -42,7 +42,14 @@ class PaymentController extends Controller
 
         $payments = $query->paginate(15)->withQueryString();
 
-        return view('admin.payments.index', compact('payments', 'statusFilter'));
+        // Hitung jumlah anak yang dapat diskon per client (untuk display di kolom Diskon)
+        $clientDiscountCounts = $payments->getCollection()
+            ->where('discount', '>', 0)
+            ->groupBy('client_id')
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        return view('admin.payments.index', compact('payments', 'statusFilter', 'clientDiscountCounts'));
     }
 
     public function generate(Request $request)
@@ -70,11 +77,19 @@ class PaymentController extends Controller
                     ->count();
 
                 if ($sessionCount > 0) {
-                    $clientPricePerSession = $student->client->session_price;
+                    $client = $student->client;
+                    $baseAmount = $sessionCount * $client->session_price;
+
+                    $discount = 0;
+                    if ($sessionCount >= config('bimbel.discount.threshold', 8)) {
+                        $discount = $client->discount;
+                    }
+
                     Payment::create([
-                        'client_id' => $student->client_id,
+                        'client_id' => $client->id,
                         'student_id' => $student->id,
-                        'amount' => $sessionCount * $clientPricePerSession,
+                        'amount' => $baseAmount - $discount,
+                        'discount' => $discount,
                         'payment_date' => null,
                         'due_date' => $periodEnd->copy()->addDays(7),
                         'status' => 'pending',
