@@ -36,8 +36,12 @@ class RecalculatePayments extends Command
                 ->count();
 
             if ($sessionCount === 0) {
-                preg_match('/\((\d+)\s*sesi\)/i', $payment->notes, $matches);
+                preg_match('/\((\d+)\s*(sesi|sessions)\)/i', $payment->notes, $matches);
                 $sessionCount = isset($matches[1]) ? (int) $matches[1] : 0;
+            }
+
+            if ($sessionCount === 0) {
+                continue;
             }
 
             $pricePerSession = $payment->client->session_price;

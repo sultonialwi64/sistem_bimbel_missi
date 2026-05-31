@@ -66,6 +66,7 @@ class PaymentController extends Controller
             $exists = Payment::where('student_id', $student->id)
                 ->where('due_date', '>=', $periodStart)
                 ->where('due_date', '<=', $periodEnd->copy()->addDays(7))
+                ->whereIn('status', ['pending', 'overdue'])
                 ->exists();
 
             if (! $exists) {
