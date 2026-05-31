@@ -42,6 +42,18 @@ class Tutor extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * total_sessions selalu dihitung fresh dari Schedule + Attendance.
+     * Admin controller bisa preload via ->withCount(['schedules as total_sessions' => fn($q) => ...])
+     * untuk hindari N+1.
+     */
+    public function getTotalSessionsAttribute(): int
+    {
+        return $this->schedules()
+            ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
+            ->count();
+    }
+
     public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);

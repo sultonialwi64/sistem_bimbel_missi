@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Salary, Tutor, Schedule};
+use App\Models\Salary;
+use App\Models\Schedule;
+use App\Models\Tutor;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SalaryController extends Controller
 {
@@ -15,12 +17,11 @@ class SalaryController extends Controller
      *  - Bagian Tutor      : Rp 40.000  ← yang masuk ke gaji tutor
      *  - Bagian Perusahaan : Rp 10.000  ← margin perusahaan
      */
-
     public function index(Request $request)
     {
         $month = $request->get('month', date('Y-m'));
-        $periodStart = \Carbon\Carbon::parse($month)->startOfMonth();
-        $periodEnd = \Carbon\Carbon::parse($month)->endOfMonth();
+        $periodStart = Carbon::parse($month)->startOfMonth();
+        $periodEnd = Carbon::parse($month)->endOfMonth();
 
         // Daftar tutor aktif
         $tutors = Tutor::with('user')->where('status', 'active')->get();
@@ -36,39 +37,31 @@ class SalaryController extends Controller
 
         foreach ($tutors as $tutor) {
             $salaryRecord = $existingSalaries->get($tutor->id);
-            
-            if ($salaryRecord) {
-                $tutorSalaries->push((object)[
-                    'tutor' => $tutor,
-                    'period_start' => $periodStart,
-                    'period_end' => $periodEnd,
-                    'total_sessions' => $salaryRecord->total_sessions,
-                    'base_salary' => $salaryRecord->base_salary,
-                    'total_amount' => $salaryRecord->total_amount,
-                    'status' => $salaryRecord->status === 'pending' ? 'unpaid' : $salaryRecord->status,
-                    'salary_id' => $salaryRecord->id,
-                ]);
-            } else {
-                $completedSessions = Schedule::where('tutor_id', $tutor->id)
-                    ->whereBetween('date', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
-                    ->whereHas('attendance', function ($query) {
-                        $query->whereIn('status', ['hadir', 'pindah_lokasi']);
-                    })
-                    ->count();
 
-                $baseSalary = $completedSessions * $tutorRatePerSession;
-                
-                $tutorSalaries->push((object)[
-                    'tutor' => $tutor,
-                    'period_start' => $periodStart,
-                    'period_end' => $periodEnd,
-                    'total_sessions' => $completedSessions,
-                    'base_salary' => $baseSalary,
-                    'total_amount' => $baseSalary,
-                    'status' => 'unpaid',
-                    'salary_id' => null,
-                ]);
+            $completedSessions = Schedule::where('tutor_id', $tutor->id)
+                ->whereBetween('date', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
+                ->whereHas('attendance', function ($query) {
+                    $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+                })
+                ->count();
+
+            $baseSalary = $completedSessions * $tutorRatePerSession;
+            $totalAmount = $baseSalary;
+
+            if ($salaryRecord) {
+                $totalAmount = $baseSalary + $salaryRecord->bonus - $salaryRecord->deduction;
             }
+
+            $tutorSalaries->push((object) [
+                'tutor' => $tutor,
+                'period_start' => $periodStart,
+                'period_end' => $periodEnd,
+                'total_sessions' => $completedSessions,
+                'base_salary' => $baseSalary,
+                'total_amount' => $totalAmount,
+                'status' => $salaryRecord ? ($salaryRecord->status === 'pending' ? 'unpaid' : $salaryRecord->status) : 'unpaid',
+                'salary_id' => $salaryRecord?->id,
+            ]);
         }
 
         // Sort: total_amount descending (dari terbanyak ke terkecil)
@@ -82,7 +75,7 @@ class SalaryController extends Controller
             })
             ->get();
 
-        $totalCompanyRevenue = $completedSchedules->sum(function($schedule) {
+        $totalCompanyRevenue = $completedSchedules->sum(function ($schedule) {
             return $schedule->student->client->company_margin ?? 10000;
         });
 
@@ -95,9 +88,9 @@ class SalaryController extends Controller
     {
         $salary->load(['tutor.user', 'approvedBy']);
 
-        // Hitung breakdown untuk salary ini
-        $tutorRate    = config('bimbel.salary.session_rate_tutor', 40000);
-        
+        // Hitung breakdown untuk salary ini — pake hitungan fresh
+        $tutorRate = config('bimbel.salary.session_rate_tutor', 40000);
+
         $schedules = Schedule::with('student.client')
             ->where('tutor_id', $salary->tutor_id)
             ->whereBetween('date', [$salary->period_start, $salary->period_end])
@@ -106,22 +99,27 @@ class SalaryController extends Controller
             })
             ->get();
 
-        $totalClientPaid = $schedules->sum(function($s) {
+        $freshSessions = $schedules->count();
+
+        $totalClientPaid = $schedules->sum(function ($s) {
             return $s->student->client->session_price ?? 50000;
         });
-        
-        $companyEarned = $schedules->sum(function($s) {
+
+        $companyEarned = $schedules->sum(function ($s) {
             return $s->student->client->company_margin ?? 10000;
         });
 
         $breakdown = [
-            'client_price'      => 'Dinamis (Tipe 1: 45rb, Tipe 2: 50rb)',
-            'tutor_rate'        => $tutorRate,
-            'company_rate'      => 'Dinamis (Tipe 1: 5rb, Tipe 2: 10rb)',
+            'client_price' => 'Dinamis (Tipe 1: 45rb, Tipe 2: 50rb)',
+            'tutor_rate' => $tutorRate,
+            'company_rate' => 'Dinamis (Tipe 1: 5rb, Tipe 2: 10rb)',
             'total_client_paid' => $totalClientPaid,
-            'tutor_earned'      => $salary->total_sessions * $tutorRate,
-            'company_earned'    => $companyEarned,
+            'tutor_earned' => $freshSessions * $tutorRate,
+            'company_earned' => $companyEarned,
         ];
+
+        $salary->total_sessions = $freshSessions;
+        $salary->total_amount = ($freshSessions * $salary->rate_per_session) + $salary->bonus - $salary->deduction;
 
         return view('admin.salaries.show', compact('salary', 'breakdown'));
     }
@@ -129,10 +127,10 @@ class SalaryController extends Controller
     public function pay(Salary $salary)
     {
         $salary->update([
-            'status'       => 'paid',
+            'status' => 'paid',
             'payment_date' => now(),
             'payment_proof' => null,
-            'approved_by'  => auth()->id(),
+            'approved_by' => auth()->id(),
         ]);
 
         return redirect()->back()->with('success', 'Gaji berhasil ditandai sudah dibayar!');
@@ -142,11 +140,11 @@ class SalaryController extends Controller
     {
         $validated = $request->validate([
             'tutor_id' => ['required', 'exists:tutors,id'],
-            'month'    => ['required', 'date_format:Y-m'],
+            'month' => ['required', 'date_format:Y-m'],
         ]);
 
-        $periodStart = \Carbon\Carbon::parse($validated['month'])->startOfMonth();
-        $periodEnd   = \Carbon\Carbon::parse($validated['month'])->endOfMonth();
+        $periodStart = Carbon::parse($validated['month'])->startOfMonth();
+        $periodEnd = Carbon::parse($validated['month'])->endOfMonth();
 
         $completedSessions = Schedule::where('tutor_id', $validated['tutor_id'])
             ->whereBetween('date', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
@@ -160,22 +158,22 @@ class SalaryController extends Controller
 
         $salary = Salary::updateOrCreate(
             [
-                'tutor_id'     => $validated['tutor_id'],
+                'tutor_id' => $validated['tutor_id'],
                 'period_start' => $periodStart->format('Y-m-d'),
-                'period_end'   => $periodEnd->format('Y-m-d'),
+                'period_end' => $periodEnd->format('Y-m-d'),
             ],
             [
-                'total_sessions'   => $completedSessions,
+                'total_sessions' => $completedSessions,
                 'rate_per_session' => $tutorRatePerSession,
-                'base_salary'      => $baseSalary,
-                'bonus'            => 0,
-                'bonus_reason'     => null,
-                'deduction'        => 0,
+                'base_salary' => $baseSalary,
+                'bonus' => 0,
+                'bonus_reason' => null,
+                'deduction' => 0,
                 'deduction_reason' => null,
-                'total_amount'     => $baseSalary,
-                'status'           => 'paid',
-                'payment_date'     => now(),
-                'approved_by'      => auth()->id(),
+                'total_amount' => $baseSalary,
+                'status' => 'paid',
+                'payment_date' => now(),
+                'approved_by' => auth()->id(),
             ]
         );
 
