@@ -58,6 +58,12 @@ class ReportController extends Controller
             abort(403, 'Unauthorized access: Jadwal ini bukan milik Anda.');
         }
 
+        $existingReport = SessionReport::where('schedule_id', $schedule->id)->first();
+        if ($existingReport) {
+            return redirect()->route('tutor.reports.show', $existingReport)
+                ->with('info', 'Laporan sudah dibuat untuk jadwal ini.');
+        }
+
         $report = SessionReport::create([
             'schedule_id' => $validated['schedule_id'],
             'tutor_id' => $schedule->tutor_id,
