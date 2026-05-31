@@ -52,7 +52,7 @@ class PaymentController extends Controller
         }
 
         // 3. TAMPILKAN LISTNYA
-        $query = Payment::with(['client.user', 'student', 'verifiedBy'])->latest();
+        $query = Payment::with(['client.user', 'student', 'verifiedBy'])->orderBy('amount', 'desc')->latest();
 
         if ($request->filled('filter_month')) {
             // Due date = akhir bulan periode + 7 hari
