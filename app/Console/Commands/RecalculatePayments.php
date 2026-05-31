@@ -67,7 +67,7 @@ class RecalculatePayments extends Command
             ];
         }
 
-        // 2. Second pass: apply discount
+        // 2. Apply discount — full flat per student if that student has >= threshold sessions
         $threshold = config('bimbel.discount.threshold', 8);
 
         foreach ($payments as $payment) {
@@ -78,14 +78,10 @@ class RecalculatePayments extends Command
             $data = $paymentData[$payment->id];
             $sessionCount = $data['sessionCount'];
             $baseAmount = $data['baseAmount'];
-            $periodKey = $data['periodKey'];
 
-            // Calculate proportional discount
-            $clientTotalSessions = $clientPeriodSessions[$periodKey][$payment->client_id] ?? 0;
             $discount = 0;
-            if ($clientTotalSessions >= $threshold) {
-                $share = $clientTotalSessions > 0 ? $sessionCount / $clientTotalSessions : 0;
-                $discount = (int) round($payment->client->discount * $share);
+            if ($sessionCount >= $threshold) {
+                $discount = $payment->client->discount;
             }
 
             $newAmount = $baseAmount - $discount;

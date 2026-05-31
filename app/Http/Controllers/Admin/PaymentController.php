@@ -42,7 +42,14 @@ class PaymentController extends Controller
 
         $payments = $query->paginate(15)->withQueryString();
 
-        return view('admin.payments.index', compact('payments', 'statusFilter'));
+        // Detect clients with multiple students (for display hint in discount column)
+        $multiStudentClientIds = $payments->getCollection()
+            ->groupBy('client_id')
+            ->filter(fn ($group) => $group->count() > 1)
+            ->keys()
+            ->toArray();
+
+        return view('admin.payments.index', compact('payments', 'statusFilter', 'multiStudentClientIds'));
     }
 
     public function generate(Request $request)
@@ -55,9 +62,8 @@ class PaymentController extends Controller
         $students = Student::with('client')->get();
         $generated = 0;
 
-        // First pass: count sessions per student & group by client
+        // Count sessions per student
         $studentData = [];
-        $clientSessionTotals = [];
 
         foreach ($students as $student) {
             $sessionCount = Schedule::where('student_id', $student->id)
@@ -72,11 +78,10 @@ class PaymentController extends Controller
                     'student' => $student,
                     'sessionCount' => $sessionCount,
                 ];
-                $clientSessionTotals[$student->client_id] = ($clientSessionTotals[$student->client_id] ?? 0) + $sessionCount;
             }
         }
 
-        // Second pass: create payments with per-client discount applied
+        // Create payments — full flat discount per student if that student has >= threshold sessions
         foreach ($studentData as $data) {
             $student = $data['student'];
             $sessionCount = $data['sessionCount'];
@@ -91,16 +96,12 @@ class PaymentController extends Controller
             }
 
             $client = $student->client;
-            $clientTotalSessions = $clientSessionTotals[$client->id];
             $baseAmount = $sessionCount * $client->session_price;
 
-            // Discount: flat once per client if threshold met
             $discount = 0;
             $discountNote = '';
-            if ($clientTotalSessions >= config('bimbel.discount.threshold', 8)) {
-                // Distribute discount proportionally by session share
-                $share = $sessionCount / $clientTotalSessions;
-                $discount = (int) round($client->discount * $share);
+            if ($sessionCount >= config('bimbel.discount.threshold', 8)) {
+                $discount = $client->discount;
                 $discountNote = ' · diskon Rp '.number_format($discount, 0, ',', '.');
             }
 

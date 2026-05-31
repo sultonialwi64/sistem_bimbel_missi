@@ -107,7 +107,10 @@
                             </td>
                             <td class="py-4 px-6">
                                 @if($payment->discount > 0)
-                                    <p class="text-sm font-semibold text-red-600">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
+                                    <div>
+                                        <p class="text-sm font-semibold text-red-600">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
+                                        <p class="text-[10px] text-gray-400 leading-tight">(8+ sesi{{ in_array($payment->client_id, $multiStudentClientIds ?? []) ? ', per student' : '' }})</p>
+                                    </div>
                                 @else
                                     <p class="text-sm text-gray-400">-</p>
                                 @endif
@@ -228,6 +231,7 @@
                         <div class="text-center">
                             <p class="text-[10px] text-gray-400 uppercase font-bold">Diskon</p>
                             <p class="text-xs font-bold text-red-600">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
+                            <p class="text-[9px] text-gray-400">(8+ sesi{{ in_array($payment->client_id, $multiStudentClientIds ?? []) ? ', per student' : '' }})</p>
                         </div>
                         @endif
                         <div class="text-right">
