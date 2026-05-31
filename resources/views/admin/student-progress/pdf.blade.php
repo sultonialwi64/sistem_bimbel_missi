@@ -71,7 +71,7 @@
             @forelse($sessionReports as $report)
                 <tr>
                     <td>
-                        <strong>{{ $report->created_at->format('d/m/Y') }}</strong><br>
+                        <strong>{{ \Carbon\Carbon::parse($report->schedule->date)->format('d/m/Y') }}</strong><br>
                         {{ $report->schedule->subject->name ?? '-' }}
                     </td>
                     <td>{!! nl2br(e($report->material_covered)) !!}</td>

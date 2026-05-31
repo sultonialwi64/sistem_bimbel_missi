@@ -56,11 +56,13 @@ class StudentProgressController extends Controller
         $startDate = \Carbon\Carbon::parse($month)->startOfMonth();
         $endDate = \Carbon\Carbon::parse($month)->endOfMonth();
 
-        // Get session reports for that month
-        $sessionReports = SessionReport::where('student_id', $student->id)
-            ->whereBetween('created_at', [$startDate, $endDate])
+        // Get session reports for that month, filtered AND sorted by when the lesson took place (schedule.date)
+        $sessionReports = SessionReport::where('session_reports.student_id', $student->id)
+            ->join('schedules', 'session_reports.schedule_id', '=', 'schedules.id')
+            ->whereBetween('schedules.date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->orderBy('schedules.date', 'asc')
+            ->select('session_reports.*')
             ->with(['schedule.subject', 'tutor.user', 'schedule.attendance'])
-            ->latest()
             ->get();
 
         // Calculate Average Score from this month's sessions
