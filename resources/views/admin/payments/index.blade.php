@@ -10,15 +10,14 @@
 
     .payment-table th,
     .payment-table td {
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
     }
 
     .payment-actions {
         display: flex;
         justify-content: flex-end;
-        gap: 0.5rem;
-        min-width: 250px;
+        gap: 0.375rem;
         white-space: nowrap;
     }
 </style>
@@ -104,17 +103,17 @@
 
         {{-- Desktop Table --}}
         <div class="hidden sm:block overflow-x-auto">
-            <table class="table-premium payment-table min-w-[1280px] table-fixed">
+            <table class="table-premium payment-table min-w-[1160px] table-fixed">
                 <colgroup>
-                    <col class="w-[21%]">
+                    <col class="w-[22%]">
                     <col class="w-[10%]">
                     <col class="w-[9%]">
                     <col class="w-[8%]">
                     <col class="w-[7%]">
+                    <col class="w-[10%]">
                     <col class="w-[8%]">
-                    <col class="w-[8%]">
-                    <col class="w-[8%]">
-                    <col class="w-[21%]">
+                    <col class="w-[7%]">
+                    <col class="w-[19%]">
                 </colgroup>
                 <thead>
                     <tr>
@@ -202,7 +201,7 @@
                                     $previewLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $dlMonth, 'preview' => 1]);
                                 @endphp
                                 <div class="payment-actions">
-                                    <button type="button" @click="previewOpen = true; previewUrl = @js($previewLink); downloadUrl = @js($dlLink); previewTitle = @js('Laporan ' . $payment->student->name . ' - ' . \Carbon\Carbon::parse($dlMonth)->translatedFormat('F Y'))" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-xs hover:bg-gray-50 hover:border-gray-300 transition-all" title="Preview Laporan PDF">
+                                    <button type="button" @click="previewOpen = true; previewUrl = @js($previewLink); downloadUrl = @js($dlLink); previewTitle = @js('Laporan ' . $payment->student->name . ' - ' . \Carbon\Carbon::parse($dlMonth)->translatedFormat('F Y'))" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-xs hover:bg-gray-50 hover:border-gray-300 transition-all" title="Preview Laporan PDF">
                                         <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                         PDF
                                     </button>
@@ -231,12 +230,12 @@
                                             $waText .= "Terima kasih banyak! 🙏";
                                             $waUrl = "https://wa.me/" . $waNumber . "?text=" . urlencode($waText);
                                         @endphp
-                                        <a href="{{ $waUrl }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 text-white border border-green-700 rounded-xl font-bold text-xs hover:bg-green-700 shadow-sm hover:shadow-md transition-all" title="Kirim Tagihan & Rapor via WA">
+                                        <a href="{{ $waUrl }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-green-600 text-white border border-green-700 rounded-xl font-bold text-xs hover:bg-green-700 shadow-sm hover:shadow-md transition-all" title="Kirim Tagihan & Rapor via WA">
                                             <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.163-.173.353-.217.473-.217l.361.002c.118.002.277-.044.433.33.161.385.55 1.341.599 1.442.049.101.082.218.01.389-.071.171-.108.277-.215.398-.109.122-.23.267-.327.369-.108.114-.222.24-.097.455.124.216.55 0.912 1.178 1.472.812.723 1.498.948 1.708 1.054.21.106.331.088.455-.052.124-.14 0.536-.622.682-.835.145-.213.291-.177.485-.104.195.072 1.229.58 1.439.685.21.105.351.157.402.244.051.087.051.503-.093.908z" /></svg>
                                             WA
                                         </a>
                                     @endif
-                                    <a href="{{ route('admin.payments.show', $payment) }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-xl font-bold text-xs hover:bg-indigo-50 transition-all">
+                                    <a href="{{ route('admin.payments.show', $payment) }}" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-xl font-bold text-xs hover:bg-indigo-50 transition-all">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         View
                                     </a>
