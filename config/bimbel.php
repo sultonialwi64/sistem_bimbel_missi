@@ -78,21 +78,6 @@ return [
     | Settings for system notifications
     |
     */
-    /*
-    |--------------------------------------------------------------------------
-    | Discount Settings
-    |--------------------------------------------------------------------------
-    |
-    | Diskon flat per bulan untuk client yang mengambil ≥threshold sesi.
-    | Berlaku per client (akumulasi semua student dalam satu bulan).
-    |
-    */
-    'discount' => [
-        'threshold' => 8,
-        'tipe_1' => 10000, // Rp 10.000
-        'tipe_2' => 20000, // Rp 20.000
-    ],
-
     'notification' => [
         'email_enabled' => env('NOTIFICATION_EMAIL', true),
         'whatsapp_enabled' => env('NOTIFICATION_WHATSAPP', false),

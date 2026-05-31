@@ -42,14 +42,7 @@ class PaymentController extends Controller
 
         $payments = $query->paginate(15)->withQueryString();
 
-        // Detect clients with multiple students (for display hint in discount column)
-        $multiStudentClientIds = $payments->getCollection()
-            ->groupBy('client_id')
-            ->filter(fn ($group) => $group->count() > 1)
-            ->keys()
-            ->toArray();
-
-        return view('admin.payments.index', compact('payments', 'statusFilter', 'multiStudentClientIds'));
+        return view('admin.payments.index', compact('payments', 'statusFilter'));
     }
 
     public function generate(Request $request)
@@ -62,60 +55,34 @@ class PaymentController extends Controller
         $students = Student::with('client')->get();
         $generated = 0;
 
-        // Count sessions per student
-        $studentData = [];
-
         foreach ($students as $student) {
-            $sessionCount = Schedule::where('student_id', $student->id)
-                ->whereBetween('date', [$periodStart, $periodEnd])
-                ->whereHas('attendance', function ($query) {
-                    $query->whereIn('status', ['hadir', 'pindah_lokasi']);
-                })
-                ->count();
-
-            if ($sessionCount > 0) {
-                $studentData[] = [
-                    'student' => $student,
-                    'sessionCount' => $sessionCount,
-                ];
-            }
-        }
-
-        // Create payments — full flat discount per student if that student has >= threshold sessions
-        foreach ($studentData as $data) {
-            $student = $data['student'];
-            $sessionCount = $data['sessionCount'];
-
             $exists = Payment::where('student_id', $student->id)
                 ->where('due_date', '>=', $periodStart)
                 ->where('due_date', '<=', $periodEnd->copy()->addDays(7))
                 ->exists();
 
-            if ($exists) {
-                continue;
+            if (! $exists) {
+                $sessionCount = Schedule::where('student_id', $student->id)
+                    ->whereBetween('date', [$periodStart, $periodEnd])
+                    ->whereHas('attendance', function ($query) {
+                        $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+                    })
+                    ->count();
+
+                if ($sessionCount > 0) {
+                    $clientPricePerSession = $student->client->session_price;
+                    Payment::create([
+                        'client_id' => $student->client_id,
+                        'student_id' => $student->id,
+                        'amount' => $sessionCount * $clientPricePerSession,
+                        'payment_date' => null,
+                        'due_date' => $periodEnd->copy()->addDays(7),
+                        'status' => 'pending',
+                        'notes' => 'Auto-generated for '.$date->translatedFormat('F Y')." ($sessionCount sesi)",
+                    ]);
+                    $generated++;
+                }
             }
-
-            $client = $student->client;
-            $baseAmount = $sessionCount * $client->session_price;
-
-            $discount = 0;
-            $discountNote = '';
-            if ($sessionCount >= config('bimbel.discount.threshold', 8)) {
-                $discount = $client->discount;
-                $discountNote = ' · diskon Rp '.number_format($discount, 0, ',', '.');
-            }
-
-            Payment::create([
-                'client_id' => $client->id,
-                'student_id' => $student->id,
-                'amount' => $baseAmount - $discount,
-                'discount' => $discount,
-                'payment_date' => null,
-                'due_date' => $periodEnd->copy()->addDays(7),
-                'status' => 'pending',
-                'notes' => 'Auto-generated for '.$date->translatedFormat('F Y')." ($sessionCount sesi$discountNote)",
-            ]);
-            $generated++;
         }
 
         return redirect()->route('admin.payments.index', ['filter_month' => $monthFilter])

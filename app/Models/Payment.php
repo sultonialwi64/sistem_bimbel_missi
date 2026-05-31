@@ -14,7 +14,6 @@ class Payment extends Model
         'client_id',
         'student_id',
         'amount',
-        'discount',
         'payment_date',
         'due_date',
         'status',
@@ -31,7 +30,6 @@ class Payment extends Model
             'payment_date' => 'date',
             'due_date' => 'date',
             'amount' => 'decimal:2',
-            'discount' => 'decimal:2',
         ];
     }
 
