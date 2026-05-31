@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Schedule;
 use App\Models\Student;
 use App\Models\StudentProgress;
 use App\Models\SessionReport;
@@ -56,17 +57,19 @@ class StudentProgressController extends Controller
         $startDate = \Carbon\Carbon::parse($month)->startOfMonth();
         $endDate = \Carbon\Carbon::parse($month)->endOfMonth();
 
-        // Get session reports for that month, filtered AND sorted by when the lesson took place (schedule.date)
-        $sessionReports = SessionReport::where('session_reports.student_id', $student->id)
-            ->join('schedules', 'session_reports.schedule_id', '=', 'schedules.id')
-            ->whereBetween('schedules.date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->orderBy('schedules.date', 'asc')
-            ->select('session_reports.*')
-            ->with(['schedule.subject', 'tutor.user', 'schedule.attendance'])
+        // Match billing: one PDF row per attended schedule, report data is optional.
+        $schedules = Schedule::where('student_id', $student->id)
+            ->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->whereHas('attendance', function ($query) {
+                $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+            })
+            ->with(['subject', 'tutor.user', 'attendance', 'sessionReport'])
+            ->orderBy('date', 'asc')
+            ->orderBy('start_time', 'asc')
             ->get();
 
         // Calculate Average Score from this month's sessions
-        $averageScore = $sessionReports->avg('student_understanding') * 20;
+        $averageScore = $schedules->pluck('sessionReport')->filter()->avg('student_understanding') * 20;
 
         // Get the latest progress assessment for that month
         $progress = StudentProgress::where('student_id', $student->id)
@@ -85,9 +88,15 @@ class StudentProgressController extends Controller
         }
 
         $pdf = Pdf::loadView('admin.student-progress.pdf', compact(
-            'student', 'sessionReports', 'averageScore', 'progress', 'month', 'startDate', 'endDate'
+            'student', 'schedules', 'averageScore', 'progress', 'month', 'startDate', 'endDate'
         ));
 
-        return $pdf->download('Laporan_Progres_' . str_replace(' ', '_', $student->name) . '_' . $month . '.pdf');
+        $fileName = 'Laporan_Progres_' . str_replace(' ', '_', $student->name) . '_' . $month . '.pdf';
+
+        if ($request->boolean('preview')) {
+            return $pdf->stream($fileName);
+        }
+
+        return $pdf->download($fileName);
     }
 }

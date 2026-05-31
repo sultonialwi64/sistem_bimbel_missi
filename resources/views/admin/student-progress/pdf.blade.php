@@ -68,20 +68,29 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($sessionReports as $report)
+            @forelse($schedules as $schedule)
+                @php
+                    $report = $schedule->sessionReport;
+                @endphp
                 <tr>
                     <td>
-                        <strong>{{ \Carbon\Carbon::parse($report->schedule->date)->format('d/m/Y') }}</strong><br>
-                        {{ $report->schedule->subject->name ?? '-' }}
+                        <strong>{{ \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') }}</strong><br>
+                        {{ $schedule->subject->name ?? '-' }}
                     </td>
-                    <td>{!! nl2br(e($report->material_covered)) !!}</td>
-                    <td>{!! nl2br(e($report->notes_for_parent ?? '-')) !!}</td>
-                    <td align="center"><span class="rating">{{ $report->student_understanding }}</span> / 5</td>
+                    <td>{!! $report ? nl2br(e($report->material_covered)) : '&nbsp;' !!}</td>
+                    <td>{!! $report && $report->notes_for_parent ? nl2br(e($report->notes_for_parent)) : '&nbsp;' !!}</td>
+                    <td align="center">
+                        @if($report)
+                            <span class="rating">{{ $report->student_understanding }}</span> / 5
+                        @else
+                            &nbsp;
+                        @endif
+                    </td>
                     <td align="center">
                         @php
                             $base64 = null;
-                            if(isset($report->schedule->attendance) && $report->schedule->attendance->photo_path) {
-                                $path = \Illuminate\Support\Facades\Storage::disk('public')->path($report->schedule->attendance->photo_path);
+                            if(isset($schedule->attendance) && $schedule->attendance->photo_path) {
+                                $path = \Illuminate\Support\Facades\Storage::disk('public')->path($schedule->attendance->photo_path);
                                 if (file_exists($path)) {
                                     $type = pathinfo($path, PATHINFO_EXTENSION);
                                     $data = file_get_contents($path);
