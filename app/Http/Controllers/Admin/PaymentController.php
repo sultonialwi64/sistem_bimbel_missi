@@ -32,6 +32,15 @@ class PaymentController extends Controller
             ]);
         }
 
+        // Filter Search (client name, student name, tutor name)
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('client.user', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('student', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('student.schedules.tutor.user', fn ($q) => $q->where('name', 'like', "%{$search}%"));
+            });
+        }
+
         // Filter Status
         $statusFilter = $request->input('status', 'all');
         if ($statusFilter === 'unpaid') {

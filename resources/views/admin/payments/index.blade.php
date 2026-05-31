@@ -31,6 +31,24 @@
         </a>
     </div>
 
+    <!-- Search Bar -->
+    <form action="{{ route('admin.payments.index') }}" method="GET">
+        <div class="flex items-center gap-3">
+            <div class="relative flex-1">
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari berdasarkan nama client, siswa, atau tutor..." class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 shadow-sm transition-all">
+            </div>
+            <button type="submit" class="px-6 py-3 bg-indigo-800 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-sm">Cari</button>
+            @if(request('search'))
+                <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" class="px-4 py-3 bg-white text-slate-600 border border-slate-200 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm">Clear</a>
+            @endif
+            <input type="hidden" name="filter_month" value="{{ request('filter_month') }}">
+            <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+        </div>
+    </form>
+
     <div class="card-premium overflow-hidden">
         <div class="bg-indigo-800 px-6 py-4">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
