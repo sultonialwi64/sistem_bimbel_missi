@@ -67,5 +67,24 @@ class Client extends Model
         return $this->client_type === 'tipe_1' ? 5000 : 10000;
     }
 
+    /**
+     * Get flat monthly discount amount based on client type
+     */
+    public function getDiscountAttribute(): int
+    {
+        return $this->client_type === 'tipe_1'
+            ? config('bimbel.discount.tipe_1', 10000)
+            : config('bimbel.discount.tipe_2', 20000);
+    }
 
+    /**
+     * Calculate total payment after discount for a given session count
+     */
+    public function calculatePaymentAmount(int $sessionCount): int
+    {
+        $total = $sessionCount * $this->session_price;
+        $discount = $sessionCount >= config('bimbel.discount.threshold', 8) ? $this->discount : 0;
+
+        return $total - $discount;
+    }
 }

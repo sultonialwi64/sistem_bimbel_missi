@@ -28,7 +28,7 @@ return [
         'session_price_client' => env('SESSION_PRICE_CLIENT', 50000),  // Rp 50.000 per sesi
 
         // Bagian yang diterima tutor per sesi
-        'session_rate_tutor'   => env('SESSION_RATE_TUTOR', 40000),   // Rp 40.000 per sesi
+        'session_rate_tutor' => env('SESSION_RATE_TUTOR', 40000),   // Rp 40.000 per sesi
 
         // Margin/keuntungan perusahaan per sesi
         'session_rate_company' => env('SESSION_RATE_COMPANY', 10000), // Rp 10.000 per sesi
@@ -78,6 +78,21 @@ return [
     | Settings for system notifications
     |
     */
+    /*
+    |--------------------------------------------------------------------------
+    | Discount Settings
+    |--------------------------------------------------------------------------
+    |
+    | Diskon flat per bulan untuk client yang mengambil ≥threshold sesi.
+    | Berlaku per client (akumulasi semua student dalam satu bulan).
+    |
+    */
+    'discount' => [
+        'threshold' => 8,
+        'tipe_1' => 10000, // Rp 10.000
+        'tipe_2' => 20000, // Rp 20.000
+    ],
+
     'notification' => [
         'email_enabled' => env('NOTIFICATION_EMAIL', true),
         'whatsapp_enabled' => env('NOTIFICATION_WHATSAPP', false),

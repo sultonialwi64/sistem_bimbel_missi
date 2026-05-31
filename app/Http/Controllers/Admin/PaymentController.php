@@ -55,34 +55,66 @@ class PaymentController extends Controller
         $students = Student::with('client')->get();
         $generated = 0;
 
+        // First pass: count sessions per student & group by client
+        $studentData = [];
+        $clientSessionTotals = [];
+
         foreach ($students as $student) {
+            $sessionCount = Schedule::where('student_id', $student->id)
+                ->whereBetween('date', [$periodStart, $periodEnd])
+                ->whereHas('attendance', function ($query) {
+                    $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+                })
+                ->count();
+
+            if ($sessionCount > 0) {
+                $studentData[] = [
+                    'student' => $student,
+                    'sessionCount' => $sessionCount,
+                ];
+                $clientSessionTotals[$student->client_id] = ($clientSessionTotals[$student->client_id] ?? 0) + $sessionCount;
+            }
+        }
+
+        // Second pass: create payments with per-client discount applied
+        foreach ($studentData as $data) {
+            $student = $data['student'];
+            $sessionCount = $data['sessionCount'];
+
             $exists = Payment::where('student_id', $student->id)
                 ->where('due_date', '>=', $periodStart)
                 ->where('due_date', '<=', $periodEnd->copy()->addDays(7))
                 ->exists();
 
-            if (! $exists) {
-                $sessionCount = Schedule::where('student_id', $student->id)
-                    ->whereBetween('date', [$periodStart, $periodEnd])
-                    ->whereHas('attendance', function ($query) {
-                        $query->whereIn('status', ['hadir', 'pindah_lokasi']);
-                    })
-                    ->count();
-
-                if ($sessionCount > 0) {
-                    $clientPricePerSession = $student->client->session_price;
-                    Payment::create([
-                        'client_id' => $student->client_id,
-                        'student_id' => $student->id,
-                        'amount' => $sessionCount * $clientPricePerSession,
-                        'payment_date' => null,
-                        'due_date' => $periodEnd->copy()->addDays(7),
-                        'status' => 'pending',
-                        'notes' => 'Auto-generated for '.$date->translatedFormat('F Y')." ($sessionCount sesi)",
-                    ]);
-                    $generated++;
-                }
+            if ($exists) {
+                continue;
             }
+
+            $client = $student->client;
+            $clientTotalSessions = $clientSessionTotals[$client->id];
+            $baseAmount = $sessionCount * $client->session_price;
+
+            // Discount: flat once per client if threshold met
+            $discount = 0;
+            $discountNote = '';
+            if ($clientTotalSessions >= config('bimbel.discount.threshold', 8)) {
+                // Distribute discount proportionally by session share
+                $share = $sessionCount / $clientTotalSessions;
+                $discount = (int) round($client->discount * $share);
+                $discountNote = ' · diskon Rp '.number_format($discount, 0, ',', '.');
+            }
+
+            Payment::create([
+                'client_id' => $client->id,
+                'student_id' => $student->id,
+                'amount' => $baseAmount - $discount,
+                'discount' => $discount,
+                'payment_date' => null,
+                'due_date' => $periodEnd->copy()->addDays(7),
+                'status' => 'pending',
+                'notes' => 'Auto-generated for '.$date->translatedFormat('F Y')." ($sessionCount sesi$discountNote)",
+            ]);
+            $generated++;
         }
 
         return redirect()->route('admin.payments.index', ['filter_month' => $monthFilter])
