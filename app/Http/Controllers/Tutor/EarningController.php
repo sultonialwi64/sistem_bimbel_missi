@@ -24,7 +24,7 @@ class EarningController extends Controller
             ->whereBetween('period_start', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
             ->first();
 
-        // Ambil semua record gaji dari DB, timpa total_sessions dengan hitungan fresh
+        // Ambil semua record gaji dari DB, timpa dengan hitungan fresh
         $salariesFromDb = Salary::where('tutor_id', $tutor->id)
             ->orderByDesc('period_start')
             ->get()
@@ -33,7 +33,10 @@ class EarningController extends Controller
                     ->whereBetween('date', [$salary->period_start->format('Y-m-d'), $salary->period_end->format('Y-m-d')])
                     ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
                     ->count();
+                $freshBase = $freshSessions * $salary->rate_per_session;
                 $salary->total_sessions = $freshSessions;
+                $salary->base_salary = $freshBase;
+                $salary->total_amount = $freshBase + $salary->bonus - $salary->deduction;
 
                 return $salary;
             });
