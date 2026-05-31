@@ -422,7 +422,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Notification::create([
-            'user_id' => $tutors[0]->id,
+            'user_id' => $tutors[0]->user_id,
             'type' => 'salary_ready',
             'title' => 'Gaji Siap Cair',
             'message' => 'Gaji Anda untuk periode ini sudah siap untuk dicairkan',
@@ -430,7 +430,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Notification::create([
-            'user_id' => $clients[0]->id,
+            'user_id' => $clients[0]->user_id,
             'type' => 'new_report',
             'title' => 'Laporan Sesi Baru',
             'message' => 'Laporan sesi pembelajaran Andi Wijaya sudah tersedia',
