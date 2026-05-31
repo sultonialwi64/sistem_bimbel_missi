@@ -31,6 +31,7 @@ class RecalculatePayments extends Command
         // 1. First pass: recalculate session count, base amount, and collect client totals
         $updated = 0;
         $clientPeriodSessions = [];
+        $paymentData = []; // [paymentId => [sessionCount, baseAmount, periodKey]]
 
         foreach ($payments as $payment) {
             if (! $payment->client || ! $payment->student) {
@@ -59,23 +60,25 @@ class RecalculatePayments extends Command
             $cid = $payment->client_id;
             $clientPeriodSessions[$periodKey][$cid] = ($clientPeriodSessions[$periodKey][$cid] ?? 0) + $sessionCount;
 
-            // Temp store for second pass
-            $payment->_sessionCount = $sessionCount;
-            $payment->_baseAmount = $baseAmount;
-            $payment->_periodKey = $periodKey;
+            $paymentData[$payment->id] = [
+                'sessionCount' => $sessionCount,
+                'baseAmount' => $baseAmount,
+                'periodKey' => $periodKey,
+            ];
         }
 
         // 2. Second pass: apply discount
         $threshold = config('bimbel.discount.threshold', 8);
 
         foreach ($payments as $payment) {
-            if (! $payment->client || ! $payment->student) {
+            if (! $payment->client || ! $payment->student || ! isset($paymentData[$payment->id])) {
                 continue;
             }
 
-            $sessionCount = $payment->_sessionCount;
-            $baseAmount = $payment->_baseAmount;
-            $periodKey = $payment->_periodKey;
+            $data = $paymentData[$payment->id];
+            $sessionCount = $data['sessionCount'];
+            $baseAmount = $data['baseAmount'];
+            $periodKey = $data['periodKey'];
 
             // Calculate proportional discount
             $clientTotalSessions = $clientPeriodSessions[$periodKey][$payment->client_id] ?? 0;
@@ -102,9 +105,6 @@ class RecalculatePayments extends Command
                 $payment->save();
                 $updated++;
             }
-
-            // Cleanup temp props
-            unset($payment->_sessionCount, $payment->_baseAmount, $payment->_periodKey);
         }
 
         $this->info("Done. {$updated} payments updated.");
