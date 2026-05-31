@@ -33,7 +33,7 @@ class EarningController extends Controller
                     ->whereBetween('date', [$salary->period_start->format('Y-m-d'), $salary->period_end->format('Y-m-d')])
                     ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
                     ->count();
-                $freshBase = $freshSessions * $salary->rate_per_session;
+                $freshBase = $freshSessions * config('bimbel.salary.session_rate_tutor', 40000);
                 $salary->total_sessions = $freshSessions;
                 $salary->base_salary = $freshBase;
                 $salary->total_amount = $freshBase + $salary->bonus - $salary->deduction;
@@ -57,7 +57,6 @@ class EarningController extends Controller
                     'period_start' => $periodStart,
                     'period_end' => $periodEnd,
                     'total_sessions' => $sessionsThisMonth,
-                    'rate_per_session' => $tutorRatePerSession,
                     'base_salary' => $baseSalary,
                     'total_amount' => $baseSalary,
                     'status' => 'unpaid',

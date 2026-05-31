@@ -42,7 +42,7 @@ class DashboardController extends Controller
                         ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
                         ->count();
 
-                    return ($freshSessions * $salary->rate_per_session) + $salary->bonus - $salary->deduction;
+                    return ($freshSessions * config('bimbel.salary.session_rate_tutor', 40000)) + $salary->bonus - $salary->deduction;
                 }),
             'completed_sessions' => Schedule::where('tutor_id', $tutor->id)
                 ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))

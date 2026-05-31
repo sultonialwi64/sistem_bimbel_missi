@@ -15,7 +15,6 @@ class Salary extends Model
         'period_start',
         'period_end',
         'total_sessions',
-        'rate_per_session',
         'base_salary',
         'bonus',
         'bonus_reason',
@@ -34,7 +33,6 @@ class Salary extends Model
             'period_start' => 'date',
             'period_end' => 'date',
             'payment_date' => 'date',
-            'rate_per_session' => 'decimal:2',
             'base_salary' => 'decimal:2',
             'bonus' => 'decimal:2',
             'deduction' => 'decimal:2',
@@ -60,7 +58,8 @@ class Salary extends Model
      */
     public function calculateBaseSalary(): void
     {
-        $this->base_salary = $this->total_sessions * $this->rate_per_session;
+        $ratePerSession = config('bimbel.salary.session_rate_tutor', 40000);
+        $this->base_salary = $this->total_sessions * $ratePerSession;
     }
 
     /**
@@ -94,6 +93,7 @@ class Salary extends Model
     public function isCurrentPeriod(): bool
     {
         $now = now();
+
         return $now >= $this->period_start && $now <= $this->period_end;
     }
 }

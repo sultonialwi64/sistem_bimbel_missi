@@ -2,9 +2,20 @@
 
 namespace Database\Seeders;
 
-use App\Models\{User, Tutor, Client, Student, Subject, Schedule, Attendance, SessionReport, Salary, Payment, StudentProgress, QualityAssessment, Notification};
-use Illuminate\Database\Seeder;
+use App\Models\Attendance;
+use App\Models\Client;
+use App\Models\Notification;
+use App\Models\Payment;
+use App\Models\Salary;
+use App\Models\Schedule;
+use App\Models\SessionReport;
+use App\Models\Student;
+use App\Models\StudentProgress;
+use App\Models\Subject;
+use App\Models\Tutor;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -29,7 +40,7 @@ class DatabaseSeeder extends Seeder
         // Create Tutors
         $this->command->info('📌 Creating Tutors...');
         $tutors = [];
-        
+
         $tutor1 = User::create([
             'name' => 'Ahmad Hidayat, S.Si',
             'email' => 'ahmad.tutor@bimbel.com',
@@ -233,14 +244,14 @@ class DatabaseSeeder extends Seeder
 
         // Create Schedules (Past and Future)
         $this->command->info('📌 Creating Schedules...');
-        
+
         // Past schedules (completed)
         for ($i = 1; $i <= 30; $i++) {
             $date = Carbon::now()->subDays(rand(1, 45));
             $student = $students[array_rand($students)];
             $tutor = $tutors[array_rand($tutors)];
             $subject = $subjects[array_rand($subjects)];
-            
+
             $schedule = Schedule::create([
                 'student_id' => $student->id,
                 'tutor_id' => $tutor->id,
@@ -271,7 +282,7 @@ class DatabaseSeeder extends Seeder
                 'schedule_id' => $schedule->id,
                 'tutor_id' => $tutor->id,
                 'student_id' => $student->id,
-                'material_covered' => 'Pembahasan materi ' . $subject->name . ' bab ' . rand(1, 10),
+                'material_covered' => 'Pembahasan materi '.$subject->name.' bab '.rand(1, 10),
                 'student_understanding' => rand(3, 5),
                 'notes_for_parent' => 'Anak cukup aktif dan antusias dalam belajar',
                 'tutor_rating_by_student' => rand(4, 5),
@@ -295,7 +306,7 @@ class DatabaseSeeder extends Seeder
             $student = $students[array_rand($students)];
             $tutor = $tutors[array_rand($tutors)];
             $subject = $subjects[array_rand($subjects)];
-            
+
             Schedule::create([
                 'student_id' => $student->id,
                 'tutor_id' => $tutor->id,
@@ -320,7 +331,6 @@ class DatabaseSeeder extends Seeder
                 'period_start' => Carbon::now()->subMonth()->startOfMonth(),
                 'period_end' => Carbon::now()->subMonth()->endOfMonth(),
                 'total_sessions' => $sessionsLastMonth,
-                'rate_per_session' => $tutor->session_rate,
                 'base_salary' => $baseSalaryLastMonth,
                 'bonus' => 0,
                 'deduction' => 0,
@@ -338,7 +348,6 @@ class DatabaseSeeder extends Seeder
                 'period_start' => Carbon::now()->startOfMonth(),
                 'period_end' => Carbon::now()->endOfMonth(),
                 'total_sessions' => $sessionsCurrentMonth,
-                'rate_per_session' => $tutor->session_rate,
                 'base_salary' => $baseSalaryCurrentMonth,
                 'bonus' => 0,
                 'deduction' => 0,

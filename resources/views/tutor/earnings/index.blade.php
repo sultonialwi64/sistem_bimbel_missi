@@ -84,7 +84,6 @@
                     <tr>
                         <th class="text-left py-4 px-6">Periode</th>
                         <th class="text-left py-4 px-6">Sesi</th>
-                        <th class="text-left py-4 px-6">Rate/Sesi</th>
                         <th class="text-left py-4 px-6">Gaji Pokok</th>
                         <th class="text-left py-4 px-6">Total</th>
                         <th class="text-left py-4 px-6">Status</th>
@@ -102,9 +101,6 @@
                             </td>
                             <td class="py-4 px-6">
                                 <span class="badge badge-indigo">{{ $currentMonthVirtual->total_sessions }}</span>
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="text-sm text-gray-700">Rp {{ number_format($currentMonthVirtual->rate_per_session, 0, ',', '.') }}</span>
                             </td>
                             <td class="py-4 px-6">
                                 <span class="text-sm text-gray-700">Rp {{ number_format($currentMonthVirtual->base_salary, 0, ',', '.') }}</span>
@@ -133,9 +129,6 @@
                                 <span class="badge badge-indigo">{{ $salary->total_sessions }}</span>
                             </td>
                             <td class="py-4 px-6">
-                                <span class="text-sm text-gray-700">Rp {{ number_format($salary->rate_per_session, 0, ',', '.') }}</span>
-                            </td>
-                            <td class="py-4 px-6">
                                 <span class="text-sm text-gray-700">Rp {{ number_format($salary->base_salary, 0, ',', '.') }}</span>
                             </td>
                             <td class="py-4 px-6">
@@ -158,7 +151,7 @@
                     @empty
                         @if(!$currentMonthVirtual)
                         <tr>
-                            <td colspan="7">
+                            <td colspan="6">
                                 <div class="empty-state py-12">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -187,14 +180,10 @@
                         </div>
                         <span class="badge badge-amber flex-shrink-0">Unpaid</span>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 gap-2">
                         <div class="bg-indigo-50 rounded-xl p-2.5 text-center">
                             <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Sesi</div>
                             <div class="text-lg font-black text-indigo-700 mt-0.5">{{ $currentMonthVirtual->total_sessions }}</div>
-                        </div>
-                        <div class="bg-slate-50 rounded-xl p-2.5 text-center border border-slate-100">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rate/Sesi</div>
-                            <div class="text-xs font-bold text-slate-700 mt-1 leading-tight">Rp {{ number_format($currentMonthVirtual->rate_per_session, 0, ',', '.') }}</div>
                         </div>
                         <div class="bg-green-50 rounded-xl p-2.5 text-center border border-green-100">
                             <div class="text-[10px] font-bold text-green-500 uppercase tracking-wider">Total</div>
@@ -228,14 +217,10 @@
                             {{ $salary->status === 'unpaid' || $salary->status === 'pending' ? 'Unpaid' : ucfirst($salary->status) }}
                         </span>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 gap-2">
                         <div class="bg-indigo-50 rounded-xl p-2.5 text-center">
                             <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Sesi</div>
                             <div class="text-lg font-black text-indigo-700 mt-0.5">{{ $salary->total_sessions }}</div>
-                        </div>
-                        <div class="bg-slate-50 rounded-xl p-2.5 text-center border border-slate-100">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rate/Sesi</div>
-                            <div class="text-xs font-bold text-slate-700 mt-1 leading-tight">Rp {{ number_format($salary->rate_per_session, 0, ',', '.') }}</div>
                         </div>
                         <div class="bg-green-50 rounded-xl p-2.5 text-center border border-green-100">
                             <div class="text-[10px] font-bold text-green-500 uppercase tracking-wider">Total</div>

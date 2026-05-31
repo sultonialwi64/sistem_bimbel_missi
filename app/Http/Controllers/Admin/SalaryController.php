@@ -88,9 +88,6 @@ class SalaryController extends Controller
     {
         $salary->load(['tutor.user', 'approvedBy']);
 
-        // Hitung breakdown untuk salary ini — pake hitungan fresh
-        $tutorRate = config('bimbel.salary.session_rate_tutor', 40000);
-
         $schedules = Schedule::with('student.client')
             ->where('tutor_id', $salary->tutor_id)
             ->whereBetween('date', [$salary->period_start, $salary->period_end])
@@ -98,8 +95,6 @@ class SalaryController extends Controller
                 $q->whereIn('status', ['hadir', 'pindah_lokasi']);
             })
             ->get();
-
-        $freshSessions = $schedules->count();
 
         $totalClientPaid = $schedules->sum(function ($s) {
             return $s->student->client->session_price ?? 50000;
@@ -109,17 +104,17 @@ class SalaryController extends Controller
             return $s->student->client->company_margin ?? 10000;
         });
 
+        $clientTypes = $schedules->pluck('student.client.client_type')->unique();
+        $clientLabel = $clientTypes->count() === 1
+            ? ($clientTypes->first() === 'tipe_1' ? 'Tipe 1 (Rp 45.000)' : 'Tipe 2 (Rp 50.000)')
+            : 'Campuran';
+
         $breakdown = [
-            'client_price' => 'Dinamis (Tipe 1: 45rb, Tipe 2: 50rb)',
-            'tutor_rate' => $tutorRate,
-            'company_rate' => 'Dinamis (Tipe 1: 5rb, Tipe 2: 10rb)',
+            'client_label' => $clientLabel,
             'total_client_paid' => $totalClientPaid,
-            'tutor_earned' => $freshSessions * $tutorRate,
+            'tutor_earned' => $salary->total_sessions * config('bimbel.salary.session_rate_tutor', 40000),
             'company_earned' => $companyEarned,
         ];
-
-        $salary->total_sessions = $freshSessions;
-        $salary->total_amount = ($freshSessions * $salary->rate_per_session) + $salary->bonus - $salary->deduction;
 
         return view('admin.salaries.show', compact('salary', 'breakdown'));
     }
@@ -164,7 +159,6 @@ class SalaryController extends Controller
             ],
             [
                 'total_sessions' => $completedSessions,
-                'rate_per_session' => $tutorRatePerSession,
                 'base_salary' => $baseSalary,
                 'bonus' => 0,
                 'bonus_reason' => null,

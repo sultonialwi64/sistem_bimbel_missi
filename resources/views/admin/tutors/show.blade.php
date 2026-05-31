@@ -164,7 +164,7 @@
                         <div class="list-item-premium">
                             <div>
                                 <p class="font-bold text-gray-900">{{ $salary->period_start->format('d M') }} - {{ $salary->period_end->format('d M Y') }}</p>
-                                <p class="text-xs text-gray-500">{{ $salary->total_sessions }} sessions × Rp {{ number_format($salary->rate_per_session, 0, ',', '.') }}</p>
+                                <p class="text-xs text-gray-500">{{ $salary->total_sessions }} sessions</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-lg font-black text-gray-900">Rp {{ number_format($salary->total_amount, 0, ',', '.') }}</p>

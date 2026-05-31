@@ -48,14 +48,10 @@
         </div>
 
         {{-- Stats Row --}}
-        <div class="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-100">
+        <div class="grid grid-cols-2 divide-x divide-gray-100 border-t border-gray-100">
             <div class="px-6 py-4 text-center">
                 <p class="text-2xl font-bold text-green-600">{{ $salary->total_sessions }}</p>
                 <p class="text-xs text-gray-500 mt-0.5 font-medium">Total Sesi</p>
-            </div>
-            <div class="px-6 py-4 text-center">
-                <p class="text-2xl font-bold text-green-600">Rp {{ number_format($salary->rate_per_session, 0, ',', '.') }}</p>
-                <p class="text-xs text-gray-500 mt-0.5 font-medium">Rate/Sesi (Tutor)</p>
             </div>
             <div class="px-6 py-4 text-center">
                 <p class="text-2xl font-bold text-gray-900">Rp {{ number_format($salary->total_amount, 0, ',', '.') }}</p>
@@ -74,7 +70,7 @@
             <div class="flex justify-between items-center py-3 border-b border-gray-100">
                 <div>
                     <p class="text-sm font-semibold text-blue-700">Total Pendapatan dari Client</p>
-                    <p class="text-xs text-gray-400">{{ $salary->total_sessions }} sesi × Rp {{ number_format($breakdown['client_price'], 0, ',', '.') }}</p>
+                    <p class="text-xs text-gray-400">{{ $salary->total_sessions }} sesi · {{ $breakdown['client_label'] }}</p>
                 </div>
                 <p class="text-sm font-bold text-blue-700">Rp {{ number_format($breakdown['total_client_paid'], 0, ',', '.') }}</p>
             </div>
@@ -83,16 +79,16 @@
             <div class="flex justify-between items-center py-3 border-b border-gray-100">
                 <div>
                     <p class="text-sm font-semibold text-gray-700">Gaji Tutor</p>
-                    <p class="text-xs text-gray-400">{{ $salary->total_sessions }} sesi × Rp {{ number_format($salary->rate_per_session, 0, ',', '.') }}</p>
+                    <p class="text-xs text-gray-400">{{ $salary->total_sessions }} sesi × Rp {{ number_format(config('bimbel.salary.session_rate_tutor', 40000), 0, ',', '.') }}</p>
                 </div>
-                <p class="text-sm font-bold text-green-700">Rp {{ number_format($salary->total_amount, 0, ',', '.') }}</p>
+                <p class="text-sm font-bold text-green-700">Rp {{ number_format($breakdown['tutor_earned'], 0, ',', '.') }}</p>
             </div>
 
             {{-- Margin Perusahaan --}}
             <div class="flex justify-between items-center py-3">
                 <div>
                     <p class="text-sm font-semibold text-amber-700">Margin Perusahaan</p>
-                    <p class="text-xs text-gray-400">{{ $salary->total_sessions }} sesi × Rp {{ number_format($breakdown['company_rate'], 0, ',', '.') }}</p>
+                    <p class="text-xs text-gray-400">{{ $salary->total_sessions }} sesi · {{ $breakdown['client_label'] }}</p>
                 </div>
                 <p class="text-sm font-bold text-amber-700">Rp {{ number_format($breakdown['company_earned'], 0, ',', '.') }}</p>
             </div>
