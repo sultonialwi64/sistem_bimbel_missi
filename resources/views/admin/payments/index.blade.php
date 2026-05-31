@@ -89,6 +89,7 @@
                     <tr>
                         <th class="text-left py-4 px-6">Klien</th>
                         <th class="text-left py-4 px-6">Siswa</th>
+                        <th class="text-left py-4 px-6">Tentor</th>
                         <th class="text-left py-4 px-6">Periode</th>
                         <th class="text-left py-4 px-6">Diskon</th>
                         <th class="text-left py-4 px-6">Tagihan</th>
@@ -116,6 +117,9 @@
                             </td>
                             <td class="py-4 px-6">
                                 <p class="font-medium text-gray-900">{{ $payment->student->name }}</p>
+                            </td>
+                            <td class="py-4 px-6">
+                                <p class="text-sm text-gray-700">{{ $payment->tutor_names ?: '-' }}</p>
                             </td>
                             <td class="py-4 px-6">
                                 @php
@@ -209,7 +213,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-12 text-center">
+                            <td colspan="9" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
                                         <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm11 0a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
@@ -241,6 +245,7 @@
                                     <span class="inline-flex items-center justify-center h-4 w-4 rounded-full text-[9px] font-black flex-shrink-0 {{ $payment->client->client_type === 'tipe_1' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700' }}">{{ $payment->client->client_type === 'tipe_1' ? '1' : '2' }}</span>
                                 </p>
                                 <p class="text-xs text-gray-500 truncate">Siswa: {{ $payment->student->name }}</p>
+                                <p class="text-xs text-gray-400 truncate">Tentor: {{ $payment->tutor_names ?: '-' }}</p>
                             </div>
                         </div>
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold flex-shrink-0

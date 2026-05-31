@@ -51,6 +51,21 @@ class PaymentController extends Controller
 
         $payments = $query->paginate(15)->withQueryString();
 
+        // Load tutor names per payment
+        $payments->getCollection()->each(function ($payment) {
+            $periodEnd = Carbon::parse($payment->due_date)->subDays(7)->endOfDay();
+            $periodStart = $periodEnd->copy()->startOfMonth();
+
+            $payment->tutor_names = Schedule::where('student_id', $payment->student_id)
+                ->whereBetween('date', [$periodStart, $periodEnd])
+                ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
+                ->with('tutor.user')
+                ->get()
+                ->pluck('tutor.user.name')
+                ->unique()
+                ->implode(', ');
+        });
+
         // Hitung jumlah anak yang dapat diskon per client (untuk display di kolom Diskon)
         $clientDiscountCounts = $payments->getCollection()
             ->where('discount', '>', 0)
