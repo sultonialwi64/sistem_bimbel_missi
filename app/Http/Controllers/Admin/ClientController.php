@@ -106,7 +106,29 @@ class ClientController extends Controller
         ]);
 
         if ($client->wasChanged('client_type')) {
-            \Illuminate\Support\Facades\Artisan::call('payments:recalculate');
+            $pendingPayments = \App\Models\Payment::where('client_id', $client->id)
+                ->where('status', 'pending')
+                ->get();
+                
+            $pricePerSession = $client->session_price;
+
+            foreach ($pendingPayments as $payment) {
+                $periodEnd = \Carbon\Carbon::parse($payment->due_date)->subDays(7)->endOfDay();
+                $periodStart = $periodEnd->copy()->startOfMonth();
+                
+                $sessionCount = \App\Models\Schedule::where('student_id', $payment->student_id)
+                    ->whereBetween('date', [$periodStart, $periodEnd])
+                    ->whereHas('attendance', function ($query) {
+                        $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+                    })
+                    ->count();
+                    
+                if ($sessionCount > 0) {
+                    $payment->update(['amount' => $sessionCount * $pricePerSession]);
+                } elseif (preg_match('/\((\d+)\s*sesi\)/i', $payment->notes, $matches)) {
+                    $payment->update(['amount' => (int)$matches[1] * $pricePerSession]);
+                }
+            }
         }
 
         return redirect()->route('admin.clients.index')
