@@ -21,7 +21,7 @@ class PaymentController extends Controller
         $periodEnd = $date->copy()->endOfMonth();
 
         // 2. TAMPILKAN LISTNYA
-        $query = Payment::with(['client.user', 'student', 'verifiedBy'])->orderBy('amount', 'desc')->latest();
+        $query = Payment::with(['client.user', 'student', 'verifiedBy', 'waSentBy'])->orderBy('amount', 'desc')->latest();
 
         if ($request->filled('filter_month')) {
             // Due date = akhir bulan periode + 7 hari
@@ -150,5 +150,16 @@ class PaymentController extends Controller
 
         return redirect()->route('admin.payments.index')
             ->with('success', 'Pembayaran berhasil diverifikasi!');
+    }
+
+    public function markWaSent(Payment $payment)
+    {
+        $payment->update([
+            'wa_sent_at' => now(),
+            'wa_sent_by' => auth()->id(),
+            'wa_sent_count' => $payment->wa_sent_count + 1,
+        ]);
+
+        return redirect()->back()->with('success', 'Tagihan ditandai sudah dikirim via WhatsApp.');
     }
 }

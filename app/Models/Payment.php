@@ -23,6 +23,9 @@ class Payment extends Model
         'transaction_id',
         'notes',
         'verified_by',
+        'wa_sent_at',
+        'wa_sent_by',
+        'wa_sent_count',
     ];
 
     protected function casts(): array
@@ -32,6 +35,8 @@ class Payment extends Model
             'due_date' => 'date',
             'amount' => 'decimal:2',
             'discount' => 'decimal:2',
+            'wa_sent_at' => 'datetime',
+            'wa_sent_count' => 'integer',
         ];
     }
 
@@ -51,6 +56,11 @@ class Payment extends Model
     public function verifiedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function waSentBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'wa_sent_by');
     }
 
     /**

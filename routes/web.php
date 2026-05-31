@@ -116,6 +116,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/payments/generate', [PaymentController::class, 'generate'])->name('payments.generate');
         Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
         Route::post('/payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
+        Route::post('/payments/{payment}/mark-wa-sent', [PaymentController::class, 'markWaSent'])->name('payments.mark-wa-sent');
 
         // Reports
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

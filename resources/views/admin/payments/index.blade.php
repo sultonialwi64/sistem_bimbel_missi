@@ -24,7 +24,7 @@
 @endpush
 
 @section('content')
-<div class="space-y-8" x-data="{ previewOpen: false, previewUrl: '', downloadUrl: '', previewTitle: '' }">
+<div class="space-y-8" x-data="{ previewOpen: false, previewUrl: '', downloadUrl: '', previewTitle: '', waConfirmOpen: false, waConfirmAction: '', waConfirmTitle: '' }">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <p class="text-gray-500">Manage client payments & automated billing</p>
@@ -193,6 +193,17 @@
                                     @endif">
                                     {{ ucfirst($payment->status) }}
                                 </span>
+                                <div class="mt-2">
+                                    @if($payment->wa_sent_at)
+                                        <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-700" title="Ditandai oleh {{ $payment->waSentBy->name ?? 'Admin' }}">
+                                            WA {{ $payment->wa_sent_at->format('d M H:i') }}
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-500">
+                                            Belum WA
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="payment-actions-cell py-4 px-6 text-right">
                                 @php
@@ -235,6 +246,9 @@
                                             WA
                                         </a>
                                     @endif
+                                    <button type="button" @click="waConfirmOpen = true; waConfirmAction = @js(route('admin.payments.mark-wa-sent', $payment)); waConfirmTitle = @js($payment->client->user->name . ' - ' . $payment->student->name)" class="inline-flex items-center justify-center px-2.5 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl font-bold text-xs hover:bg-blue-100 transition-all" title="Tandai sudah dikirim via WhatsApp">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    </button>
                                     <a href="{{ route('admin.payments.show', $payment) }}" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-xl font-bold text-xs hover:bg-indigo-50 transition-all">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         View
@@ -279,14 +293,25 @@
                                 <p class="text-xs text-gray-400 truncate">Tentor: {{ $payment->tutor_names ?: '-' }}</p>
                             </div>
                         </div>
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold flex-shrink-0
-                            @if($payment->status === 'paid') bg-green-100 text-green-700
-                            @elseif($payment->status === 'pending') bg-amber-100 text-amber-700
-                            @elseif($payment->status === 'overdue') bg-red-100 text-red-700
-                            @else bg-gray-100 text-gray-700
-                            @endif">
-                            {{ ucfirst($payment->status) }}
-                        </span>
+                        <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold
+                                @if($payment->status === 'paid') bg-green-100 text-green-700
+                                @elseif($payment->status === 'pending') bg-amber-100 text-amber-700
+                                @elseif($payment->status === 'overdue') bg-red-100 text-red-700
+                                @else bg-gray-100 text-gray-700
+                                @endif">
+                                {{ ucfirst($payment->status) }}
+                            </span>
+                            @if($payment->wa_sent_at)
+                                <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-700">
+                                    WA {{ $payment->wa_sent_at->format('d M H:i') }}
+                                </span>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-slate-50 px-2 py-0.5 text-[9px] font-bold text-slate-500">
+                                    Belum WA
+                                </span>
+                            @endif
+                        </div>
                     </div>
                     <div class="flex items-center justify-between py-2 border-y border-gray-50 mb-3">
                         <div>
@@ -342,6 +367,10 @@
                                 WhatsApp
                             </a>
                         @endif
+                        <button type="button" @click="waConfirmOpen = true; waConfirmAction = @js(route('admin.payments.mark-wa-sent', $payment)); waConfirmTitle = @js($payment->client->user->name . ' - ' . $payment->student->name)" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs hover:bg-blue-100 transition-all">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            Tandai
+                        </button>
                         <a href="{{ route('admin.payments.show', $payment) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-semibold text-xs hover:bg-indigo-100 transition-all">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             Detail
@@ -389,6 +418,41 @@
             <div class="min-h-0 flex-1 bg-slate-100">
                 <iframe x-show="previewUrl" :src="previewUrl" class="h-full w-full border-0 bg-white"></iframe>
             </div>
+        </div>
+    </div>
+
+    <div
+        x-cloak
+        x-show="waConfirmOpen"
+        x-transition.opacity
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6"
+        @keydown.escape.window="waConfirmOpen = false"
+    >
+        <div class="absolute inset-0" @click="waConfirmOpen = false"></div>
+        <div class="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div class="border-b border-slate-100 px-6 py-5">
+                <div class="flex items-start gap-4">
+                    <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-lg font-black text-slate-900">Tandai Sudah Dikirim?</h3>
+                        <p class="mt-1 text-sm leading-6 text-slate-500">
+                            Tagihan <span class="font-bold text-slate-700" x-text="waConfirmTitle"></span> akan ditandai sudah dikirim via WhatsApp.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <form :action="waConfirmAction" method="POST" class="flex items-center justify-end gap-3 bg-slate-50 px-6 py-4">
+                @csrf
+                <button type="button" @click="waConfirmOpen = false" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 shadow-sm transition-all hover:bg-slate-100">
+                    Batal
+                </button>
+                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-blue-800">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Tandai
+                </button>
+            </form>
         </div>
     </div>
 </div>
