@@ -88,7 +88,10 @@
                                         <span class="text-white font-bold text-xs">{{ substr($payment->client->user->name, 0, 2) }}</span>
                                     </div>
                                     <div>
-                                        <p class="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">{{ $payment->client->user->name }}</p>
+                                        <p class="font-bold text-gray-900 group-hover:text-purple-600 transition-colors flex items-center gap-1.5">
+                                            {{ $payment->client->user->name }}
+                                            <span class="inline-flex items-center justify-center h-4 w-4 rounded-full text-[9px] font-black {{ $payment->client->client_type === 'tipe_1' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700' }}">{{ $payment->client->client_type === 'tipe_1' ? '1' : '2' }}</span>
+                                        </p>
                                         <p class="text-xs text-gray-500">{{ $payment->client->user->email }}</p>
                                     </div>
                                 </div>
@@ -209,7 +212,10 @@
                                 <span class="text-white font-bold text-xs">{{ substr($payment->client->user->name, 0, 2) }}</span>
                             </div>
                             <div class="min-w-0">
-                                <p class="font-bold text-gray-900 text-sm truncate">{{ $payment->client->user->name }}</p>
+                                <p class="font-bold text-gray-900 text-sm truncate flex items-center gap-1.5">
+                                    {{ $payment->client->user->name }}
+                                    <span class="inline-flex items-center justify-center h-4 w-4 rounded-full text-[9px] font-black flex-shrink-0 {{ $payment->client->client_type === 'tipe_1' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700' }}">{{ $payment->client->client_type === 'tipe_1' ? '1' : '2' }}</span>
+                                </p>
                                 <p class="text-xs text-gray-500 truncate">Siswa: {{ $payment->student->name }}</p>
                             </div>
                         </div>
