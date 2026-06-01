@@ -61,6 +61,8 @@ class ClientController extends Controller
             'address'           => $validated['address'],
             'emergency_contact' => $validated['emergency_contact'] ?? null,
             'client_type'       => $validated['client_type'],
+            'is_active'         => true,
+            'created_by'        => auth()->id(),
         ]);
 
         app(NotificationService::class)->notifyAdminsNewClient($client);
@@ -71,7 +73,7 @@ class ClientController extends Controller
 
     public function show(Client $client)
     {
-        $client->load(['user', 'students', 'payments']);
+        $client->load(['user', 'students', 'payments', 'createdBy']);
         return view('tutor.clients.show', compact('client'));
     }
 

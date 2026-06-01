@@ -54,6 +54,14 @@
                         <label class="text-gray-500">Emergency Contact</label>
                         <p class="font-medium">{{ $client->emergency_contact ?? '-' }}</p>
                     </div>
+                    <div>
+                        <label class="text-gray-500">Ditambahkan Oleh</label>
+                        <p class="font-medium">{{ $client->createdBy?->name ?? 'Data lama / tidak tercatat' }}</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-500">Tanggal Ditambahkan</label>
+                        <p class="font-medium">{{ $client->created_at?->translatedFormat('d F Y H:i') ?? '-' }}</p>
+                    </div>
                 </div>
             </div>
         </div>

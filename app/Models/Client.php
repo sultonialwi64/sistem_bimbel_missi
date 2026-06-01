@@ -17,6 +17,7 @@ class Client extends Model
         'emergency_contact',
         'client_type',
         'is_active',
+        'created_by',
     ];
 
     protected function casts(): array
@@ -42,6 +43,11 @@ class Client extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function scopeActive($query)

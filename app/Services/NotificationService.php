@@ -98,14 +98,16 @@ class NotificationService
 
     public function notifyAdminsNewClient($client): void
     {
-        $client->loadMissing('user');
+        $client->loadMissing(['user', 'createdBy']);
+
+        $creatorName = $client->createdBy?->name ?? 'Sistem';
 
         $this->broadcast(
             $this->admins()->all(),
             'new_client',
             'Client Baru Dibuat',
-            "{$client->user->name} baru ditambahkan sebagai client.",
-            ['client_id' => $client->id],
+            "{$client->user->name} baru ditambahkan sebagai client oleh {$creatorName}.",
+            ['client_id' => $client->id, 'created_by' => $client->created_by],
             route('admin.clients.show', $client)
         );
     }
