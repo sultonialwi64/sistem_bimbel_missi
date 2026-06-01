@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Student, Client};
+use App\Models\{Student, Client, GradeLevel};
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,9 @@ class StudentController extends Controller
     public function create()
     {
         $clients = Client::active()->get();
-        return view('admin.students.create', compact('clients'));
+        $gradeLevels = GradeLevel::orderBy('name')->get();
+
+        return view('admin.students.create', compact('clients', 'gradeLevels'));
     }
 
     public function store(Request $request)
@@ -28,7 +30,7 @@ class StudentController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'birth_date' => ['nullable', 'date'],
             'school_name' => ['nullable', 'string', 'max:255'],
-            'grade_level' => ['nullable', 'string', 'max:50'],
+            'grade_level' => ['nullable', 'exists:grade_levels,name'],
             'photo' => ['nullable', 'image', 'max:2048'],
         ]);
 
@@ -56,7 +58,9 @@ class StudentController extends Controller
             $query->where('is_active', true)
                 ->orWhere('id', $student->client_id);
         })->get();
-        return view('admin.students.edit', compact('student', 'clients'));
+        $gradeLevels = GradeLevel::orderBy('name')->get();
+
+        return view('admin.students.edit', compact('student', 'clients', 'gradeLevels'));
     }
 
     public function update(Request $request, Student $student)
@@ -66,7 +70,7 @@ class StudentController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'birth_date' => ['nullable', 'date'],
             'school_name' => ['nullable', 'string', 'max:255'],
-            'grade_level' => ['nullable', 'string', 'max:50'],
+            'grade_level' => ['nullable', 'string', 'max:255'],
             'photo' => ['nullable', 'image', 'max:2048'],
             'is_active' => ['boolean'],
         ]);

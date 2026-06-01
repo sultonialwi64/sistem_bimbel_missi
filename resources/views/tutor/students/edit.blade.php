@@ -34,9 +34,19 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Grade Level</label>
                         <select name="grade_level" class="mt-1 block w-full rounded-md border-gray-300">
-                            <option value="SD" {{ $student->grade_level == 'SD' ? 'selected' : '' }}>SD</option>
-                            <option value="SMP" {{ $student->grade_level == 'SMP' ? 'selected' : '' }}>SMP</option>
-                            <option value="SMA" {{ $student->grade_level == 'SMA' ? 'selected' : '' }}>SMA</option>
+                            <option value="">Select Grade</option>
+                            @php
+                                $selectedGrade = old('grade_level', $student->grade_level);
+                                $gradeNames = $gradeLevels->pluck('name');
+                            @endphp
+                            @if($selectedGrade && ! $gradeNames->contains($selectedGrade))
+                                <option value="{{ $selectedGrade }}" selected>{{ $selectedGrade }} (data lama)</option>
+                            @endif
+                            @foreach($gradeLevels as $gradeLevel)
+                                <option value="{{ $gradeLevel->name }}" {{ $selectedGrade === $gradeLevel->name ? 'selected' : '' }}>
+                                    {{ $gradeLevel->name }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </div>

@@ -72,6 +72,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
         Route::post('/clients/{client}/deactivate', [ClientController::class, 'deactivate'])->name('clients.deactivate');
         Route::post('/clients/{client}/activate', [ClientController::class, 'activate'])->name('clients.activate');
+        Route::delete('/clients/{client}/force-destroy', [ClientController::class, 'forceDestroy'])->name('clients.force-destroy');
+        Route::patch('/clients/{client}/account', [ClientController::class, 'updateAccount'])->name('clients.update-account');
+        Route::patch('/clients/{client}/address', [ClientController::class, 'updateAddress'])->name('clients.update-address');
+        Route::patch('/clients/{client}/type', [ClientController::class, 'updateType'])->name('clients.update-type');
+        Route::post('/clients/{client}/students', [ClientController::class, 'storeStudent'])->name('clients.students.store');
         Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
         Route::get('/clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit');
         Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');

@@ -143,6 +143,10 @@ class ClientController extends Controller
 
     public function destroy(Client $client)
     {
+        if ($client->students()->exists() || $client->payments()->exists()) {
+            return back()->with('error', 'Client tidak bisa dihapus permanen karena sudah memiliki anak atau histori tagihan.');
+        }
+
         $user = $client->user;
         $client->delete();
         if ($user) {

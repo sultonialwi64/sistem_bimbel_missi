@@ -50,9 +50,11 @@
                             <select name="grade_level"
                                     class="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="">Select Grade</option>
-                                <option value="SD" {{ old('grade_level') == 'SD' ? 'selected' : '' }}>SD</option>
-                                <option value="SMP" {{ old('grade_level') == 'SMP' ? 'selected' : '' }}>SMP</option>
-                                <option value="SMA" {{ old('grade_level') == 'SMA' ? 'selected' : '' }}>SMA</option>
+                                @foreach($gradeLevels as $gradeLevel)
+                                    <option value="{{ $gradeLevel->name }}" {{ old('grade_level') === $gradeLevel->name ? 'selected' : '' }}>
+                                        {{ $gradeLevel->name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         
