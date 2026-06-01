@@ -20,6 +20,8 @@ class PaymentController extends Controller
         $periodStart = $date->copy()->startOfMonth();
         $periodEnd = $date->copy()->endOfMonth();
 
+        $this->syncPaymentsForPeriod($date);
+
         // 2. TAMPILKAN LISTNYA
         $query = Payment::with(['client.user', 'student', 'verifiedBy', 'waSentBy'])->orderBy('amount', 'desc')->latest();
 
@@ -80,53 +82,86 @@ class PaymentController extends Controller
     {
         $monthFilter = $request->input('filter_month', Carbon::now()->subMonth()->format('Y-m'));
         $date = Carbon::parse($monthFilter);
+        $result = $this->syncPaymentsForPeriod($date);
+
+        return redirect()->route('admin.payments.index', ['filter_month' => $monthFilter])
+            ->with('success', "{$result['created']} tagihan dibuat dan {$result['updated']} tagihan diperbarui untuk ".$date->translatedFormat('F Y'));
+    }
+
+    private function syncPaymentsForPeriod(Carbon $date): array
+    {
         $periodStart = $date->copy()->startOfMonth();
         $periodEnd = $date->copy()->endOfMonth();
+        $dueDate = $periodEnd->copy()->addDays(7);
 
         $students = Student::with('client')->get();
-        $generated = 0;
+        $created = 0;
+        $updated = 0;
 
         foreach ($students as $student) {
-            $exists = Payment::where('student_id', $student->id)
-                ->where('due_date', '>=', $periodStart)
-                ->where('due_date', '<=', $periodEnd->copy()->addDays(7))
-                ->whereIn('status', ['pending', 'overdue'])
-                ->exists();
+            if (! $student->client) {
+                continue;
+            }
 
-            if (! $exists) {
-                $sessionCount = Schedule::where('student_id', $student->id)
-                    ->whereBetween('date', [$periodStart, $periodEnd])
-                    ->whereHas('attendance', function ($query) {
-                        $query->whereIn('status', ['hadir', 'pindah_lokasi']);
-                    })
-                    ->count();
+            $sessionCount = Schedule::where('student_id', $student->id)
+                ->whereBetween('date', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
+                ->whereHas('attendance', function ($query) {
+                    $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+                })
+                ->count();
 
-                if ($sessionCount > 0) {
-                    $client = $student->client;
-                    $baseAmount = $sessionCount * $client->session_price;
+            if ($sessionCount === 0) {
+                continue;
+            }
 
-                    $discount = 0;
-                    if ($sessionCount >= config('bimbel.discount.threshold', 8)) {
-                        $discount = $client->discount;
-                    }
+            $client = $student->client;
+            $baseAmount = $sessionCount * $client->session_price;
+            $discount = $sessionCount >= config('bimbel.discount.threshold', 8)
+                ? $client->discount
+                : 0;
+            $amount = $baseAmount - $discount;
+            $notes = 'Auto-generated for '.$date->translatedFormat('F Y')." ($sessionCount sesi)";
 
-                    Payment::create([
+            $payments = Payment::where('student_id', $student->id)
+                ->whereDate('due_date', $dueDate->format('Y-m-d'))
+                ->where('status', '!=', 'cancelled')
+                ->get();
+
+            if ($payments->isEmpty()) {
+                Payment::create([
+                    'client_id' => $client->id,
+                    'student_id' => $student->id,
+                    'amount' => $amount,
+                    'discount' => $discount,
+                    'payment_date' => null,
+                    'due_date' => $dueDate,
+                    'status' => 'pending',
+                    'notes' => $notes,
+                ]);
+                $created++;
+
+                continue;
+            }
+
+            foreach ($payments->whereIn('status', ['pending', 'overdue']) as $payment) {
+                if (
+                    (float) $payment->amount !== (float) $amount ||
+                    (float) $payment->discount !== (float) $discount ||
+                    $payment->client_id !== $client->id ||
+                    $payment->notes !== $notes
+                ) {
+                    $payment->update([
                         'client_id' => $client->id,
-                        'student_id' => $student->id,
-                        'amount' => $baseAmount - $discount,
+                        'amount' => $amount,
                         'discount' => $discount,
-                        'payment_date' => null,
-                        'due_date' => $periodEnd->copy()->addDays(7),
-                        'status' => 'pending',
-                        'notes' => 'Auto-generated for '.$date->translatedFormat('F Y')." ($sessionCount sesi)",
+                        'notes' => $notes,
                     ]);
-                    $generated++;
+                    $updated++;
                 }
             }
         }
 
-        return redirect()->route('admin.payments.index', ['filter_month' => $monthFilter])
-            ->with('success', "$generated tagihan berhasil digenerate untuk ".$date->translatedFormat('F Y'));
+        return compact('created', 'updated');
     }
 
     public function show(Payment $payment)
