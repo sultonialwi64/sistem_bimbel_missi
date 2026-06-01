@@ -8,11 +8,20 @@ use App\Models\Payment;
 use App\Models\Schedule;
 use App\Models\Student;
 use App\Models\Tutor;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $financialMonth = $request->input('financial_month', now()->format('Y-m'));
+        $financialDate = Carbon::parse($financialMonth);
+        $financialStart = $financialDate->copy()->startOfMonth();
+        $financialEnd = $financialDate->copy()->endOfMonth();
+        $invoiceDueStart = $financialStart->copy()->addDays(7);
+        $invoiceDueEnd = $financialEnd->copy()->addDays(7);
+
         $stats = [
             'total_tutors' => Tutor::count(),
             'active_tutors' => Tutor::where('status', 'active')->count(),
@@ -20,17 +29,18 @@ class DashboardController extends Controller
             'total_students' => Student::where('is_active', true)->count(),
             'total_schedules' => Schedule::count(),
             'today_schedules' => Schedule::whereDate('date', today())->count(),
-            'pending_payments' => Payment::where('status', 'pending')->sum('amount'),
+            'pending_payments' => Payment::where('status', 'pending')
+                ->whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
+                ->sum('amount'),
             'monthly_revenue' => Payment::where('status', 'paid')
-                ->whereMonth('payment_date', now()->month)
+                ->whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
                 ->sum('amount'),
         ];
 
         // Pendapatan bersih perusahaan bulan ini
         // = jumlah sesi terlaksana (kehadiran terverifikasi) × margin perusahaan per sesi (berdasarkan tipe klien)
         $validSessionsThisMonth = Schedule::with('student.client')
-            ->whereMonth('date', now()->month)
-            ->whereYear('date', now()->year)
+            ->whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
             ->where('status', 'completed')
             ->whereHas('attendance', function ($q) {
                 $q->whereIn('status', ['hadir', 'pindah_lokasi']);
@@ -60,6 +70,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentSchedules', 'recentPayments', 'topTutors'));
+        return view('admin.dashboard', compact('stats', 'recentSchedules', 'recentPayments', 'topTutors', 'financialMonth'));
     }
 }

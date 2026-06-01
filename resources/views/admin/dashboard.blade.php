@@ -6,6 +6,23 @@
 
 @section('content')
 <div class="space-y-8">
+    <div class="flex justify-end">
+        <form action="{{ route('admin.dashboard') }}" method="GET" class="flex w-full flex-col gap-2 rounded-2xl border border-indigo-700 bg-indigo-800 p-3 shadow-lg sm:w-auto sm:flex-row sm:items-center">
+            <span class="text-xs font-bold uppercase tracking-widest text-indigo-100 sm:mr-1">
+                Filter Pendapatan
+            </span>
+            <input type="month" name="financial_month" value="{{ $financialMonth }}" class="rounded-xl border border-indigo-600 bg-indigo-900 px-3 py-2 text-sm font-bold text-white shadow-sm focus:border-blue-300 focus:ring-2 focus:ring-blue-300">
+            <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-blue-500">
+                Terapkan
+            </button>
+            @if($financialMonth !== now()->format('Y-m'))
+                <a href="{{ route('admin.dashboard') }}" class="rounded-xl border border-indigo-600 px-4 py-2 text-center text-sm font-bold text-indigo-100 transition-all hover:bg-indigo-700">
+                    Bulan Ini
+                </a>
+            @endif
+        </form>
+    </div>
+
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6">
 
@@ -63,7 +80,10 @@
         <!-- 4. Monthly Revenue -->
         <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div class="flex items-start justify-between mb-3">
-                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Monthly Revenue</p>
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-white/70">Monthly Revenue</p>
+                    <p class="mt-1 text-[10px] font-bold uppercase tracking-wider text-indigo-200">{{ \Carbon\Carbon::parse($financialMonth)->translatedFormat('M Y') }}</p>
+                </div>
                 <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
                     <svg class="h-5 w-5 text-blue-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -80,7 +100,10 @@
         <!-- 5. Net Income (Pendapatan Bersih) -->
         <div class="group bg-indigo-800 rounded-2xl shadow-lg border border-indigo-700 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div class="flex items-start justify-between mb-3">
-                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Pendapatan Bersih</p>
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-white/70">Pendapatan Bersih</p>
+                    <p class="mt-1 text-[10px] font-bold uppercase tracking-wider text-indigo-200">{{ \Carbon\Carbon::parse($financialMonth)->translatedFormat('M Y') }}</p>
+                </div>
                 <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-green-500/20 border border-green-400/30 flex items-center justify-center group-hover:bg-green-600 transition-colors">
                     <svg class="h-5 w-5 text-green-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
@@ -90,7 +113,7 @@
             <p class="text-2xl font-black text-white leading-none mb-4 whitespace-nowrap">Rp {{ number_format($stats['net_income'], 0, ',', '.') }}</p>
             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
                 <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                {{ $stats['net_income_sessions'] }} sesi × Rp {{ number_format($stats['net_income_rate'], 0, ',', '.') }}
+                {{ $stats['net_income_sessions'] }} sesi terlaksana
             </span>
         </div>
 
