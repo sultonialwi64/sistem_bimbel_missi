@@ -101,7 +101,10 @@ class PaymentController extends Controller
         $periodEnd = $date->copy()->endOfMonth();
         $dueDate = $periodEnd->copy()->addDays(7);
 
-        $students = Student::with('client')->get();
+        $students = Student::with('client')
+            ->where('is_active', true)
+            ->whereHas('client', fn ($query) => $query->where('is_active', true))
+            ->get();
         $created = 0;
         $updated = 0;
 

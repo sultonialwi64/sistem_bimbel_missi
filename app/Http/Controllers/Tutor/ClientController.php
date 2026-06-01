@@ -14,6 +14,7 @@ class ClientController extends Controller
         $search = $request->input('search');
         
         $clients = Client::with('user')
+            ->where('is_active', true)
             ->when($search, function($query) use ($search) {
                 $query->whereHas('user', function($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")

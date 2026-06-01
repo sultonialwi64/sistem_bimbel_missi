@@ -16,12 +16,13 @@ class Client extends Model
         'address',
         'emergency_contact',
         'client_type',
+        'is_active',
     ];
 
     protected function casts(): array
     {
         return [
-            // No coordinates to cast
+            'is_active' => 'boolean',
         ];
     }
 
@@ -41,6 +42,11 @@ class Client extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 
     /**

@@ -33,7 +33,10 @@ class ScheduleController extends Controller
     public function create()
     {
         // Ambil semua murid yang aktif dan semua subject
-        $students = Student::where('is_active', true)->orderBy('name')->get();
+        $students = Student::where('is_active', true)
+            ->whereHas('client', fn ($query) => $query->where('is_active', true))
+            ->orderBy('name')
+            ->get();
         $subjects = Subject::orderBy('name')->get();
 
         return view('tutor.schedules.create', compact('students', 'subjects'));
@@ -144,7 +147,12 @@ class ScheduleController extends Controller
             return redirect()->route('tutor.schedules.index')->with('error', 'Hanya jadwal yang masih berstatus Scheduled yang dapat diedit.');
         }
 
-        $students = Student::where('is_active', true)->orderBy('name')->get();
+        $students = Student::where(function ($query) use ($schedule) {
+            $query->where(function ($activeQuery) {
+                $activeQuery->where('is_active', true)
+                    ->whereHas('client', fn ($clientQuery) => $clientQuery->where('is_active', true));
+            })->orWhere('id', $schedule->student_id);
+        })->orderBy('name')->get();
         $subjects = Subject::orderBy('name')->get();
 
         return view('tutor.schedules.edit', compact('schedule', 'students', 'subjects'));

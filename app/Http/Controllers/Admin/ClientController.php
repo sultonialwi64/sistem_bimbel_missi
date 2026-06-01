@@ -12,8 +12,11 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $statusFilter = $request->input('status', 'active');
         
-        $clients = Client::with('user')
+        $clients = Client::with(['user', 'students'])
+            ->when($statusFilter === 'active', fn ($query) => $query->where('is_active', true))
+            ->when($statusFilter === 'inactive', fn ($query) => $query->where('is_active', false))
             ->when($search, function($query) use ($search) {
                 $query->whereHas('user', function($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
@@ -25,7 +28,7 @@ class ClientController extends Controller
             ->paginate(10)
             ->withQueryString();
             
-        return view('admin.clients.index', compact('clients', 'search'));
+        return view('admin.clients.index', compact('clients', 'search', 'statusFilter'));
     }
 
     public function create()
@@ -59,6 +62,7 @@ class ClientController extends Controller
             'address' => $validated['address'],
             'emergency_contact' => $validated['emergency_contact'] ?? null,
             'client_type' => $validated['client_type'],
+            'is_active' => true,
         ]);
 
         return redirect()->route('admin.clients.index')
@@ -145,5 +149,23 @@ class ClientController extends Controller
         
         return redirect()->route('admin.clients.index')
             ->with('success', 'Client dan akun login berhasil dihapus!');
+    }
+
+    public function deactivate(Client $client)
+    {
+        $client->update(['is_active' => false]);
+        $client->user?->update(['is_active' => false]);
+
+        return redirect()->route('admin.clients.index')
+            ->with('success', 'Client berhasil dinonaktifkan. Histori siswa, sesi, laporan, dan tagihan tetap tersimpan.');
+    }
+
+    public function activate(Client $client)
+    {
+        $client->update(['is_active' => true]);
+        $client->user?->update(['is_active' => true]);
+
+        return redirect()->route('admin.clients.index', ['status' => 'active'])
+            ->with('success', 'Client berhasil diaktifkan kembali.');
     }
 }

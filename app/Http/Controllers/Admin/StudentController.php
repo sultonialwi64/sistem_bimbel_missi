@@ -16,7 +16,7 @@ class StudentController extends Controller
 
     public function create()
     {
-        $clients = Client::all();
+        $clients = Client::active()->get();
         return view('admin.students.create', compact('clients'));
     }
 
@@ -49,7 +49,10 @@ class StudentController extends Controller
 
     public function edit(Student $student)
     {
-        $clients = Client::all();
+        $clients = Client::where(function ($query) use ($student) {
+            $query->where('is_active', true)
+                ->orWhere('id', $student->client_id);
+        })->get();
         return view('admin.students.edit', compact('student', 'clients'));
     }
 

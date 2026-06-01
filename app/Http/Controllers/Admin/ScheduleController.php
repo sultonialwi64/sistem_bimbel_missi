@@ -18,7 +18,9 @@ class ScheduleController extends Controller
         $allSchedules = Schedule::with(['tutor.user', 'student', 'subject'])->get();
         
         $tutors = Tutor::where('status', 'active')->get();
-        $students = Student::where('is_active', true)->get();
+        $students = Student::where('is_active', true)
+            ->whereHas('client', fn ($query) => $query->where('is_active', true))
+            ->get();
         $subjects = Subject::where('is_active', true)->get();
         
         return view('admin.schedules.index', compact('schedules', 'allSchedules', 'tutors', 'students', 'subjects'));
@@ -27,7 +29,9 @@ class ScheduleController extends Controller
     public function create()
     {
         $tutors = Tutor::where('status', 'active')->get();
-        $students = Student::where('is_active', true)->get();
+        $students = Student::where('is_active', true)
+            ->whereHas('client', fn ($query) => $query->where('is_active', true))
+            ->get();
         $subjects = Subject::where('is_active', true)->get();
         
         return view('admin.schedules.create', compact('tutors', 'students', 'subjects'));
@@ -125,7 +129,12 @@ class ScheduleController extends Controller
     public function edit(Schedule $schedule)
     {
         $tutors = Tutor::where('status', 'active')->get();
-        $students = Student::where('is_active', true)->get();
+        $students = Student::where(function ($query) use ($schedule) {
+            $query->where(function ($activeQuery) {
+                $activeQuery->where('is_active', true)
+                    ->whereHas('client', fn ($clientQuery) => $clientQuery->where('is_active', true));
+            })->orWhere('id', $schedule->student_id);
+        })->get();
         $subjects = Subject::where('is_active', true)->get();
         
         return view('admin.schedules.edit', compact('schedule', 'tutors', 'students', 'subjects'));

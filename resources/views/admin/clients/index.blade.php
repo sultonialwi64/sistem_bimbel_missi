@@ -4,17 +4,35 @@
 @section('page-title', 'Client Management')
 @section('page-subtitle', 'Manage clients and their information')
 
+@push('styles')
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+@endpush
+
 @section('content')
-<div class="space-y-8">
+<div class="space-y-8" x-data="{ deactivateOpen: false, deactivateAction: '', deactivateName: '' }">
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
             <p class="text-gray-500 text-sm">Manage clients and their information</p>
         </div>
         <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            <div class="flex items-center gap-2 rounded-2xl border border-indigo-200 bg-white p-1 shadow-sm w-full sm:w-auto">
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'active']) }}" class="flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-center text-xs font-bold transition-all {{ $statusFilter === 'active' ? 'bg-indigo-700 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Aktif
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'inactive']) }}" class="flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-center text-xs font-bold transition-all {{ $statusFilter === 'inactive' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Nonaktif
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-center text-xs font-bold transition-all {{ $statusFilter === 'all' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Semua
+                </a>
+            </div>
             <form action="{{ route('admin.clients.index') }}" method="GET" class="w-full sm:w-auto relative">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, telepon..." 
                        class="w-full sm:w-64 pl-10 pr-4 py-2.5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm shadow-sm transition-all"
                        onblur="this.form.submit()">
+                <input type="hidden" name="status" value="{{ $statusFilter }}">
                 <svg class="h-4 w-4 text-gray-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
@@ -62,7 +80,12 @@
                                         <span class="text-white font-bold text-sm">{{ substr($client->user->name, 0, 2) }}</span>
                                     </div>
                                     <div>
-                                        <p class="font-bold text-gray-900 group-hover:text-green-600 transition-colors">{{ $client->user->name }}</p>
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <p class="font-bold text-gray-900 group-hover:text-green-600 transition-colors">{{ $client->user->name }}</p>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black {{ $client->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">
+                                                {{ $client->is_active ? 'Aktif' : 'Nonaktif' }}
+                                            </span>
+                                        </div>
                                         <p class="text-sm text-gray-500">{{ $client->user->email }}</p>
                                     </div>
                                 </div>
@@ -108,14 +131,22 @@
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         Edit
                                     </a>
-                                    <form action="{{ route('admin.clients.destroy', $client) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-red-50 to-pink-50 text-red-700 rounded-xl font-semibold text-sm hover:shadow-lg hover:shadow-red-500/20 transition-all">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            Delete
-                                        </button>
-                                    </form>
+                                    @if($client->is_active)
+                                        <div class="inline">
+                                            <button type="button" @click="deactivateAction = '{{ route('admin.clients.deactivate', $client) }}'; deactivateName = @js($client->user->name); deactivateOpen = true" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-slate-50 to-gray-100 text-slate-700 rounded-xl font-semibold text-sm hover:shadow-lg hover:shadow-slate-500/20 transition-all">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 115.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                                Nonaktifkan
+                                            </button>
+                                        </div>
+                                    @else
+                                        <form action="{{ route('admin.clients.activate', $client) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 rounded-xl font-semibold text-sm hover:shadow-lg hover:shadow-emerald-500/20 transition-all">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                Aktifkan
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -139,7 +170,12 @@
                             <span class="text-white font-bold text-sm">{{ substr($client->user->name, 0, 2) }}</span>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <p class="font-bold text-gray-900 text-sm">{{ $client->user->name }}</p>
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <p class="font-bold text-gray-900 text-sm">{{ $client->user->name }}</p>
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black {{ $client->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">
+                                    {{ $client->is_active ? 'Aktif' : 'Nonaktif' }}
+                                </span>
+                            </div>
                             <p class="text-xs text-gray-500 truncate">{{ $client->user->email }}</p>
                         </div>
                         <span class="inline-flex items-center px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-full text-[10px] font-bold flex-shrink-0">
@@ -185,14 +221,22 @@
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             Edit
                         </a>
-                        <form action="{{ route('admin.clients.destroy', $client) }}" method="POST" class="inline flex-1" onsubmit="return confirm('Hapus client ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-700 rounded-xl font-semibold text-xs hover:bg-red-100 transition-all">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                Delete
-                            </button>
-                        </form>
+                        @if($client->is_active)
+                            <div class="inline flex-1">
+                                <button type="button" @click="deactivateAction = '{{ route('admin.clients.deactivate', $client) }}'; deactivateName = @js($client->user->name); deactivateOpen = true" class="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-slate-50 text-slate-700 rounded-xl font-semibold text-xs hover:bg-slate-100 transition-all">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 115.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                    Nonaktif
+                                </button>
+                            </div>
+                        @else
+                            <form action="{{ route('admin.clients.activate', $client) }}" method="POST" class="inline flex-1">
+                                @csrf
+                                <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-emerald-50 text-emerald-700 rounded-xl font-semibold text-xs hover:bg-emerald-100 transition-all">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    Aktifkan
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -207,6 +251,42 @@
                 {{ $clients->links() }}
             </div>
         @endif
+    </div>
+
+    <div x-cloak x-show="deactivateOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 backdrop-blur-sm" x-transition.opacity>
+        <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200" @click.outside="deactivateOpen = false" x-transition.scale.origin.center>
+            <div class="p-6">
+                <div class="flex items-start gap-4">
+                    <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 115.636 5.636m12.728 12.728L5.636 5.636"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-lg font-black text-slate-900">Nonaktifkan Client?</h3>
+                        <p class="mt-1 text-sm leading-6 text-slate-600">
+                            <span class="font-bold text-slate-800" x-text="deactivateName"></span> akan dinonaktifkan dari operasional baru. Data siswa, sesi, laporan, dan tagihan lama tetap tersimpan.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    Client tidak akan ikut auto-generate tagihan baru dan akun loginnya tidak bisa masuk sampai diaktifkan kembali.
+                </div>
+            </div>
+
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
+                <button type="button" @click="deactivateOpen = false" class="inline-flex justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">
+                    Batal
+                </button>
+                <form method="POST" :action="deactivateAction">
+                    @csrf
+                    <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-slate-700 sm:w-auto">
+                        Ya, Nonaktifkan
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
