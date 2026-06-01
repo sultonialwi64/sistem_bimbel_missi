@@ -174,17 +174,19 @@ class PaymentController extends Controller
         return compact('created', 'updated');
     }
 
-    public function show(Payment $payment)
+    public function show(Request $request, Payment $payment)
     {
         $payment->load(['client.user', 'student', 'verifiedBy']);
+        $returnUrl = $this->safePaymentsReturnUrl($request->input('return_url'));
 
-        return view('admin.payments.show', compact('payment'));
+        return view('admin.payments.show', compact('payment', 'returnUrl'));
     }
 
     public function verify(Request $request, Payment $payment)
     {
         $validated = $request->validate([
             'status' => ['required', 'in:paid,overdue,cancelled'],
+            'return_url' => ['nullable', 'string'],
         ]);
 
         $payment->update([
@@ -193,8 +195,29 @@ class PaymentController extends Controller
             'payment_date' => $validated['status'] === 'paid' ? now() : $payment->payment_date,
         ]);
 
-        return redirect()->route('admin.payments.index')
+        return redirect($this->safePaymentsReturnUrl($validated['return_url'] ?? null))
             ->with('success', 'Pembayaran berhasil diverifikasi!');
+    }
+
+    private function safePaymentsReturnUrl(?string $returnUrl): string
+    {
+        if (! $returnUrl) {
+            return route('admin.payments.index');
+        }
+
+        $parts = parse_url($returnUrl);
+        $path = $parts['path'] ?? '';
+        $host = $parts['host'] ?? null;
+
+        if ($host && $host !== request()->getHost()) {
+            return route('admin.payments.index');
+        }
+
+        if ($path !== '/admin/payments') {
+            return route('admin.payments.index');
+        }
+
+        return $returnUrl;
     }
 
     public function markWaSent(Payment $payment)

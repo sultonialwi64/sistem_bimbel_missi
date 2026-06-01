@@ -256,7 +256,7 @@
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                         </button>
                                     @endunless
-                                    <a href="{{ route('admin.payments.show', $payment) }}" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-xl font-bold text-xs hover:bg-indigo-50 transition-all">
+                                    <a href="{{ route('admin.payments.show', ['payment' => $payment, 'return_url' => request()->fullUrl()]) }}" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-xl font-bold text-xs hover:bg-indigo-50 transition-all">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         View
                                     </a>
@@ -380,7 +380,7 @@
                                 Tandai
                             </button>
                         @endunless
-                        <a href="{{ route('admin.payments.show', $payment) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-semibold text-xs hover:bg-indigo-100 transition-all">
+                        <a href="{{ route('admin.payments.show', ['payment' => $payment, 'return_url' => request()->fullUrl()]) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-semibold text-xs hover:bg-indigo-100 transition-all">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             Detail
                         </a>

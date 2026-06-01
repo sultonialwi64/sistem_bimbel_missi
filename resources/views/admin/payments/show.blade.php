@@ -1,10 +1,12 @@
 @extends('layouts.app')
+
 @section('title', 'Payment Detail')
 @section('page-title', 'Payment Detail')
+
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <a href="{{ route('admin.payments.index') }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">← Back to Payments</a>
-    
+    <a href="{{ $returnUrl }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">&larr; Back to Payments</a>
+
     <div class="bg-white rounded-lg shadow p-6">
         <div class="grid grid-cols-2 gap-6 mb-6">
             <div>
@@ -32,7 +34,7 @@
                 <p class="text-lg font-semibold">{{ $payment->due_date->format('d M Y') }}</p>
             </div>
         </div>
-        
+
         <div class="flex items-center justify-between border-t pt-6">
             <div>
                 <span class="px-3 py-1 rounded-full text-sm {{ $payment->status === 'paid' ? 'bg-green-100 text-green-800' : ($payment->status === 'overdue' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
@@ -42,6 +44,7 @@
             @if($payment->status === 'pending')
                 <form action="{{ route('admin.payments.verify', $payment) }}" method="POST" class="flex gap-2">
                     @csrf
+                    <input type="hidden" name="return_url" value="{{ $returnUrl }}">
                     <select name="status" required class="rounded-md border-gray-300">
                         <option value="paid">Mark as Paid</option>
                         <option value="overdue">Mark as Overdue</option>
@@ -51,7 +54,7 @@
                 </form>
             @endif
         </div>
-        
+
         @if($payment->payment_proof)
             <div class="mt-6">
                 <label class="text-sm text-gray-500">Payment Proof</label>
