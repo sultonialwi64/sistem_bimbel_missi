@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
         $user = auth()->user();
 
         if ($user->isAdmin()) {
-            return app(AdminDashboardController::class)->index();
+            return app(AdminDashboardController::class)->index(request());
         } elseif ($user->isTutor()) {
             return app(TutorDashboardController::class)->index();
         } elseif ($user->isClient()) {
