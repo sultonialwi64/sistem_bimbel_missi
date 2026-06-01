@@ -51,6 +51,13 @@ class PaymentController extends Controller
             $query->where('status', 'paid');
         }
 
+        $waStatusFilter = $request->input('wa_status', 'all');
+        if ($waStatusFilter === 'sent') {
+            $query->whereNotNull('wa_sent_at');
+        } elseif ($waStatusFilter === 'unsent') {
+            $query->whereNull('wa_sent_at');
+        }
+
         $payments = $query->paginate(15)->withQueryString();
 
         // Load tutor names per payment
@@ -75,7 +82,7 @@ class PaymentController extends Controller
             ->map(fn ($group) => $group->count())
             ->toArray();
 
-        return view('admin.payments.index', compact('payments', 'statusFilter', 'clientDiscountCounts'));
+        return view('admin.payments.index', compact('payments', 'statusFilter', 'waStatusFilter', 'clientDiscountCounts'));
     }
 
     public function generate(Request $request)

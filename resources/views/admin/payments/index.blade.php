@@ -24,49 +24,52 @@
 @endpush
 
 @section('content')
-<div class="space-y-8" x-data="{ previewOpen: false, previewUrl: '', downloadUrl: '', previewTitle: '', waConfirmOpen: false, waConfirmAction: '', waConfirmTitle: '' }">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <p class="text-gray-500">Manage client payments & automated billing</p>
+<div class="space-y-6" x-data="{ previewOpen: false, previewUrl: '', downloadUrl: '', previewTitle: '', waConfirmOpen: false, waConfirmAction: '', waConfirmTitle: '' }">
+    <div class="rounded-2xl border border-indigo-300/30 bg-indigo-900/35 p-4 shadow-sm">
+        <div class="grid gap-3 md:grid-cols-[auto_auto_minmax(280px,1fr)] md:items-center">
+            <div class="flex min-w-max flex-wrap items-center gap-2">
+                <span class="mr-1 text-xs font-bold uppercase tracking-widest text-indigo-200">Tagihan</span>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'all' ? 'bg-indigo-700 text-white shadow-md ring-1 ring-indigo-200/70' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Semua
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'unpaid']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'unpaid' ? 'bg-amber-500 text-white shadow-md ring-1 ring-amber-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Belum Lunas
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'paid']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'paid' ? 'bg-emerald-500 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Lunas
+                </a>
+            </div>
+
+            <div class="flex min-w-max flex-wrap items-center gap-2 md:border-l md:border-indigo-300/25 md:pl-4">
+                <span class="mr-1 text-xs font-bold uppercase tracking-widest text-indigo-200">WA</span>
+                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'all']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $waStatusFilter === 'all' ? 'bg-orange-600 text-white shadow-md ring-1 ring-orange-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Semua
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'unsent']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $waStatusFilter === 'unsent' ? 'bg-slate-700 text-white shadow-md ring-1 ring-slate-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Belum
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'sent']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $waStatusFilter === 'sent' ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Sudah
+                </a>
+            </div>
+
+            <form action="{{ route('admin.payments.index') }}" method="GET" class="flex w-full items-center gap-2 md:justify-self-end">
+                <div class="relative min-w-0 flex-1">
+                    <svg class="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari client, siswa, atau tutor..." class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-sm shadow-sm transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400">
+                </div>
+                <button type="submit" class="rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-600">Cari</button>
+                @if(request('search'))
+                    <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" class="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-600 shadow-sm transition-all hover:bg-slate-50">Clear</a>
+                @endif
+                <input type="hidden" name="filter_month" value="{{ request('filter_month') }}">
+                <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+                <input type="hidden" name="wa_status" value="{{ request('wa_status', 'all') }}">
+            </form>
         </div>
     </div>
-
-    <!-- Status Tabs -->
-    <div class="flex items-center gap-3">
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'all' ? 'bg-indigo-800 text-white shadow-md ring-2 ring-indigo-200' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
-            Semua Tagihan
-        </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'unpaid']) }}" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'unpaid' ? 'bg-amber-500 text-white shadow-md ring-2 ring-amber-200' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-white"></span>
-                Belum Lunas
-            </div>
-        </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'paid']) }}" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'paid' ? 'bg-emerald-500 text-white shadow-md ring-2 ring-emerald-200' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-white"></span>
-                Lunas
-            </div>
-        </a>
-    </div>
-
-    <!-- Search Bar -->
-    <form action="{{ route('admin.payments.index') }}" method="GET">
-        <div class="flex items-center gap-3">
-            <div class="relative flex-1">
-                <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari berdasarkan nama client, siswa, atau tutor..." class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 shadow-sm transition-all">
-            </div>
-            <button type="submit" class="px-6 py-3 bg-indigo-800 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-sm">Cari</button>
-            @if(request('search'))
-                <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" class="px-4 py-3 bg-white text-slate-600 border border-slate-200 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm">Clear</a>
-            @endif
-            <input type="hidden" name="filter_month" value="{{ request('filter_month') }}">
-            <input type="hidden" name="status" value="{{ request('status', 'all') }}">
-        </div>
-    </form>
 
     <div class="card-premium overflow-hidden">
         <div class="bg-indigo-800 px-6 py-4">
@@ -87,6 +90,11 @@
                         </button>
                         @if(request()->has('filter_month'))
                             <a href="{{ route('admin.payments.index') }}" class="text-indigo-200 hover:text-white text-xs font-bold underline">Clear</a>
+                        @endif
+                        <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+                        <input type="hidden" name="wa_status" value="{{ request('wa_status', 'all') }}">
+                        @if(request('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
                         @endif
                     </form>
                     <span class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-100 ring-1 ring-emerald-300/20">
