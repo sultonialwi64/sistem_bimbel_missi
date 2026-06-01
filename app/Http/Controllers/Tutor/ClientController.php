@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tutor;
 
 use App\Http\Controllers\Controller;
 use App\Models\{User, Client};
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -55,12 +56,14 @@ class ClientController extends Controller
             'is_active' => true,
         ]);
 
-        Client::create([
+        $client = Client::create([
             'user_id'           => $user->id,
             'address'           => $validated['address'],
             'emergency_contact' => $validated['emergency_contact'] ?? null,
             'client_type'       => $validated['client_type'],
         ]);
+
+        app(NotificationService::class)->notifyAdminsNewClient($client);
 
         return redirect()->route('tutor.clients.index')
             ->with('success', 'Client berhasil ditambahkan!');

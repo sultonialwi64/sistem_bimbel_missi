@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\{Student, Client};
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -35,7 +36,9 @@ class StudentController extends Controller
             $validated['photo'] = $request->file('photo')->store('students', 'public');
         }
 
-        Student::create($validated);
+        $student = Student::create($validated);
+
+        app(NotificationService::class)->notifyAdminsNewStudent($student);
 
         return redirect()->route('admin.students.index')
             ->with('success', 'Data siswa berhasil ditambahkan!');
@@ -72,7 +75,12 @@ class StudentController extends Controller
             $validated['photo'] = $request->file('photo')->store('students', 'public');
         }
 
+        $wasActive = $student->is_active;
         $student->update($validated);
+
+        if ($wasActive && ! $student->is_active) {
+            app(NotificationService::class)->notifyAdminsStudentDeactivated($student);
+        }
 
         return redirect()->route('admin.students.index')
             ->with('success', 'Data siswa berhasil diupdate!');

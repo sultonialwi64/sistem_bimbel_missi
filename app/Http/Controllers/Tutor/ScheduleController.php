@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -105,9 +106,11 @@ class ScheduleController extends Controller
             return back()->withInput()->withErrors(['time_conflict' => $conflicts]);
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($datesToCreate, $validated, $tutorId) {
+        $createdSchedules = collect();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($datesToCreate, $validated, $tutorId, &$createdSchedules) {
             foreach ($datesToCreate as $date) {
-                Schedule::create([
+                $createdSchedules->push(Schedule::create([
                     'tutor_id' => $tutorId,
                     'student_id' => $validated['student_id'],
                     'subject_id' => $validated['subject_id'],
@@ -116,9 +119,13 @@ class ScheduleController extends Controller
                     'end_time' => $validated['end_time'],
                     'status' => 'scheduled',
                     'created_by' => Auth::id(),
-                ]);
+                ]));
             }
         });
+
+        if ($createdSchedules->isNotEmpty()) {
+            app(NotificationService::class)->notifyAdminsNewSchedule($createdSchedules->first(), $createdSchedules->count());
+        }
 
         $message = $repeatWeeks > 0 
             ? 'Jadwal berulang berhasil ditambahkan (' . count($datesToCreate) . ' sesi).' 

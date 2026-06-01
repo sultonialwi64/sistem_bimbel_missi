@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\{Schedule, Student, Tutor, Subject};
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
@@ -104,13 +105,19 @@ class ScheduleController extends Controller
         $validated['created_by'] = auth()->id();
         $validated['status'] = 'scheduled';
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($datesToCreate, $validated) {
+        $createdSchedules = collect();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($datesToCreate, $validated, &$createdSchedules) {
             foreach ($datesToCreate as $date) {
                 $scheduleData = $validated;
                 $scheduleData['date'] = $date;
-                Schedule::create($scheduleData);
+                $createdSchedules->push(Schedule::create($scheduleData));
             }
         });
+
+        if ($createdSchedules->isNotEmpty()) {
+            app(NotificationService::class)->notifyAdminsNewSchedule($createdSchedules->first(), $createdSchedules->count());
+        }
 
         $message = $repeatWeeks > 0 
             ? 'Jadwal berulang berhasil ditambahkan (' . count($datesToCreate) . ' sesi)!' 

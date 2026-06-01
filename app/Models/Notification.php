@@ -72,8 +72,13 @@ class Notification extends Model
     {
         return match($this->type) {
             'schedule_changed' => 'calendar',
+            'new_schedule' => 'calendar',
             'payment_due' => 'currency-dollar',
             'new_report' => 'document-text',
+            'new_client' => 'user-plus',
+            'new_student' => 'academic-cap',
+            'missing_report' => 'clipboard-list',
+            'data_deactivated' => 'user-minus',
             'salary_ready' => 'cash',
             'quality_alert' => 'exclamation',
             default => 'bell',

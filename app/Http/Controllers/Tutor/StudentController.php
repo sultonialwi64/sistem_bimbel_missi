@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tutor;
 
 use App\Http\Controllers\Controller;
 use App\Models\{Student, Client};
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -16,7 +17,7 @@ class StudentController extends Controller
 
     public function create()
     {
-        $clients = Client::all();
+        $clients = Client::active()->get();
         return view('tutor.students.create', compact('clients'));
     }
 
@@ -35,7 +36,9 @@ class StudentController extends Controller
             $validated['photo'] = $request->file('photo')->store('students', 'public');
         }
 
-        Student::create($validated);
+        $student = Student::create($validated);
+
+        app(NotificationService::class)->notifyAdminsNewStudent($student);
 
         return redirect()->route('tutor.students.index')
             ->with('success', 'Data siswa berhasil ditambahkan!');
@@ -49,7 +52,10 @@ class StudentController extends Controller
 
     public function edit(Student $student)
     {
-        $clients = Client::all();
+        $clients = Client::where(function ($query) use ($student) {
+            $query->where('is_active', true)
+                ->orWhere('id', $student->client_id);
+        })->get();
         return view('tutor.students.edit', compact('student', 'clients'));
     }
 
@@ -69,7 +75,12 @@ class StudentController extends Controller
             $validated['photo'] = $request->file('photo')->store('students', 'public');
         }
 
+        $wasActive = $student->is_active;
         $student->update($validated);
+
+        if ($wasActive && ! $student->is_active) {
+            app(NotificationService::class)->notifyAdminsStudentDeactivated($student);
+        }
 
         return redirect()->route('tutor.students.index')
             ->with('success', 'Data siswa berhasil diupdate!');

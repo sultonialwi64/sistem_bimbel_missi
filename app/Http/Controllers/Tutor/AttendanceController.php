@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tutor;
 
 use App\Http\Controllers\Controller;
 use App\Models\{Schedule, Attendance};
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -103,6 +104,11 @@ class AttendanceController extends Controller
 
             // Update status schedule
             $schedule->update(['status' => 'completed']);
+            $schedule->refresh();
+
+            if (! $schedule->sessionReport()->exists()) {
+                app(NotificationService::class)->notifyAdminsMissingReport($schedule);
+            }
 
             $msg = 'Absensi berhasil disubmit.';
             if ($verificationStatus === 'manual_review') {
@@ -130,6 +136,11 @@ class AttendanceController extends Controller
             } else {
                 // libur_sakit
                 $schedule->update(['status' => 'completed']);
+                $schedule->refresh();
+
+                if (! $schedule->sessionReport()->exists()) {
+                    app(NotificationService::class)->notifyAdminsMissingReport($schedule);
+                }
             }
 
             return redirect()->route('tutor.schedules.show', $schedule)

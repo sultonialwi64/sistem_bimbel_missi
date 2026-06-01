@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tutor;
 
 use App\Http\Controllers\Controller;
 use App\Models\{SessionReport, Schedule, StudentProgress};
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -73,6 +74,8 @@ class ReportController extends Controller
             'notes_for_parent' => $validated['notes_for_parent'] ?? null,
             'tutor_rating_by_student' => $validated['tutor_rating_by_student'] ?? null,
         ]);
+
+        app(NotificationService::class)->notifyAdminsNewReport($report);
 
         return redirect()->route('tutor.reports.index')
             ->with('success', 'Laporan sesi berhasil dibuat!');

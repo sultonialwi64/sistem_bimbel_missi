@@ -16,7 +16,7 @@ class NotificationService
         string $title,
         string $message,
         array $data = [],
-        string $actionUrl = null
+        ?string $actionUrl = null
     ): Notification {
         $notification = Notification::create([
             'user_id' => $user->id,
@@ -45,17 +45,141 @@ class NotificationService
         string $title,
         string $message,
         array $data = [],
-        string $actionUrl = null
+        ?string $actionUrl = null
     ): void {
         foreach ($users as $user) {
             $this->sendToUser($user, $type, $title, $message, $data, $actionUrl);
         }
     }
 
+    private function admins()
+    {
+        return User::where('role', 'admin')->where('is_active', true)->get();
+    }
+
+    public function notifyAdminsNewSchedule($schedule, int $createdCount = 1): void
+    {
+        $schedule->loadMissing(['student.client.user', 'tutor.user']);
+
+        $title = $createdCount > 1 ? 'Jadwal Baru Dibuat' : 'Jadwal Baru';
+        $startTime = \Carbon\Carbon::parse($schedule->start_time)->format('H:i');
+        $message = $createdCount > 1
+            ? "{$createdCount} jadwal baru dibuat untuk {$schedule->student->name} dengan tutor {$schedule->tutor->user->name}."
+            : "Jadwal baru untuk {$schedule->student->name} dengan tutor {$schedule->tutor->user->name} pada {$schedule->date->format('d M Y')} pukul {$startTime}.";
+
+        $this->broadcast(
+            $this->admins()->all(),
+            'new_schedule',
+            $title,
+            $message,
+            ['schedule_id' => $schedule->id, 'created_count' => $createdCount],
+            $createdCount > 1 ? route('admin.schedules.index') : route('admin.schedules.show', $schedule)
+        );
+    }
+
+    public function notifyAdminsNewReport($report): void
+    {
+        $report->loadMissing(['student.client.user', 'tutor.user', 'schedule']);
+
+        Notification::where('type', 'missing_report')
+            ->where('data->schedule_id', $report->schedule_id)
+            ->where('is_read', false)
+            ->update(['is_read' => true, 'read_at' => now()]);
+
+        $this->broadcast(
+            $this->admins()->all(),
+            'new_report',
+            'Laporan Sesi Baru',
+            "{$report->tutor->user->name} submit laporan sesi untuk {$report->student->name}.",
+            ['report_id' => $report->id, 'schedule_id' => $report->schedule_id],
+            route('admin.session-reports.show', $report)
+        );
+    }
+
+    public function notifyAdminsNewClient($client): void
+    {
+        $client->loadMissing('user');
+
+        $this->broadcast(
+            $this->admins()->all(),
+            'new_client',
+            'Client Baru Dibuat',
+            "{$client->user->name} baru ditambahkan sebagai client.",
+            ['client_id' => $client->id],
+            route('admin.clients.show', $client)
+        );
+    }
+
+    public function notifyAdminsNewStudent($student): void
+    {
+        $student->loadMissing('client.user');
+
+        $this->broadcast(
+            $this->admins()->all(),
+            'new_student',
+            'Siswa Baru Dibuat',
+            "{$student->name} ditambahkan untuk client {$student->client->user->name}.",
+            ['student_id' => $student->id, 'client_id' => $student->client_id],
+            route('admin.students.show', $student)
+        );
+    }
+
+    public function notifyAdminsMissingReport($schedule): void
+    {
+        $schedule->loadMissing(['student.client.user', 'tutor.user']);
+
+        foreach ($this->admins() as $admin) {
+            $exists = Notification::where('user_id', $admin->id)
+                ->where('type', 'missing_report')
+                ->where('data->schedule_id', $schedule->id)
+                ->exists();
+
+            if (! $exists) {
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'type' => 'missing_report',
+                    'title' => 'Sesi Belum Ada Laporan',
+                    'message' => "Sesi {$schedule->student->name} dengan tutor {$schedule->tutor->user->name} sudah selesai, tapi laporan belum diisi.",
+                    'data' => ['schedule_id' => $schedule->id, 'student_id' => $schedule->student_id, 'tutor_id' => $schedule->tutor_id],
+                    'action_url' => route('admin.schedules.show', $schedule),
+                    'is_read' => false,
+                ]);
+            }
+        }
+    }
+
+    public function notifyAdminsClientDeactivated($client): void
+    {
+        $client->loadMissing('user');
+
+        $this->broadcast(
+            $this->admins()->all(),
+            'data_deactivated',
+            'Client Dinonaktifkan',
+            "{$client->user->name} dinonaktifkan. Histori data lama tetap tersimpan.",
+            ['client_id' => $client->id, 'data_type' => 'client'],
+            route('admin.clients.show', $client)
+        );
+    }
+
+    public function notifyAdminsStudentDeactivated($student): void
+    {
+        $student->loadMissing('client.user');
+
+        $this->broadcast(
+            $this->admins()->all(),
+            'data_deactivated',
+            'Siswa Dinonaktifkan',
+            "{$student->name} dari client {$student->client->user->name} dinonaktifkan.",
+            ['student_id' => $student->id, 'client_id' => $student->client_id, 'data_type' => 'student'],
+            route('admin.students.show', $student)
+        );
+    }
+
     /**
      * Send email notification
      */
-    private function sendEmail(User $user, string $title, string $message, string $actionUrl = null): void
+    private function sendEmail(User $user, string $title, string $message, ?string $actionUrl = null): void
     {
         // TODO: Implement email sending with Laravel Mail
         // For now, just log the notification
