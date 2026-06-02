@@ -24,6 +24,7 @@ class Notification extends Model
     protected function casts(): array
     {
         return [
+            'user_id' => 'integer',
             'data' => 'array',
             'is_read' => 'boolean',
             'read_at' => 'datetime',

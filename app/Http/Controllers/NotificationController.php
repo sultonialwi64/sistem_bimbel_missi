@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Notification;
 use App\Services\NotificationService;
+use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
@@ -30,13 +31,12 @@ class NotificationController extends Controller
     /**
      * Mark notification as read
      */
-    public function markAsRead($id)
+    public function markAsRead(Request $request, Notification $notification)
     {
-        $notification = \App\Models\Notification::findOrFail($id);
-        
-        // Authorize
-        if ($notification->user_id !== auth()->id()) {
-            abort(403);
+        if ($notification->user_id !== $request->user()->id) {
+            return redirect()
+                ->route('notifications.index')
+                ->with('error', 'Notifikasi tidak ditemukan untuk akun ini.');
         }
 
         $notification->markAsRead();
