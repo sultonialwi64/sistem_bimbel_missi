@@ -229,6 +229,7 @@
             font-size: 13px;
             font-weight: 800;
         }
+        .session-cards { display: none; }
         .footer {
             margin-top: 20px;
             text-align: center;
@@ -243,8 +244,40 @@
             .meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .summary { grid-template-columns: 1fr; padding: 14px; }
             .section-header { padding: 16px; }
-            .table-wrap { overflow-x: auto; }
-            table { min-width: 760px; }
+            .desktop-session-table { display: none; }
+            .session-cards { display: block; }
+            .session-card {
+                border-bottom: 1px solid #e2e8f0;
+                padding: 16px;
+            }
+            .session-card:last-child { border-bottom: 0; }
+            .session-card-head {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+            .mobile-field {
+                border-radius: 14px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                padding: 12px;
+                margin-top: 10px;
+            }
+            .mobile-label {
+                margin: 0 0 6px;
+                color: #64748b;
+                font-size: 11px;
+                font-weight: 900;
+                text-transform: uppercase;
+            }
+            .mobile-value {
+                margin: 0;
+                color: #334155;
+                font-size: 13px;
+                line-height: 1.7;
+            }
             .photo-table { min-width: 0; }
             .photo-table thead { display: none; }
             .photo-table, .photo-table tbody, .photo-table tr, .photo-table td { display: block; width: 100%; }
@@ -329,7 +362,7 @@
             <h2 class="section-title">Rincian Kegiatan Pembelajaran</h2>
             <p class="section-note">Daftar sesi yang sudah terlaksana pada periode laporan.</p>
         </div>
-        <div class="table-wrap">
+        <div class="table-wrap desktop-session-table">
             <table>
                 <thead>
                     <tr>
@@ -366,6 +399,40 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="session-cards">
+            @forelse($schedules as $schedule)
+                @php
+                    $report = $schedule->sessionReport;
+                @endphp
+                <article class="session-card">
+                    <div class="session-card-head">
+                        <div>
+                            <div class="date">{{ \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') }}</div>
+                            <div class="subject">{{ $schedule->subject->name ?? '-' }}</div>
+                        </div>
+                        <div>
+                            @if($report)
+                                <span class="rating">{{ $report->student_understanding }} / 5</span>
+                            @else
+                                <span class="rating">-</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="mobile-field">
+                        <p class="mobile-label">Materi yang Diajarkan</p>
+                        <p class="mobile-value">{!! $report ? nl2br(e($report->material_covered)) : '<span class="empty-text">Laporan belum diisi.</span>' !!}</p>
+                    </div>
+
+                    <div class="mobile-field">
+                        <p class="mobile-label">Catatan</p>
+                        <p class="mobile-value">{!! $report && $report->notes_for_parent ? nl2br(e($report->notes_for_parent)) : '<span class="empty-text">Belum ada catatan.</span>' !!}</p>
+                    </div>
+                </article>
+            @empty
+                <div class="session-card" style="text-align: center;">Tidak ada sesi pembelajaran pada periode ini.</div>
+            @endforelse
         </div>
     </section>
 
