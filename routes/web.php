@@ -211,7 +211,11 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-// Secure Public Route for downloading PDF report (No login required)
+// Secure public routes for report access (no login required, signed URL required).
+Route::get('/public/report/{student}', [StudentProgressController::class, 'publicReport'])
+    ->name('public.report.show')
+    ->middleware('signed');
+
 Route::get('/public/report/download/{student}', [StudentProgressController::class, 'exportPdf'])
     ->name('public.report.download')
     ->middleware('signed');

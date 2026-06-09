@@ -215,6 +215,7 @@
                                     $dlMonth = $periodMonth->format('Y-m');
                                     $dlLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $dlMonth]);
                                     $previewLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $dlMonth, 'preview' => 1]);
+                                    $reportLink = URL::signedRoute('public.report.show', ['student' => $payment->student_id, 'month' => $dlMonth]);
                                 @endphp
                                 <div class="payment-actions">
                                     <button type="button" @click="previewOpen = true; previewUrl = @js($previewLink); downloadUrl = @js($dlLink); previewTitle = @js('Laporan ' . $payment->student->name . ' - ' . \Carbon\Carbon::parse($dlMonth)->translatedFormat('F Y'))" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-xs hover:bg-gray-50 hover:border-gray-300 transition-all" title="Preview Laporan PDF">
@@ -234,9 +235,9 @@
 
                                             $waText  = "Halo Bapak/Ibu *{$clientName}*,\n\n";
                                             $waText .= "Berikut adalah rekap laporan belajar ananda *{$studentName}* selama bulan *{$bulan}*.\n\n";
-                                            $waText .= "📄 *Laporan Belajar (PDF):*\n";
-                                            $waText .= $dlLink . "\n\n";
-                                            $waText .= "_(Klik link di atas untuk membuka & mengunduh laporan. Tidak perlu login)_\n\n";
+                                            $waText .= "*Laporan Belajar:*\n";
+                                            $waText .= $reportLink . "\n\n";
+                                            $waText .= "_Klik link di atas untuk melihat laporan. Tidak perlu login. Jika ingin menyimpan, tersedia tombol Download PDF di halaman laporan._\n\n";
                                             $waText .= "Bersamaan dengan ini, kami informasikan total tagihan biaya bimbingan belajar bulan ini adalah sebesar *{$tagihan}*.\n\n";
                                             $waText .= "Mohon berkenan untuk melakukan pembayaran melalui rekening:\n";
                                             $waText .= "*Bank BRI*\n";
@@ -351,6 +352,7 @@
                             $dlMonth = $periodMonth->format('Y-m');
                             $dlLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $dlMonth]);
                             $previewLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $dlMonth, 'preview' => 1]);
+                            $reportLink = URL::signedRoute('public.report.show', ['student' => $payment->student_id, 'month' => $dlMonth]);
                         @endphp
                         <button type="button" @click="previewOpen = true; previewUrl = @js($previewLink); downloadUrl = @js($dlLink); previewTitle = @js('Laporan ' . $payment->student->name . ' - ' . \Carbon\Carbon::parse($dlMonth)->translatedFormat('F Y'))" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-xs hover:bg-gray-50 transition-all">
                             <svg class="h-3.5 w-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -366,7 +368,7 @@
                                 $clientName  = $payment->client->user->name;
                                 $bulan       = \Carbon\Carbon::parse($dlMonth)->translatedFormat('F Y');
                                 $tagihan     = 'Rp ' . number_format($payment->amount, 0, ',', '.');
-                                $waText  = "Halo Bapak/Ibu *{$clientName}*,\n\nBerikut adalah rekap laporan belajar ananda *{$studentName}* selama bulan *{$bulan}*.\n\n📄 *Laporan Belajar (PDF):*\n{$dlLink}\n\n_(Klik link di atas untuk membuka & mengunduh laporan)_\n\nTagihan bulan ini: *{$tagihan}*.\nMohon pembayaran melalui rekening:\n*Bank BRI*\n*No. Rekening: 011201074931505*\n*Atas Nama: Ike Indah Pratiwi*\n\nTerima kasih! 🙏";
+                                $waText  = "Halo Bapak/Ibu *{$clientName}*,\n\nBerikut adalah rekap laporan belajar ananda *{$studentName}* selama bulan *{$bulan}*.\n\n*Laporan Belajar:*\n{$reportLink}\n\n_Klik link di atas untuk melihat laporan. Tidak perlu login. Jika ingin menyimpan, tersedia tombol Download PDF di halaman laporan._\n\nTagihan bulan ini: *{$tagihan}*.\nMohon pembayaran melalui rekening:\n*Bank BRI*\n*No. Rekening: 011201074931505*\n*Atas Nama: Ike Indah Pratiwi*\n\nTerima kasih!";
                                 $waUrl = "https://wa.me/" . $waNumber . "?text=" . urlencode($waText);
                             @endphp
                             <a href="{{ $waUrl }}" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-green-600 text-white rounded-xl font-bold text-xs hover:bg-green-700 transition-all">

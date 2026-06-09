@@ -17,6 +17,9 @@
         .table th { background-color: #f8fafc; font-weight: bold; color: #475569; }
         .rating { color: #eab308; font-weight: bold; }
         .summary-box { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
+        .photo-box { text-align: center; min-height: 170px; }
+        .documentation-photo { max-width: 360px; max-height: 240px; border-radius: 6px; border: 1px solid #cbd5e1; }
+        .photo-placeholder { height: 160px; border: 1px dashed #cbd5e1; color: #94a3b8; font-size: 11px; text-align: center; line-height: 160px; background-color: #f8fafc; }
         .footer { margin-top: 50px; text-align: right; }
         .signature-line { border-top: 1px solid #333; width: 200px; display: inline-block; margin-top: 60px; text-align: center; padding-top: 5px; }
     </style>
@@ -61,10 +64,9 @@
         <thead>
             <tr>
                 <th width="15%">Tanggal & Mapel</th>
-                <th width="35%">Materi yang Diajarkan</th>
-                <th width="30%">Catatan</th>
+                <th width="40%">Materi yang Diajarkan</th>
+                <th width="35%">Catatan</th>
                 <th width="10%">Pemahaman</th>
-                <th width="10%">Foto</th>
             </tr>
         </thead>
         <tbody>
@@ -86,34 +88,56 @@
                             &nbsp;
                         @endif
                     </td>
-                    <td align="center">
-                        @php
-                            $base64 = null;
-                            if(isset($schedule->attendance) && $schedule->attendance->photo_path) {
-                                $path = \Illuminate\Support\Facades\Storage::disk('public')->path($schedule->attendance->photo_path);
-                                if (file_exists($path)) {
-                                    $type = pathinfo($path, PATHINFO_EXTENSION);
-                                    $data = file_get_contents($path);
-                                    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                }
-                            }
-                        @endphp
-                        @if($base64)
-                            <img src="{{ $base64 }}" style="max-width: 80px; max-height: 80px; border-radius: 4px; object-fit: contain;">
-                        @else
-                            <span style="font-size: 10px; color: #999;">Tidak ada foto</span>
-                        @endif
-                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" align="center">Tidak ada sesi pembelajaran pada periode ini.</td>
+                    <td colspan="4" align="center">Tidak ada sesi pembelajaran pada periode ini.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
-
+    <div class="section-title">3. DOKUMENTASI FOTO KEGIATAN</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="25%">Tanggal & Mapel</th>
+                <th width="75%">Foto Dokumentasi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($schedules as $schedule)
+                @php
+                    $base64 = null;
+                    if(isset($schedule->attendance) && $schedule->attendance->photo_path) {
+                        $path = \Illuminate\Support\Facades\Storage::disk('public')->path($schedule->attendance->photo_path);
+                        if (file_exists($path)) {
+                            $type = pathinfo($path, PATHINFO_EXTENSION);
+                            $data = file_get_contents($path);
+                            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                        }
+                    }
+                @endphp
+                <tr>
+                    <td>
+                        <strong>{{ \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') }}</strong><br>
+                        {{ $schedule->subject->name ?? '-' }}
+                    </td>
+                    <td class="photo-box">
+                        @if($base64)
+                            <img src="{{ $base64 }}" class="documentation-photo">
+                        @else
+                            <div class="photo-placeholder">Foto belum tersedia</div>
+                        @endif
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="2" align="center">Tidak ada dokumentasi foto pada periode ini.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 
 </body>
 </html>

@@ -51,13 +51,33 @@ class StudentProgressController extends Controller
 
     public function exportPdf(Request $request, Student $student)
     {
+        $data = $this->buildReportData($request, $student);
+
+        $pdf = Pdf::loadView('admin.student-progress.pdf', $data);
+
+        $fileName = 'Laporan_Progres_' . str_replace(' ', '_', $student->name) . '_' . $data['month'] . '.pdf';
+
+        if ($request->boolean('preview')) {
+            return $pdf->stream($fileName);
+        }
+
+        return $pdf->download($fileName);
+    }
+
+    public function publicReport(Request $request, Student $student)
+    {
+        return view('public.student-progress.show', $this->buildReportData($request, $student));
+    }
+
+    private function buildReportData(Request $request, Student $student): array
+    {
         $student->load(['client.user']);
-        
+
         $month = $request->input('month', now()->format('Y-m'));
         $startDate = \Carbon\Carbon::parse($month)->startOfMonth();
         $endDate = \Carbon\Carbon::parse($month)->endOfMonth();
 
-        // Match billing: one PDF row per attended schedule, report data is optional.
+        // Match billing: one report row per attended schedule, report data is optional.
         $schedules = Schedule::where('student_id', $student->id)
             ->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
             ->whereHas('attendance', function ($query) {
@@ -68,35 +88,25 @@ class StudentProgressController extends Controller
             ->orderBy('start_time', 'asc')
             ->get();
 
-        // Calculate Average Score from this month's sessions
+        // Calculate Average Score from this month's sessions.
         $averageScore = $schedules->pluck('sessionReport')->filter()->avg('student_understanding') * 20;
 
-        // Get the latest progress assessment for that month
+        // Get the latest progress assessment for that month.
         $progress = StudentProgress::where('student_id', $student->id)
             ->whereBetween('assessment_date', [$startDate, $endDate])
             ->with(['subject', 'tutor.user'])
             ->latest('assessment_date')
             ->first();
 
-        // If no progress for that month, fallback to the latest one available before end Date
-        if (!$progress) {
-             $progress = StudentProgress::where('student_id', $student->id)
+        // If no progress for that month, fallback to the latest one available before end date.
+        if (! $progress) {
+            $progress = StudentProgress::where('student_id', $student->id)
                 ->where('assessment_date', '<=', $endDate)
                 ->with(['subject', 'tutor.user'])
                 ->latest('assessment_date')
                 ->first();
         }
 
-        $pdf = Pdf::loadView('admin.student-progress.pdf', compact(
-            'student', 'schedules', 'averageScore', 'progress', 'month', 'startDate', 'endDate'
-        ));
-
-        $fileName = 'Laporan_Progres_' . str_replace(' ', '_', $student->name) . '_' . $month . '.pdf';
-
-        if ($request->boolean('preview')) {
-            return $pdf->stream($fileName);
-        }
-
-        return $pdf->download($fileName);
+        return compact('student', 'schedules', 'averageScore', 'progress', 'month', 'startDate', 'endDate');
     }
 }
