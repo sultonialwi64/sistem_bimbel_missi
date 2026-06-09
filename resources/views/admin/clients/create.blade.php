@@ -11,7 +11,7 @@
         Back to Clients
     </a>
 
-    <form action="{{ route('admin.clients.store') }}" method="POST">
+    <form action="{{ route('admin.clients.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="space-y-6">
 
@@ -116,6 +116,8 @@
                     </div>
                 </div>
             </div>
+
+            @include('partials.client-children-create')
 
             {{-- Actions --}}
             <div class="flex justify-end gap-3">

@@ -25,7 +25,7 @@
         </div>
     @endif
 
-    <form action="{{ route('tutor.clients.store') }}" method="POST" autocomplete="off">
+    <form action="{{ route('tutor.clients.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
         @csrf
         <div class="space-y-6">
 
@@ -122,6 +122,8 @@
                     </div>
                 </div>
             </div>
+
+            @include('partials.client-children-create')
 
             {{-- Actions --}}
             <div class="flex justify-end gap-3">

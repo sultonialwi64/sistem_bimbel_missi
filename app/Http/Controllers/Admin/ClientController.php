@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\{User, Client, Student, GradeLevel};
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
@@ -35,7 +36,9 @@ class ClientController extends Controller
 
     public function create()
     {
-        return view('admin.clients.create');
+        $gradeLevels = GradeLevel::orderBy('name')->get();
+
+        return view('admin.clients.create', compact('gradeLevels'));
     }
 
     public function store(Request $request)
@@ -48,30 +51,58 @@ class ClientController extends Controller
             'address' => ['required', 'string'],
             'emergency_contact' => ['nullable', 'string', 'max:20'],
             'client_type' => ['required', 'in:tipe_1,tipe_2'],
+            'children' => ['required', 'array', 'min:1'],
+            'children.*.name' => ['required', 'string', 'max:255'],
+            'children.*.birth_date' => ['nullable', 'date'],
+            'children.*.school_name' => ['nullable', 'string', 'max:255'],
+            'children.*.grade_level' => ['nullable', 'exists:grade_levels,name'],
+            'children.*.photo' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'role' => 'client',
-            'phone' => $validated['phone'],
-            'is_active' => true,
-        ]);
+        $client = DB::transaction(function () use ($request, $validated) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => bcrypt($validated['password']),
+                'role' => 'client',
+                'phone' => $validated['phone'],
+                'is_active' => true,
+            ]);
 
-        $client = Client::create([
-            'user_id' => $user->id,
-            'address' => $validated['address'],
-            'emergency_contact' => $validated['emergency_contact'] ?? null,
-            'client_type' => $validated['client_type'],
-            'is_active' => true,
-            'created_by' => auth()->id(),
-        ]);
+            $client = Client::create([
+                'user_id' => $user->id,
+                'address' => $validated['address'],
+                'emergency_contact' => $validated['emergency_contact'] ?? null,
+                'client_type' => $validated['client_type'],
+                'is_active' => true,
+                'created_by' => auth()->id(),
+            ]);
 
-        app(NotificationService::class)->notifyAdminsNewClient($client);
+            foreach ($validated['children'] as $index => $child) {
+                if ($request->hasFile("children.{$index}.photo")) {
+                    $child['photo'] = $request->file("children.{$index}.photo")->store('students', 'public');
+                }
+
+                $student = Student::create([
+                    'client_id' => $client->id,
+                    'name' => $child['name'],
+                    'birth_date' => $child['birth_date'] ?? null,
+                    'school_name' => $child['school_name'] ?? null,
+                    'grade_level' => $child['grade_level'] ?? null,
+                    'photo' => $child['photo'] ?? null,
+                    'is_active' => true,
+                ]);
+
+                app(NotificationService::class)->notifyAdminsNewStudent($student);
+            }
+
+            app(NotificationService::class)->notifyAdminsNewClient($client);
+
+            return $client;
+        });
 
         return redirect()->route('admin.clients.index')
-            ->with('success', 'Client berhasil ditambahkan!');
+            ->with('success', "Client {$client->user->name} dan data anak berhasil ditambahkan!");
     }
 
     public function show(Client $client)
