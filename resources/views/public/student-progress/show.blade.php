@@ -341,7 +341,9 @@
                 </thead>
                 <tbody>
                     @forelse($schedules as $schedule)
-                        @php($report = $schedule->sessionReport)
+                        @php
+                            $report = $schedule->sessionReport;
+                        @endphp
                         <tr>
                             <td>
                                 <div class="date">{{ \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') }}</div>
