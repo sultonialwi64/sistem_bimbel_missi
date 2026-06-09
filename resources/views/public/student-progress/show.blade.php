@@ -393,7 +393,7 @@
                             <div class="subject">{{ $schedule->subject->name ?? '-' }}</div>
                         </td>
                         <td>
-                            @if($photoUrl)
+                            @if(!empty($photoUrl))
                                 <img src="{{ $photoUrl }}" class="documentation-photo" alt="Dokumentasi {{ $student->name }} {{ \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') }}">
                             @else
                                 <div class="photo-placeholder">Foto belum tersedia</div>
