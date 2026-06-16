@@ -200,7 +200,10 @@
             image: null,
             imageUrl: null,
             stageSize: 0,
+            cropFrameRatio: 0.78,
+            cropFrameSize: 0,
             baseScale: 1,
+            minZoom: 1,
             zoom: 1,
             offsetX: 0,
             offsetY: 0,
@@ -224,7 +227,9 @@
             state.image = null;
             state.imageUrl = null;
             state.stageSize = 0;
+            state.cropFrameSize = 0;
             state.baseScale = 1;
+            state.minZoom = 1;
             state.zoom = 1;
             state.offsetX = 0;
             state.offsetY = 0;
@@ -254,8 +259,8 @@
         const clampOffsets = () => {
             const displayWidth = state.image.naturalWidth * state.baseScale * state.zoom;
             const displayHeight = state.image.naturalHeight * state.baseScale * state.zoom;
-            const maxOffsetX = Math.max((displayWidth - state.stageSize) / 2, 0);
-            const maxOffsetY = Math.max((displayHeight - state.stageSize) / 2, 0);
+            const maxOffsetX = Math.max((displayWidth - state.cropFrameSize) / 2, 0);
+            const maxOffsetY = Math.max((displayHeight - state.cropFrameSize) / 2, 0);
 
             state.offsetX = Math.min(Math.max(state.offsetX, -maxOffsetX), maxOffsetX);
             state.offsetY = Math.min(Math.max(state.offsetY, -maxOffsetY), maxOffsetY);
@@ -280,14 +285,17 @@
 
         const initializeCrop = () => {
             state.stageSize = stage.clientWidth;
+            state.cropFrameSize = state.stageSize * state.cropFrameRatio;
             state.baseScale = Math.max(
-                state.stageSize / state.image.naturalWidth,
-                state.stageSize / state.image.naturalHeight
+                state.cropFrameSize / state.image.naturalWidth,
+                state.cropFrameSize / state.image.naturalHeight
             );
-            state.zoom = 1;
+            state.minZoom = 1;
+            zoomInput.min = String(state.minZoom);
+            zoomInput.value = String(state.minZoom);
+            state.zoom = state.minZoom;
             state.offsetX = 0;
             state.offsetY = 0;
-            zoomInput.value = '1';
             renderCropImage();
         };
 
@@ -299,9 +307,9 @@
             const ctx = canvas.getContext('2d');
             const displayWidth = state.image.naturalWidth * state.baseScale * state.zoom;
             const displayHeight = state.image.naturalHeight * state.baseScale * state.zoom;
-            const sourceX = ((displayWidth - state.stageSize) / 2 - state.offsetX) / (state.baseScale * state.zoom);
-            const sourceY = ((displayHeight - state.stageSize) / 2 - state.offsetY) / (state.baseScale * state.zoom);
-            const sourceSize = state.stageSize / (state.baseScale * state.zoom);
+            const sourceX = ((displayWidth - state.cropFrameSize) / 2 - state.offsetX) / (state.baseScale * state.zoom);
+            const sourceY = ((displayHeight - state.cropFrameSize) / 2 - state.offsetY) / (state.baseScale * state.zoom);
+            const sourceSize = state.cropFrameSize / (state.baseScale * state.zoom);
 
             ctx.drawImage(
                 state.image,
@@ -357,7 +365,7 @@
         });
 
         zoomInput.addEventListener('input', () => {
-            state.zoom = Number(zoomInput.value);
+            state.zoom = Math.max(Number(zoomInput.value), state.minZoom);
             renderCropImage();
         });
 
