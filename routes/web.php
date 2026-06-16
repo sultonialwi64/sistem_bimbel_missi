@@ -21,20 +21,24 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Tutor\AttendanceController;
 use App\Http\Controllers\Tutor\DashboardController as TutorDashboardController;
 use App\Http\Controllers\Tutor\EarningController;
-use App\Models\Attendance;
-use App\Models\Subject;
+use App\Models\Schedule;
 use App\Models\Tutor;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $sessionCount = Attendance::whereIn('status', ['hadir', 'pindah_lokasi'])->count();
-    $sessionDisplayTarget = $sessionCount >= 100
-        ? intdiv($sessionCount, 50) * 50
-        : $sessionCount;
+    $sessionCount = Schedule::where('status', 'completed')
+        ->whereHas('attendance', function ($query) {
+            $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+        })
+        ->count();
 
-    $landingTutors = Tutor::with('user')
+    $landingTutors = Tutor::query()
+        ->select('tutors.*')
+        ->join('users', 'users.id', '=', 'tutors.user_id')
         ->where('status', 'active')
+        ->orderByRaw("CASE WHEN users.avatar IS NULL OR users.avatar = '' THEN 1 ELSE 0 END")
         ->latest()
+        ->with('user')
         ->take(4)
         ->get();
 
@@ -47,18 +51,11 @@ Route::get('/', function () {
             'accent' => 'text-miss-navy',
         ],
         [
-            'value' => number_format($sessionDisplayTarget) . ($sessionCount >= 100 ? '+' : ''),
-            'target' => $sessionDisplayTarget,
-            'suffix' => $sessionCount >= 100 ? '+' : '',
+            'value' => number_format($sessionCount),
+            'target' => $sessionCount,
+            'suffix' => '',
             'label' => 'Sesi belajar telah terlaksana',
             'accent' => 'text-miss-goldDark',
-        ],
-        [
-            'value' => number_format(Subject::active()->count()),
-            'target' => Subject::active()->count(),
-            'suffix' => '',
-            'label' => 'Program atau mapel tersedia',
-            'accent' => 'text-miss-navy',
         ],
     ];
 
@@ -66,9 +63,13 @@ Route::get('/', function () {
 });
 
 Route::get('/tutors', function () {
-    $tutors = Tutor::with('user')
+    $tutors = Tutor::query()
+        ->select('tutors.*')
+        ->join('users', 'users.id', '=', 'tutors.user_id')
         ->where('status', 'active')
+        ->orderByRaw("CASE WHEN users.avatar IS NULL OR users.avatar = '' THEN 1 ELSE 0 END")
         ->latest()
+        ->with('user')
         ->get();
 
     return view('tutors.index', compact('tutors'));

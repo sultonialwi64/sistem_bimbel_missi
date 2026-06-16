@@ -12,9 +12,39 @@
         ['title' => 'Les SMP dan SMA', 'category' => 'Sekolah menengah', 'goal' => 'Belajar lebih terarah untuk mapel inti dan persiapan evaluasi sekolah.', 'mode' => 'Tutor datang ke rumah atau online', 'cta' => 'Cari Tutor Mapel', 'tone' => 'bg-miss-blueSoft text-miss-navyDark border-miss-navy/10'],
         ['title' => 'Bahasa Inggris', 'category' => 'Bahasa', 'goal' => 'Meningkatkan vocabulary, speaking, grammar, dan percaya diri berbahasa.', 'mode' => 'Privat atau kelompok kecil', 'cta' => 'Cari Tutor Bahasa Inggris', 'tone' => 'bg-miss-sand text-miss-goldDark border-miss-gold/20'],
         ['title' => 'Mengaji', 'category' => 'Keagamaan', 'goal' => "Bimbingan baca tulis Al-Qur'an dengan pendampingan yang sabar.", 'mode' => 'Tutor datang ke rumah', 'cta' => 'Tanya Program Mengaji', 'tone' => 'bg-miss-cream text-miss-goldDark border-miss-gold/20'],
-        ['title' => 'Kreatif Menggambar', 'category' => 'Kreativitas', 'goal' => 'Mengasah motorik halus, ekspresi, dan kreativitas anak.', 'mode' => 'Privat atau kelompok kecil', 'cta' => 'Tanya Kelas Kreatif', 'tone' => 'bg-miss-blueSoft text-miss-navy border-miss-navy/10'],
+        ['title' => 'Menggambar, Mewarnai, dan Crafting', 'category' => 'Kreativitas', 'goal' => 'Mengasah kreativitas, motorik halus, dan keberanian berekspresi lewat aktivitas seni yang menyenangkan.', 'mode' => 'Privat atau kelompok kecil', 'cta' => 'Tanya Kelas Kreatif', 'tone' => 'bg-miss-blueSoft text-miss-navy border-miss-navy/10'],
         ['title' => 'Persiapan Ujian', 'category' => 'Tes dan evaluasi', 'goal' => 'Latihan soal dan review materi untuk menghadapi ujian dengan lebih siap.', 'mode' => 'Tutor datang ke rumah atau online', 'cta' => 'Cek Program Ujian', 'tone' => 'bg-miss-sand text-miss-goldDark border-miss-gold/20'],
         ['title' => 'Privat Renang', 'category' => 'Skill anak', 'goal' => 'Latihan renang dasar sampai mahir bersama instruktur.', 'mode' => 'Lokasi menyesuaikan', 'cta' => 'Cek Jadwal Renang', 'tone' => 'bg-miss-blueSoft text-miss-navyDark border-miss-navy/10'],
+        ['title' => 'Les Tari', 'category' => 'Seni gerak', 'goal' => 'Membantu anak belajar tari dengan pendampingan yang menyenangkan, terarah, dan sesuai minatnya.', 'mode' => 'Privat atau kelompok kecil', 'cta' => 'Tanya Program Tari', 'tone' => 'bg-miss-cream text-miss-goldDark border-miss-gold/20'],
+        ['title' => 'Bahasa Mandarin dan Jepang', 'category' => 'Bahasa asing', 'goal' => 'Belajar kosakata, percakapan dasar, dan pengenalan budaya dengan pendekatan bertahap.', 'mode' => 'Online atau privat terjadwal', 'cta' => 'Cari Tutor Bahasa Asing', 'tone' => 'bg-miss-sand text-miss-goldDark border-miss-gold/20'],
+        ['title' => 'Event dan Workshop Bulanan', 'category' => 'Kegiatan tematik', 'goal' => 'Kegiatan belajar tematik untuk menambah pengalaman anak lewat workshop berkala yang seru dan terarah.', 'mode' => 'Jadwal event menyesuaikan', 'cta' => 'Tanya Jadwal Workshop', 'tone' => 'bg-miss-blueSoft text-miss-navyDark border-miss-navy/10'],
+    ];
+    $pricePackages = [
+        [
+            'price' => 'Rp 200k',
+            'sessions' => '1 bulan | 4 sesi',
+            'frequency' => '1 minggu 1x',
+            'highlight' => 'Paket bulanan',
+            'accent' => 'bg-white border-miss-navy/15',
+            'badge' => null,
+        ],
+        [
+            'price' => 'Rp 380k',
+            'sessions' => '1 bulan | 8 sesi',
+            'frequency' => '1 minggu 2x',
+            'highlight' => 'Lebih hemat',
+            'accent' => 'bg-miss-cream border-miss-gold/20',
+            'badge' => 'Best value',
+        ],
+    ];
+    $priceIncludes = [
+        'FREE Transportation',
+        'FREE Registration',
+        'FREE Program Planning',
+        'Private 1 guru 1 siswa',
+        'LKPD & interactive activity kit',
+        'Science experiment & engaging skill time',
+        'Laporan siswa',
     ];
     $faqItems = [
         ['q' => 'Apakah tutor datang ke rumah?', 'a' => 'Ya, layanan utama Bimbel Missi adalah les privat ke rumah. Untuk beberapa program, pembelajaran online atau lokasi khusus dapat menyesuaikan kebutuhan.'],
@@ -23,7 +53,7 @@
         ['q' => 'Apakah tutor dapat diganti?', 'a' => 'Jika ada kendala kecocokan atau jadwal, orang tua dapat berkonsultasi dengan admin agar dicari solusi sesuai kebijakan layanan.'],
         ['q' => 'Apakah tersedia pembelajaran online?', 'a' => 'Beberapa program dapat dilakukan secara online, terutama bahasa Inggris, speaking, TOEFL, atau pendampingan mapel tertentu.'],
         ['q' => 'Apakah orang tua menerima laporan belajar?', 'a' => 'Ya. Orang tua dapat memantau materi yang dipelajari, catatan tutor, pemahaman siswa, dan dokumentasi kegiatan jika tersedia.'],
-        ['q' => 'Area mana saja yang dilayani?', 'a' => 'Saat ini layanan masih berfokus di area Wonosobo dan sekitarnya. Ke depannya Bimbel Missi berencana membuka layanan untuk daerah lain secara bertahap.'],
+        ['q' => 'Area mana saja yang dilayani?', 'a' => 'Saat ini layanan Bimbel Missi tersedia untuk area Wonosobo, Magelang, dan Purwokerto.'],
         ['q' => 'Bagaimana cara mendaftar?', 'a' => 'Klik tombol Konsultasi Gratis, isi kebutuhan belajar anak, lalu admin akan membantu mencarikan program dan tutor yang sesuai.'],
     ];
 @endphp
@@ -33,7 +63,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Les Privat ke Rumah untuk Anak | Bimbel Missi</title>
-    <meta name="description" content="Bimbel Missi menyediakan tutor privat ke rumah untuk Calistung, SD, SMP, SMA, Bahasa Inggris, Mengaji, Renang, dan persiapan ujian. Saat ini fokus area Wonosobo dan sekitarnya, dengan rencana ekspansi bertahap.">
+    <meta name="description" content="Bimbel Missi menyediakan tutor privat ke rumah untuk Calistung, SD, SMP, SMA, Bahasa Inggris, bahasa asing, mengaji, renang, seni, dan workshop anak. Area layanan mencakup Wonosobo, Magelang, dan Purwokerto.">
     <link rel="canonical" href="{{ $canonicalUrl }}">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Les Privat ke Rumah untuk Anak | Bimbel Missi">
@@ -303,7 +333,7 @@
             'name' => 'Bimbel Missi',
             'url' => $canonicalUrl,
             'image' => $ogImage,
-            'areaServed' => 'Wonosobo dan sekitarnya',
+            'areaServed' => ['Wonosobo', 'Magelang', 'Purwokerto'],
             'description' => 'Layanan les privat ke rumah untuk anak dengan tutor personal dan laporan perkembangan belajar.',
             'telephone' => '+' . $whatsappNumber,
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
@@ -336,6 +366,7 @@
             <div class="hidden items-center gap-7 text-sm font-bold text-slate-700 lg:flex">
                 <a class="hover:text-miss-navy" href="#home">Beranda</a>
                 <a class="hover:text-miss-navy" href="#program">Program</a>
+                <a class="hover:text-miss-navy" href="#harga">Harga</a>
                 <a class="hover:text-miss-navy" href="#cara-kerja">Cara Kerja</a>
                 <a class="hover:text-miss-navy" href="#laporan">Laporan</a>
                 <a class="hover:text-miss-navy" href="#tutor">Tutor</a>
@@ -366,6 +397,7 @@
             <div class="grid gap-2 text-sm font-bold text-slate-700">
                 <a class="rounded-lg px-3 py-2 hover:bg-miss-blueSoft" href="#home">Beranda</a>
                 <a class="rounded-lg px-3 py-2 hover:bg-miss-blueSoft" href="#program">Program</a>
+                <a class="rounded-lg px-3 py-2 hover:bg-miss-blueSoft" href="#harga">Harga</a>
                 <a class="rounded-lg px-3 py-2 hover:bg-miss-blueSoft" href="#cara-kerja">Cara Kerja</a>
                 <a class="rounded-lg px-3 py-2 hover:bg-miss-blueSoft" href="#laporan">Laporan</a>
                 <a class="rounded-lg px-3 py-2 hover:bg-miss-blueSoft" href="#tutor">Tutor</a>
@@ -407,7 +439,7 @@
                         <span class="feature-pill">Tutor datang ke rumah</span>
                         <span class="feature-pill">Jadwal fleksibel</span>
                         <span class="feature-pill">Ada laporan belajar</span>
-                        <span class="feature-pill">Fokus Wonosobo, soon area lain</span>
+                        <span class="feature-pill">Wonosobo, Magelang, Purwokerto</span>
                     </div>
                 </div>
 
@@ -446,13 +478,13 @@
 
         <section id="landing-stats" aria-label="Kepercayaan layanan" class="relative z-20 -mt-2 px-4 sm:-mt-10 sm:px-6 lg:px-8">
             <div class="quiet-strip mx-auto rounded-lg border border-white/70">
-                <div class="relative mx-auto grid max-w-7xl gap-5 px-5 py-6 sm:px-6 lg:grid-cols-[.85fr_1.15fr] lg:px-8">
+                <div class="relative mx-auto grid max-w-7xl items-start gap-5 px-5 py-6 sm:px-6 lg:grid-cols-[.85fr_1.15fr] lg:px-8">
                     <div>
                         <p class="text-xs font-black uppercase text-miss-goldDark">Belajar privat yang lebih tertata</p>
                         <p class="mt-2 max-w-xl text-xl font-black leading-8 text-miss-navy">Tutor datang ke rumah, proses belajar dibantu admin, dan laporan sesi dapat dicatat.</p>
                         <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600">Angka di bawah ini diambil dari aktivitas belajar yang sudah tercatat di sistem Missi.</p>
                     </div>
-                    <div class="grid gap-4 sm:grid-cols-3">
+                    <div class="grid self-start content-start gap-4 sm:grid-cols-2">
                         @foreach(($landingStats ?? []) as $stat)
                             <article class="rounded-lg border border-white/80 bg-white/90 p-4 shadow-sm">
                                 <p
@@ -547,7 +579,7 @@
                     <div class="max-w-3xl">
                         <p class="section-kicker">Pilihan Program</p>
                         <h2 class="mt-3 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">Program Belajar untuk Kebutuhan Anak</h2>
-                        <p class="mt-4 text-base leading-8 text-slate-600">Pilih program sesuai usia, jenjang, dan tujuan belajar. Jika masih bingung, admin akan bantu merekomendasikan pilihan yang tepat.</p>
+                        <p class="mt-4 text-base leading-8 text-slate-600">Pilih program sesuai usia, jenjang, minat, dan tujuan belajar. Jika masih bingung, admin akan bantu merekomendasikan pilihan yang tepat.</p>
                     </div>
                     <a href="{{ $whatsappUrl }}" target="_blank" class="focus-ring inline-flex rounded-full bg-miss-navy px-6 py-3 text-sm font-black text-white hover:bg-miss-navyDark">
                         Konsultasi Program
@@ -568,19 +600,100 @@
             </div>
         </section>
 
-        <section id="harga" class="bg-white py-16">
+        <section id="harga" class="bg-white py-16 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="rounded-lg border border-slate-100 bg-slate-950 p-8 text-white lg:flex lg:items-center lg:justify-between lg:p-10">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-3xl">
-                        <p class="text-sm font-black uppercase text-miss-gold">Informasi Biaya</p>
-                        <h2 class="mt-3 text-2xl font-black sm:text-3xl">Biaya menyesuaikan kebutuhan belajar anak</h2>
-                        <p class="mt-4 text-sm leading-7 text-slate-300">
-                            Biaya disesuaikan dengan jenjang, program, lokasi, dan jumlah pertemuan. Konsultasi kebutuhan dan pencarian tutor tidak dikenakan biaya.
+                        <p class="section-kicker">Pricelist</p>
+                        <h2 class="mt-3 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">Paket Belajar Privat Home Visit</h2>
+                        <p class="mt-4 text-base leading-8 text-slate-600">
+                            Pricelist ini berlaku untuk area Wonosobo. Untuk kebutuhan lokasi lain, program khusus, atau frekuensi belajar berbeda, admin akan bantu informasikan penyesuaian biayanya.
                         </p>
                     </div>
-                    <a href="{{ $whatsappUrl }}" target="_blank" class="focus-ring mt-6 inline-flex rounded-full bg-miss-gold px-6 py-3 text-sm font-black text-white hover:bg-miss-goldDark lg:mt-0">
-                        Tanya Biaya Les
+                    <a href="{{ $whatsappUrl }}" target="_blank" class="focus-ring inline-flex rounded-full bg-miss-navy px-6 py-3 text-sm font-black text-white hover:bg-miss-navyDark">
+                        Tanya Paket Lainnya
                     </a>
+                </div>
+
+                <div class="mt-10 grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
+                    <div class="rounded-[28px] border border-miss-gold/20 bg-gradient-to-br from-[#fff9ec] via-white to-[#f8f2e9] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:p-8">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div>
+                                <p class="text-sm font-black uppercase tracking-[0.18em] text-miss-goldDark">Pricelist Wonosobo</p>
+                                <h3 class="mt-3 text-3xl font-black text-miss-goldDark sm:text-4xl">Privat Class - Home Visit</h3>
+                                <p class="mt-3 text-sm font-bold text-slate-600">Durasi 60-90 minutes</p>
+                            </div>
+                            <div class="rounded-full border border-miss-gold/25 bg-white px-4 py-2 text-xs font-black uppercase tracking-wide text-miss-navy shadow-sm">
+                                Paket Bulanan
+                            </div>
+                        </div>
+
+                        <div class="mt-8 grid gap-4 lg:grid-cols-2">
+                            @foreach($pricePackages as $package)
+                                <article class="relative rounded-[26px] border p-5 shadow-sm {{ $package['accent'] }}">
+                                    @if($package['badge'])
+                                        <span class="absolute -top-3 left-5 rounded-full bg-miss-gold px-3 py-1 text-[11px] font-black uppercase tracking-wide text-white shadow-md">
+                                            {{ $package['badge'] }}
+                                        </span>
+                                    @endif
+
+                                    <p class="text-xs font-black uppercase tracking-[0.18em] text-miss-navy/70">{{ $package['highlight'] }}</p>
+                                    <p class="mt-3 text-4xl font-black leading-none text-miss-navy">{{ $package['price'] }}</p>
+                                    <div class="mt-4 h-px w-full bg-slate-200"></div>
+                                    <p class="mt-4 text-sm font-black text-slate-800">{{ $package['sessions'] }}</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-500">({{ $package['frequency'] }})</p>
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-6 flex flex-col gap-3 rounded-[24px] border border-miss-navy/10 bg-white/80 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-black text-miss-navy">Register Now</p>
+                                <p class="mt-1 text-xs leading-6 text-slate-500">Konsultasi gratis sebelum menentukan paket belajar.</p>
+                            </div>
+                            <a href="{{ $whatsappUrl }}" target="_blank" class="focus-ring inline-flex items-center justify-center rounded-full bg-[#2f7d57] px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-[#276949]">
+                                0895392551182
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-6">
+                        <div class="rounded-[28px] border border-miss-navy/10 bg-miss-blueSoft p-6 shadow-sm sm:p-8">
+                            <p class="text-sm font-black uppercase tracking-[0.18em] text-miss-goldDark">Include</p>
+                            <h3 class="mt-3 text-2xl font-black text-slate-950">Sudah termasuk dalam paket</h3>
+                            <div class="mt-6 grid gap-3">
+                                @foreach($priceIncludes as $item)
+                                    <div class="flex items-start gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm">
+                                        <span class="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-miss-gold/15 text-[11px] font-black text-miss-goldDark">+</span>
+                                        <p class="text-sm font-semibold leading-6 text-slate-700">{{ $item }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                            <p class="text-sm font-black uppercase tracking-[0.18em] text-miss-goldDark">Kontak & Area</p>
+                            <div class="mt-4 grid gap-4">
+                                <a href="{{ $whatsappUrl }}" target="_blank" class="focus-ring inline-flex items-center justify-between gap-4 rounded-2xl border border-slate-200 px-4 py-4 text-left transition hover:border-miss-navy/20 hover:bg-miss-blueSoft">
+                                    <div>
+                                        <p class="text-xs font-black uppercase tracking-wide text-slate-400">Contact</p>
+                                        <p class="mt-1 text-base font-black text-slate-950">0895392551182</p>
+                                    </div>
+                                    <span class="rounded-full bg-miss-navy px-3 py-1 text-xs font-black text-white">Hubungi</span>
+                                </a>
+                                <div class="rounded-2xl border border-slate-200 px-4 py-4">
+                                    <p class="text-xs font-black uppercase tracking-wide text-slate-400">Area Layanan</p>
+                                    <p class="mt-1 text-base font-black text-slate-950">Wonosobo - Magelang - Purwokerto</p>
+                                </div>
+                                <div class="rounded-2xl border border-slate-200 px-4 py-4">
+                                    <p class="text-xs font-black uppercase tracking-wide text-slate-400">Instagram</p>
+                                    <a href="https://www.instagram.com/missiprivatecourse?igsh=bXRqOGpleWxrYWJ5" target="_blank" class="mt-1 inline-flex text-base font-black text-miss-navy hover:text-miss-goldDark">
+                                        @missiprivatecourse
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -740,7 +853,7 @@
                     <p class="section-kicker">Area Layanan</p>
                     <h2 class="mt-3 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">Area Layanan Tutor Bimbel Missi</h2>
                     <p class="mt-5 text-base leading-8 text-slate-600">
-                        Saat ini layanan masih berfokus di area Wonosobo dan sekitarnya. Ke depannya Bimbel Missi berencana membuka layanan untuk daerah lain secara bertahap.
+                        Layanan Bimbel Missi saat ini mencakup area Wonosobo, Magelang, dan Purwokerto.
                     </p>
                     <a href="{{ $whatsappUrl }}" target="_blank" class="focus-ring mt-7 inline-flex rounded-full bg-miss-navy px-6 py-3 text-sm font-black text-white hover:bg-miss-navyDark">
                         Cek Ketersediaan Tutor di Lokasi Saya
@@ -748,11 +861,10 @@
                 </div>
                 <div class="rounded-lg border border-slate-100 bg-white p-6 shadow-sm">
                     <div class="grid gap-3 sm:grid-cols-2">
-                        @foreach(['Fokus Wonosobo saat ini', 'Wilayah sekitar Wonosobo', 'Soon daerah lain', 'Ekspansi bertahap'] as $area)
+                        @foreach(['Wonosobo', 'Magelang', 'Purwokerto'] as $area)
                             <div class="rounded-lg bg-miss-blueSoft p-4 text-sm font-black text-miss-navy">{{ $area }}</div>
                         @endforeach
                     </div>
-                    <p class="mt-5 text-sm leading-7 text-slate-500">Hubungi admin untuk memastikan apakah alamat rumah Anda sudah dapat dijangkau tutor yang tersedia.</p>
                 </div>
             </div>
         </section>
@@ -800,6 +912,7 @@
                 <p class="font-black text-white">Navigasi</p>
                 <div class="mt-4 grid gap-2 text-sm">
                     <a href="#program" class="hover:text-white">Program</a>
+                    <a href="#harga" class="hover:text-white">Harga</a>
                     <a href="#cara-kerja" class="hover:text-white">Cara Kerja</a>
                     <a href="#laporan" class="hover:text-white">Laporan</a>
                     <a href="#faq" class="hover:text-white">FAQ</a>
@@ -810,7 +923,7 @@
                 <div class="mt-4 grid gap-2 text-sm">
                     <a href="{{ $whatsappUrl }}" target="_blank" class="hover:text-white">WhatsApp Admin</a>
                     <a href="https://www.instagram.com/missiprivatecourse?igsh=bXRqOGpleWxrYWJ5" target="_blank" class="hover:text-white">Instagram</a>
-                    <span>Fokus Wonosobo saat ini, soon daerah lain</span>
+                    <span>Wonosobo, Magelang, dan Purwokerto</span>
                 </div>
             </div>
         </div>

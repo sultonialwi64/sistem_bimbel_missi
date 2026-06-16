@@ -1,81 +1,128 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
+    <header class="border-b border-slate-200 pb-6">
+        <div>
+            <div class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#205085]/10 text-[#205085]">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+            <h2 class="mt-4 text-2xl font-black text-slate-950">
+                Informasi Profil
+            </h2>
+            <p class="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
+                Perbarui identitas akun dan foto profil Anda. Perubahan di sini dipakai sebagai identitas utama akun pada sistem.
+            </p>
+        </div>
     </header>
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6" id="profile-form">
+    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-8 space-y-8" id="profile-form">
         @csrf
         @method('patch')
 
-        <div>
-            <x-input-label for="avatar" value="Foto Profil" />
-            <div class="mt-2 flex items-center gap-4">
-                <img
-                    id="avatar-preview"
-                    src="{{ $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=205085&color=fff&size=128' }}"
-                    alt="Foto profil {{ $user->name }}"
-                    class="h-20 w-20 rounded-full object-cover ring-4 ring-slate-100"
-                >
-                <div class="flex-1">
-                    <input id="avatar" name="avatar" type="file" accept="image/*" class="block w-full rounded-md border border-gray-300 text-sm text-gray-700 file:mr-4 file:border-0 file:bg-[#205085] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#173b63]" />
-                    <p class="mt-2 text-xs text-gray-500">Opsional. Maksimal 5MB, otomatis dikompres oleh sistem.</p>
-                    <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
+        <div class="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+            <div class="rounded-3xl border border-slate-200 bg-slate-50/80 p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-black text-slate-950">Foto Profil</p>
+                        <p class="mt-1 text-xs leading-6 text-slate-500">Preview yang dipakai untuk sidebar dan kartu tutor.</p>
+                    </div>
+                    <span class="rounded-full bg-[#205085]/10 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-[#205085]">Avatar</span>
                 </div>
+
+                <div class="mt-6 flex flex-col items-center gap-5">
+                    <div class="relative">
+                        <div class="absolute inset-0 rounded-full bg-[#205085]/10 blur-xl"></div>
+                        <img
+                            id="avatar-preview"
+                            src="{{ $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=205085&color=fff&size=128' }}"
+                            alt="Foto profil {{ $user->name }}"
+                            class="relative h-32 w-32 rounded-full object-cover ring-4 ring-white shadow-xl"
+                        >
+                    </div>
+
+                    <div class="w-full rounded-3xl border border-dashed border-slate-300 bg-white p-4">
+                        <input id="avatar" name="avatar" type="file" accept="image/*" class="sr-only" />
+
+                        <div class="flex flex-col gap-3">
+                            <label for="avatar" class="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-full bg-[#205085] px-5 py-3 text-sm font-black text-white transition hover:bg-[#173b63]">
+                                Pilih Foto Baru
+                            </label>
+
+                            <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                                <p class="text-[11px] font-black uppercase tracking-wide text-slate-400">File terpilih</p>
+                                <p id="avatar-file-name" class="mt-1 truncate text-sm font-semibold text-slate-700">Belum ada file dipilih</p>
+                            </div>
+                        </div>
+
+                        <p class="mt-4 text-xs leading-6 text-slate-500">Maksimal 5MB. Setelah memilih file, sistem akan membuka crop bulat agar posisi foto bisa dirapikan dulu sebelum disimpan.</p>
+                        <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <x-input-label for="name" value="Nama Lengkap" class="text-sm font-black text-slate-900" />
+                    <x-text-input id="name" name="name" type="text" class="mt-2 block w-full rounded-2xl border-slate-300 py-3 text-base shadow-sm focus:border-[#205085] focus:ring-[#205085]" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+                    <p class="mt-2 text-xs leading-6 text-slate-500">Gunakan nama yang ingin tampil konsisten pada akun dan halaman kerja Anda.</p>
+                    <x-input-error class="mt-2" :messages="$errors->get('name')" />
+                </div>
+
+                <div>
+                    <x-input-label for="email" value="Email" class="text-sm font-black text-slate-900" />
+                    <x-text-input id="email" name="email" type="email" class="mt-2 block w-full rounded-2xl border-slate-300 py-3 text-base shadow-sm focus:border-[#205085] focus:ring-[#205085]" :value="old('email', $user->email)" required autocomplete="username" />
+                    <p class="mt-2 text-xs leading-6 text-slate-500">Email ini dipakai untuk login dan notifikasi akun bila diperlukan.</p>
+                    <x-input-error class="mt-2" :messages="$errors->get('email')" />
+                </div>
+
+                @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
+                    <div class="rounded-3xl border border-amber-200 bg-amber-50/80 p-5">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-black text-amber-900">Email ini belum terverifikasi</p>
+                                <p class="mt-1 text-sm leading-6 text-amber-800">Silakan kirim ulang email verifikasi bila Anda membutuhkannya.</p>
+                            </div>
+
+                            <button form="send-verification" class="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-amber-800 shadow-sm transition hover:bg-amber-100">
+                                Kirim ulang email verifikasi
+                            </button>
+                        </div>
+
+                        @if (session('status') === 'verification-link-sent')
+                            <p class="mt-3 text-sm font-bold text-green-700">
+                                Link verifikasi baru sudah dikirim ke email Anda.
+                            </p>
+                        @endif
+                    </div>
+                @endif
             </div>
         </div>
 
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
-        </div>
+        <div class="flex flex-col gap-3 rounded-[26px] border border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-black text-slate-900">Simpan perubahan profil</p>
+                <p class="mt-1 text-xs leading-6 text-slate-500">Perubahan nama, email, dan foto akan langsung dipakai setelah tersimpan.</p>
+            </div>
 
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            <div class="flex items-center gap-4">
+                <x-primary-button class="rounded-full bg-[#205085] px-6 py-3 text-sm font-black uppercase tracking-wide hover:bg-[#173b63]">
+                    Simpan Profil
+                </x-primary-button>
 
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
-                </div>
-            @endif
-        </div>
-
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
+                @if (session('status') === 'profile-updated')
+                    <p
+                        x-data="{ show: true }"
+                        x-show="show"
+                        x-transition
+                        x-init="setTimeout(() => show = false, 2000)"
+                        class="text-sm font-bold text-green-700"
+                    >Profil tersimpan.</p>
+                @endif
+            </div>
         </div>
     </form>
 
@@ -133,6 +180,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('avatar');
         const preview = document.getElementById('avatar-preview');
+        const fileName = document.getElementById('avatar-file-name');
         const modal = document.getElementById('avatar-crop-modal');
         const closeButton = document.getElementById('avatar-crop-close');
         const cancelButton = document.getElementById('avatar-crop-cancel');
@@ -141,9 +189,11 @@
         const cropImage = document.getElementById('avatar-crop-image');
         const zoomInput = document.getElementById('avatar-zoom');
 
-        if (!input || !preview || !modal || !stage || !cropImage || !zoomInput) {
+        if (!input || !preview || !fileName || !modal || !stage || !cropImage || !zoomInput) {
             return;
         }
+
+        const defaultFileName = 'Belum ada file dipilih';
 
         const state = {
             fileName: null,
@@ -159,6 +209,10 @@
             dragStartY: 0,
             dragOriginX: 0,
             dragOriginY: 0,
+        };
+
+        const setFileName = (value) => {
+            fileName.textContent = value || defaultFileName;
         };
 
         const resetCropState = (clearInput = false) => {
@@ -180,6 +234,7 @@
 
             if (clearInput) {
                 input.value = '';
+                setFileName(defaultFileName);
             }
         };
 
@@ -278,15 +333,18 @@
 
             const previewUrl = URL.createObjectURL(blob);
             preview.src = previewUrl;
+            setFileName(croppedFile.name);
         };
 
         input.addEventListener('change', (event) => {
             const [file] = event.target.files || [];
 
             if (!file) {
+                setFileName(defaultFileName);
                 return;
             }
 
+            setFileName(file.name);
             state.fileName = file.name;
             state.imageUrl = URL.createObjectURL(file);
             state.image = new Image();
