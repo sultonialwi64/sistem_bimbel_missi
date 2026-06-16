@@ -38,7 +38,12 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => base_path('../../public_html/storage'),
+            'root' => env(
+                'PUBLIC_STORAGE_PATH',
+                env('APP_ENV', 'production') === 'local'
+                    ? storage_path('app/public')
+                    : base_path('../../public_html/storage')
+            ),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,

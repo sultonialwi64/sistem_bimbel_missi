@@ -21,11 +21,58 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Tutor\AttendanceController;
 use App\Http\Controllers\Tutor\DashboardController as TutorDashboardController;
 use App\Http\Controllers\Tutor\EarningController;
+use App\Models\Attendance;
+use App\Models\Subject;
+use App\Models\Tutor;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $sessionCount = Attendance::whereIn('status', ['hadir', 'pindah_lokasi'])->count();
+    $sessionDisplayTarget = $sessionCount >= 100
+        ? intdiv($sessionCount, 50) * 50
+        : $sessionCount;
+
+    $landingTutors = Tutor::with('user')
+        ->where('status', 'active')
+        ->latest()
+        ->take(4)
+        ->get();
+
+    $landingStats = [
+        [
+            'value' => '100+',
+            'target' => 100,
+            'suffix' => '+',
+            'label' => 'Siswa pernah belajar bersama Missi',
+            'accent' => 'text-miss-navy',
+        ],
+        [
+            'value' => number_format($sessionDisplayTarget) . ($sessionCount >= 100 ? '+' : ''),
+            'target' => $sessionDisplayTarget,
+            'suffix' => $sessionCount >= 100 ? '+' : '',
+            'label' => 'Sesi belajar telah terlaksana',
+            'accent' => 'text-miss-goldDark',
+        ],
+        [
+            'value' => number_format(Subject::active()->count()),
+            'target' => Subject::active()->count(),
+            'suffix' => '',
+            'label' => 'Program atau mapel tersedia',
+            'accent' => 'text-miss-navy',
+        ],
+    ];
+
+    return view('welcome', compact('landingTutors', 'landingStats'));
 });
+
+Route::get('/tutors', function () {
+    $tutors = Tutor::with('user')
+        ->where('status', 'active')
+        ->latest()
+        ->get();
+
+    return view('tutors.index', compact('tutors'));
+})->name('tutors.public.index');
 
 Route::middleware('auth')->group(function () {
     // Notifications

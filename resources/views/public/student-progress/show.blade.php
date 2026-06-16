@@ -303,7 +303,7 @@
                 <p class="eyebrow">Laporan Progres Belajar</p>
                 <h1>{{ $student->name }}</h1>
                 <p class="hero-subtitle">
-                    Periode {{ $startDate->translatedFormat('F Y') }}. Laporan ini dapat dibuka tanpa login melalui link resmi yang dikirim oleh Bimbel Miss I.
+                    Periode {{ $startDate->translatedFormat('F Y') }}. Laporan ini dapat dibuka tanpa login melalui link resmi yang dikirim oleh Bimbel Missi.
                 </p>
             </div>
             <a href="{{ $pdfLink }}" class="download">

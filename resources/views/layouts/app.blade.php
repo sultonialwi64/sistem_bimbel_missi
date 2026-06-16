@@ -123,7 +123,7 @@
             
             <!-- User Info -->
             <div class="p-4 border-b border-slate-700/50">
-                <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+                <a href="{{ route('profile.edit') }}" class="group flex items-center gap-3 p-3 bg-slate-800/50 hover:bg-slate-800 rounded-2xl border border-slate-700/50 hover:border-[#c28552]/50 transition-all duration-200">
                     <img class="h-10 w-10 rounded-xl object-cover ring-2 ring-indigo-500/30" 
                          src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=205085&color=fff&size=128' }}" 
                          alt="{{ auth()->user()->name }}">
@@ -132,8 +132,14 @@
                         <p class="text-xs text-slate-400 capitalize">
                             {{ auth()->user()->role === 'admin' ? 'Administrator' : (auth()->user()->role === 'tutor' ? 'Pengajar' : 'Wali Murid') }}
                         </p>
+                        <p class="mt-1 text-[11px] font-bold text-[#c28552] opacity-90 group-hover:text-[#f0c99f]">
+                            Edit profil & foto
+                        </p>
                     </div>
-                </div>
+                    <svg class="h-4 w-4 shrink-0 text-slate-500 transition group-hover:translate-x-0.5 group-hover:text-[#c28552]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
             </div>
             
             <!-- Navigation -->
