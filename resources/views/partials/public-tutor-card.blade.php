@@ -34,6 +34,9 @@
         <div class="mt-5">
             <h3 class="text-lg font-black leading-7 text-slate-950 sm:text-xl">{{ $tutor->user->name }}</h3>
             <p class="mt-1 min-h-5 text-sm font-bold leading-6 text-slate-500">{{ $tutor->education ?: 'Pengajar Missi' }}</p>
+            @if($tutor->teaching_experience_label)
+                <p class="mt-2 text-sm font-semibold leading-6 text-miss-goldDark">{{ $tutor->teaching_experience_label }}</p>
+            @endif
         </div>
 
         <p class="mt-4 text-xs font-black uppercase text-miss-goldDark">Bidang yang diampu</p>

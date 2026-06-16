@@ -72,6 +72,29 @@
                                 <option value="suspended" {{ $tutor->status == 'suspended' ? 'selected' : '' }}>Suspended</option>
                             </select>
                         </div>
+
+                        <div class="col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-sm font-semibold text-gray-800">Landing Page</p>
+                            <p class="mt-1 text-xs leading-6 text-gray-500">Pilih apakah tutor ini masuk 4 card utama landing page dan atur urutannya.</p>
+
+                            <div class="mt-4 grid gap-4 md:grid-cols-2">
+                                <label class="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3">
+                                    <input type="checkbox" name="is_featured_on_landing" value="1" {{ old('is_featured_on_landing', $tutor->is_featured_on_landing) ? 'checked' : '' }} class="mt-1 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                    <span>
+                                        <span class="block text-sm font-semibold text-gray-800">Tampilkan di landing page</span>
+                                        <span class="block text-xs text-gray-500">Tutor ini diprioritaskan muncul di card utama.</span>
+                                    </span>
+                                </label>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Urutan Landing</label>
+                                    <input type="number" name="landing_feature_order" min="1" max="20" value="{{ old('landing_feature_order', $tutor->landing_feature_order) }}"
+                                           class="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" placeholder="Contoh: 1">
+                                    <p class="mt-1 text-xs text-gray-500">Semakin kecil angkanya, semakin atas posisinya.</p>
+                                    @error('landing_feature_order')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                                </div>
+                            </div>
+                        </div>
                         
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700">Education</label>

@@ -34,6 +34,8 @@ class TutorController extends Controller
             'education' => ['nullable', 'string'],
             'bank_account' => ['nullable', 'string'],
             'bank_name' => ['nullable', 'string'],
+            'is_featured_on_landing' => ['nullable', 'boolean'],
+            'landing_feature_order' => ['nullable', 'integer', 'min:1', 'max:20'],
         ]);
 
         $user = User::create([
@@ -52,6 +54,8 @@ class TutorController extends Controller
             'education' => $validated['education'] ?? null,
             'bank_account' => $validated['bank_account'] ?? null,
             'bank_name' => $validated['bank_name'] ?? null,
+            'is_featured_on_landing' => $request->boolean('is_featured_on_landing'),
+            'landing_feature_order' => $request->boolean('is_featured_on_landing') ? ($validated['landing_feature_order'] ?? null) : null,
         ]);
 
         return redirect()->route('admin.tutors.index')
@@ -84,6 +88,8 @@ class TutorController extends Controller
             'education' => ['nullable', 'string'],
             'bank_account' => ['nullable', 'string'],
             'bank_name' => ['nullable', 'string'],
+            'is_featured_on_landing' => ['nullable', 'boolean'],
+            'landing_feature_order' => ['nullable', 'integer', 'min:1', 'max:20'],
         ]);
 
         $tutor->user->update([
@@ -104,6 +110,8 @@ class TutorController extends Controller
             'education' => $validated['education'] ?? null,
             'bank_account' => $validated['bank_account'] ?? null,
             'bank_name' => $validated['bank_name'] ?? null,
+            'is_featured_on_landing' => $request->boolean('is_featured_on_landing'),
+            'landing_feature_order' => $request->boolean('is_featured_on_landing') ? ($validated['landing_feature_order'] ?? null) : null,
         ]);
 
         return redirect()->route('admin.tutors.index')

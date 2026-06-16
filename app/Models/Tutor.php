@@ -22,7 +22,10 @@ class Tutor extends Model
         'bank_name',
         'bio',
         'education',
+        'teaching_experience_years',
         'certificate',
+        'is_featured_on_landing',
+        'landing_feature_order',
     ];
 
     protected function casts(): array
@@ -31,6 +34,7 @@ class Tutor extends Model
             'specialization' => 'array',
             'session_rate' => 'decimal:2',
             'rating_avg' => 'decimal:2',
+            'is_featured_on_landing' => 'boolean',
         ];
     }
 
@@ -106,5 +110,14 @@ class Tutor extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    public function getTeachingExperienceLabelAttribute(): ?string
+    {
+        if ($this->teaching_experience_years === null) {
+            return null;
+        }
+
+        return $this->teaching_experience_years.' year'.($this->teaching_experience_years === 1 ? '' : 's').' teaching experience';
     }
 }

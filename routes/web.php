@@ -36,8 +36,11 @@ Route::get('/', function () {
         ->select('tutors.*')
         ->join('users', 'users.id', '=', 'tutors.user_id')
         ->where('status', 'active')
+        ->orderByDesc('is_featured_on_landing')
+        ->orderByRaw('CASE WHEN tutors.landing_feature_order IS NULL THEN 1 ELSE 0 END')
+        ->orderBy('tutors.landing_feature_order')
         ->orderByRaw("CASE WHEN users.avatar IS NULL OR users.avatar = '' THEN 1 ELSE 0 END")
-        ->latest()
+        ->latest('tutors.id')
         ->with('user')
         ->take(4)
         ->get();
@@ -67,8 +70,11 @@ Route::get('/tutors', function () {
         ->select('tutors.*')
         ->join('users', 'users.id', '=', 'tutors.user_id')
         ->where('status', 'active')
+        ->orderByDesc('is_featured_on_landing')
+        ->orderByRaw('CASE WHEN tutors.landing_feature_order IS NULL THEN 1 ELSE 0 END')
+        ->orderBy('tutors.landing_feature_order')
         ->orderByRaw("CASE WHEN users.avatar IS NULL OR users.avatar = '' THEN 1 ELSE 0 END")
-        ->latest()
+        ->latest('tutors.id')
         ->with('user')
         ->get();
 

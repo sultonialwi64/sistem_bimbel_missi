@@ -60,6 +60,7 @@
                     <tr>
                         <th class="text-left py-4 px-6">Tutor</th>
                         <th class="text-left py-4 px-6">Specialization</th>
+                        <th class="text-left py-4 px-6">Landing</th>
                         <th class="text-left py-4 px-6">Rating</th>
                         <th class="text-left py-4 px-6">Sessions</th>
                         <th class="text-left py-4 px-6">Status</th>
@@ -96,6 +97,18 @@
                                 </div>
                                 @if($tutor->education)
                                     <p class="text-xs text-gray-500 mt-1">{{ $tutor->education }}</p>
+                                @endif
+                            </td>
+                            <td class="py-4 px-6">
+                                @if($tutor->is_featured_on_landing)
+                                    <div class="space-y-1">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold">
+                                            Featured
+                                        </span>
+                                        <p class="text-xs text-gray-500">Urutan: {{ $tutor->landing_feature_order ?? '-' }}</p>
+                                    </div>
+                                @else
+                                    <span class="text-sm text-gray-400">Tidak tampil</span>
                                 @endif
                             </td>
                             <td class="py-4 px-6">
@@ -148,7 +161,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-12 text-center">
+                            <td colspan="8" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
                                         <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -183,6 +196,9 @@
                                 </span>
                             </div>
                             <p class="text-xs text-gray-500 truncate">{{ $tutor->user->email }}</p>
+                            @if($tutor->is_featured_on_landing)
+                                <p class="mt-1 text-[10px] font-bold text-indigo-600">Landing order: {{ $tutor->landing_feature_order ?? '-' }}</p>
+                            @endif
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-1 mb-3">

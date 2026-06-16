@@ -43,6 +43,12 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
+        if ($request->user()->isTutor() && $request->user()->tutor) {
+            $request->user()->tutor->update([
+                'teaching_experience_years' => $validated['teaching_experience_years'] ?? null,
+            ]);
+        }
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 

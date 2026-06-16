@@ -36,6 +36,14 @@
                         </span>
                     </div>
 
+                    <div class="mt-3">
+                        @if($tutor->is_featured_on_landing)
+                            <span class="badge badge-indigo">Landing page #{{ $tutor->landing_feature_order ?? '-' }}</span>
+                        @else
+                            <span class="badge badge-gray">Tidak tampil di landing</span>
+                        @endif
+                    </div>
+
                     <div class="mt-5 flex justify-center gap-2">
                         <a href="{{ route('admin.tutors.edit', $tutor) }}" class="btn-primary text-sm">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -108,6 +116,12 @@
                     <div class="p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100">
                         <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Education</label>
                         <p class="text-gray-900 mt-1 font-medium">{{ $tutor->education ?? '-' }}</p>
+                    </div>
+                    <div class="p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100">
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Teaching Experience</label>
+                        <p class="text-gray-900 mt-1 font-medium">
+                            {{ $tutor->teaching_experience_label ?? '-' }}
+                        </p>
                     </div>
                     <div class="p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100">
                         <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Bio</label>

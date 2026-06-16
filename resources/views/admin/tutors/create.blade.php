@@ -60,6 +60,25 @@
                             <label class="form-label">Education</label>
                             <input type="text" name="education" value="{{ old('education') }}" class="input-premium" placeholder="e.g. S1 Matematika">
                         </div>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 md:row-span-2">
+                            <p class="text-sm font-bold text-gray-900">Landing Page</p>
+                            <p class="mt-1 text-xs leading-6 text-gray-500">Admin dapat memilih tutor ini tampil di 4 card utama landing page.</p>
+
+                            <label class="mt-4 flex items-start gap-3">
+                                <input type="checkbox" name="is_featured_on_landing" value="1" {{ old('is_featured_on_landing') ? 'checked' : '' }} class="mt-1 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                <span>
+                                    <span class="block text-sm font-semibold text-gray-800">Tampilkan di landing page</span>
+                                    <span class="block text-xs text-gray-500">Tutor ini masuk kandidat 4 tutor utama.</span>
+                                </span>
+                            </label>
+
+                            <div class="mt-4">
+                                <label class="form-label">Urutan Landing</label>
+                                <input type="number" name="landing_feature_order" min="1" max="20" value="{{ old('landing_feature_order') }}" class="input-premium" placeholder="Contoh: 1">
+                                <p class="mt-1 text-xs text-gray-500">Semakin kecil angkanya, semakin atas posisinya.</p>
+                                @error('landing_feature_order')<p class="form-error">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
                         <div class="md:col-span-2">
                             <label class="form-label">Spesialisasi <span class="text-red-500">*</span></label>
                             <select id="specialization-select" name="specialization[]" multiple placeholder="Pilih atau ketik spesialisasi baru..." class="@error('specialization') border-red-500 @enderror">

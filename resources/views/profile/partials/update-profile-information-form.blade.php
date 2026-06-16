@@ -79,6 +79,24 @@
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
                 </div>
 
+                @if($user->isTutor() && $user->tutor)
+                    <div>
+                        <x-input-label for="teaching_experience_years" value="Pengalaman Mengajar (Tahun)" class="text-sm font-black text-slate-900" />
+                        <x-text-input
+                            id="teaching_experience_years"
+                            name="teaching_experience_years"
+                            type="number"
+                            min="0"
+                            max="60"
+                            class="mt-2 block w-full rounded-2xl border-slate-300 py-3 text-base shadow-sm focus:border-[#205085] focus:ring-[#205085]"
+                            :value="old('teaching_experience_years', $user->tutor->teaching_experience_years)"
+                            inputmode="numeric"
+                        />
+                        <p class="mt-2 text-xs leading-6 text-slate-500">Isi angka tahun pengalaman mengajar. Data ini akan dipakai untuk card tutor di landing page.</p>
+                        <x-input-error class="mt-2" :messages="$errors->get('teaching_experience_years')" />
+                    </div>
+                @endif
+
                 @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                     <div class="rounded-3xl border border-amber-200 bg-amber-50/80 p-5">
                         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

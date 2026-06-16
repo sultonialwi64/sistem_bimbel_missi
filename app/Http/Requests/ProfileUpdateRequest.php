@@ -27,6 +27,7 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'avatar' => ['nullable', 'image', 'max:5120'],
+            'teaching_experience_years' => ['nullable', 'integer', 'min:0', 'max:60'],
         ];
     }
 }
