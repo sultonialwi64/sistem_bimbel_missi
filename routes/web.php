@@ -32,18 +32,61 @@ Route::get('/', function () {
         })
         ->count();
 
-    $landingTutors = Tutor::query()
+    $featuredLandingTutors = Tutor::query()
         ->select('tutors.*')
         ->join('users', 'users.id', '=', 'tutors.user_id')
         ->where('status', 'active')
-        ->orderByDesc('is_featured_on_landing')
+        ->where('is_featured_on_landing', true)
         ->orderByRaw('CASE WHEN tutors.landing_feature_order IS NULL THEN 1 ELSE 0 END')
         ->orderBy('tutors.landing_feature_order')
         ->orderByRaw("CASE WHEN users.avatar IS NULL OR users.avatar = '' THEN 1 ELSE 0 END")
         ->latest('tutors.id')
         ->with('user')
-        ->take(4)
         ->get();
+
+    $orderedFeaturedTutors = $featuredLandingTutors
+        ->filter(function ($tutor) {
+            return $tutor->landing_feature_order !== null
+                && $tutor->landing_feature_order >= 1
+                && $tutor->landing_feature_order <= 4;
+        })
+        ->unique('landing_feature_order')
+        ->keyBy(function ($tutor) {
+            return (int) $tutor->landing_feature_order;
+        });
+
+    $featuredWithoutExplicitSlot = $featuredLandingTutors
+        ->reject(function ($tutor) use ($orderedFeaturedTutors) {
+            return $orderedFeaturedTutors->contains('id', $tutor->id);
+        })
+        ->values();
+
+    $fallbackTutors = Tutor::query()
+        ->select('tutors.*')
+        ->join('users', 'users.id', '=', 'tutors.user_id')
+        ->where('status', 'active')
+        ->whereNotIn('tutors.id', $featuredLandingTutors->pluck('id'))
+        ->orderByRaw("CASE WHEN users.avatar IS NULL OR users.avatar = '' THEN 1 ELSE 0 END")
+        ->latest('tutors.id')
+        ->with('user')
+        ->get();
+
+    $remainingTutorPool = $featuredWithoutExplicitSlot
+        ->concat($fallbackTutors)
+        ->values();
+
+    $landingTutors = collect();
+
+    for ($position = 1; $position <= 4; $position++) {
+        if ($orderedFeaturedTutors->has($position)) {
+            $landingTutors->push($orderedFeaturedTutors->get($position));
+            continue;
+        }
+
+        if ($remainingTutorPool->isNotEmpty()) {
+            $landingTutors->push($remainingTutorPool->shift());
+        }
+    }
 
     $landingStats = [
         [
