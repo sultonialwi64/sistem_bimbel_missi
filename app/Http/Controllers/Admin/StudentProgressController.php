@@ -55,7 +55,9 @@ class StudentProgressController extends Controller
 
         $pdf = Pdf::loadView('admin.student-progress.pdf', $data);
 
-        $fileName = 'Laporan_Progres_' . str_replace(' ', '_', $student->name) . '_' . $data['month'] . '.pdf';
+        $safeName = preg_replace('/[\/\\\:*?"<>|]/', '', $student->name); // strip invalid filename chars
+        $safeName = preg_replace('/\s+/', '_', trim($safeName));           // spaces → underscore
+        $fileName = 'Laporan_Progres_' . $safeName . '_' . $data['month'] . '.pdf';
 
         if ($request->boolean('preview')) {
             return $pdf->stream($fileName);
