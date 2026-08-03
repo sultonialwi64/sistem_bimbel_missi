@@ -26,8 +26,9 @@
 @section('content')
 <div class="space-y-6" x-data="{ previewOpen: false, previewUrl: '', downloadUrl: '', previewTitle: '', waConfirmOpen: false, waConfirmAction: '', waConfirmTitle: '' }">
     <div class="rounded-2xl border border-indigo-300/30 bg-indigo-900/35 p-4 shadow-sm">
-        <div class="grid gap-3 md:grid-cols-[auto_auto_minmax(280px,1fr)] md:items-center">
-            <div class="flex min-w-max flex-wrap items-center gap-2">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4">
+            <div class="flex flex-wrap items-center gap-2 md:gap-3">
+                <div class="flex min-w-max flex-wrap items-center gap-2">
                 <span class="mr-1 text-xs font-bold uppercase tracking-widest text-indigo-200">Tagihan</span>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'all' ? 'bg-indigo-700 text-white shadow-md ring-1 ring-indigo-200/70' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Semua
@@ -53,7 +54,21 @@
                 </a>
             </div>
 
-            <form action="{{ route('admin.payments.index') }}" method="GET" class="flex w-full items-center gap-2 md:justify-self-end">
+            <div class="flex min-w-max flex-wrap items-center gap-2 md:border-l md:border-indigo-300/25 md:pl-4">
+                <span class="mr-1 text-xs font-bold uppercase tracking-widest text-indigo-200">Tentor</span>
+                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'all']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ (!isset($tutorStatusFilter) || $tutorStatusFilter === 'all') ? 'bg-indigo-600 text-white shadow-md ring-1 ring-indigo-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Semua
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'incomplete']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ (isset($tutorStatusFilter) && $tutorStatusFilter === 'incomplete') ? 'bg-amber-500 text-white shadow-md ring-1 ring-amber-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Belum
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'completed']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ (isset($tutorStatusFilter) && $tutorStatusFilter === 'completed') ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                    Selesai
+                </a>
+            </div>
+            </div>
+
+            <form action="{{ route('admin.payments.index') }}" method="GET" class="flex w-full items-center gap-2 lg:max-w-md">
                 <div class="relative min-w-0 flex-1">
                     <svg class="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -67,6 +82,7 @@
                 <input type="hidden" name="filter_month" value="{{ request('filter_month') }}">
                 <input type="hidden" name="status" value="{{ request('status', 'all') }}">
                 <input type="hidden" name="wa_status" value="{{ request('wa_status', 'all') }}">
+                <input type="hidden" name="tutor_status" value="{{ request('tutor_status', 'all') }}">
             </form>
         </div>
     </div>
@@ -93,6 +109,7 @@
                         @endif
                         <input type="hidden" name="status" value="{{ request('status', 'all') }}">
                         <input type="hidden" name="wa_status" value="{{ request('wa_status', 'all') }}">
+                        <input type="hidden" name="tutor_status" value="{{ request('tutor_status', 'all') }}">
                         @if(request('search'))
                             <input type="hidden" name="search" value="{{ request('search') }}">
                         @endif
@@ -154,7 +171,28 @@
                                 <p class="font-medium text-gray-900 break-words">{{ $payment->student->name }}</p>
                             </td>
                             <td class="py-4 px-6">
-                                <p class="text-sm text-gray-700 break-words">{{ $payment->tutor_names ?: '-' }}</p>
+                                @if(isset($payment->tutors_with_status) && $payment->tutors_with_status->count() > 0)
+                                    <div class="flex flex-col gap-1.5">
+                                        @foreach($payment->tutors_with_status as $tutor)
+                                            <div class="flex items-center flex-wrap gap-1.5">
+                                                <span class="text-sm font-medium text-gray-800">{{ $tutor->name }}</span>
+                                                @if($tutor->is_completed)
+                                                    <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+                                                        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                                        Selesai
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                                                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                        Belum
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-700 break-words">-</p>
+                                @endif
                             </td>
                             <td class="py-4 px-6">
                                 @php
@@ -252,11 +290,15 @@
                                             WA
                                         </a>
                                     @endif
-                                    @unless($payment->wa_sent_at)
-                                        <button type="button" @click="waConfirmOpen = true; waConfirmAction = @js(route('admin.payments.mark-wa-sent', $payment)); waConfirmTitle = @js($payment->client->user->name . ' - ' . $payment->student->name)" class="inline-flex items-center justify-center px-2.5 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl font-bold text-xs hover:bg-blue-100 transition-all" title="Tandai sudah dikirim via WhatsApp">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    @if($payment->wa_sent_at)
+                                        <button type="button" class="inline-flex items-center justify-center px-3 py-2 bg-[#10b981] text-white border border-[#059669] rounded-xl font-bold hover:bg-[#059669] transition-all shadow-sm cursor-default" title="Sudah dikirim via WhatsApp pada {{ $payment->wa_sent_at->format('d M Y H:i') }}">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                         </button>
-                                    @endunless
+                                    @else
+                                        <button type="button" @click="waConfirmOpen = true; waConfirmAction = @js(route('admin.payments.mark-wa-sent', $payment)); waConfirmTitle = @js($payment->client->user->name . ' - ' . $payment->student->name)" class="inline-flex items-center justify-center px-3 py-2 bg-[#fbbf24] text-[#78350f] border border-[#f59e0b] rounded-xl font-bold hover:bg-[#f59e0b] hover:text-white transition-all shadow-sm" title="Tandai sudah dikirim via WhatsApp">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        </button>
+                                    @endif
                                     <a href="{{ route('admin.payments.show', ['payment' => $payment, 'return_url' => request()->fullUrl()]) }}" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-xl font-bold text-xs hover:bg-indigo-50 transition-all">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         View
@@ -376,12 +418,17 @@
                                 WhatsApp
                             </a>
                         @endif
-                        @unless($payment->wa_sent_at)
-                            <button type="button" @click="waConfirmOpen = true; waConfirmAction = @js(route('admin.payments.mark-wa-sent', $payment)); waConfirmTitle = @js($payment->client->user->name . ' - ' . $payment->student->name)" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs hover:bg-blue-100 transition-all">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        @if($payment->wa_sent_at)
+                            <button type="button" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-[#10b981] text-white border border-[#059669] rounded-xl font-bold text-xs shadow-sm cursor-default" title="Sudah dikirim">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                Dikirim
+                            </button>
+                        @else
+                            <button type="button" @click="waConfirmOpen = true; waConfirmAction = @js(route('admin.payments.mark-wa-sent', $payment)); waConfirmTitle = @js($payment->client->user->name . ' - ' . $payment->student->name)" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-[#fbbf24] text-[#78350f] border border-[#f59e0b] rounded-xl font-bold text-xs hover:bg-[#f59e0b] hover:text-white transition-all shadow-sm">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                 Tandai
                             </button>
-                        @endunless
+                        @endif
                         <a href="{{ route('admin.payments.show', ['payment' => $payment, 'return_url' => request()->fullUrl()]) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-semibold text-xs hover:bg-indigo-100 transition-all">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             Detail

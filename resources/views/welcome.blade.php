@@ -589,12 +589,28 @@
 
                 <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     @foreach($programs as $program)
-                        <article class="rounded-lg border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-                            <span class="inline-flex rounded-full border px-3 py-1 text-xs font-black {{ $program['tone'] }}">{{ $program['category'] }}</span>
-                            <h3 class="mt-4 text-lg font-black text-slate-950">{{ $program['title'] }}</h3>
-                            <p class="mt-3 text-sm leading-7 text-slate-600">{{ $program['goal'] }}</p>
-                            <p class="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-slate-600">{{ $program['mode'] }}</p>
-                            <a href="{{ $whatsappUrl }}" target="_blank" class="mt-4 inline-flex text-sm font-black text-miss-navy hover:text-miss-gold">{{ $program['cta'] }}</a>
+                        <article class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-miss-navy/5 hover:border-miss-navy/20">
+                            <!-- Hover Gradient Bar -->
+                            <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-miss-gold to-miss-navy opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                            
+                            <div>
+                                <span class="inline-flex rounded-full border px-3 py-1 text-xs font-black {{ $program['tone'] }}">{{ $program['category'] }}</span>
+                                <h3 class="mt-5 text-xl font-black leading-tight text-slate-900 transition-colors group-hover:text-miss-navy">{{ $program['title'] }}</h3>
+                                <p class="mt-3 text-sm leading-relaxed text-slate-600">{{ $program['goal'] }}</p>
+                            </div>
+                            
+                            <div class="mt-auto pt-6">
+                                <div class="flex items-center justify-between border-t border-slate-100 pt-5">
+                                    <a href="{{ $whatsappUrl }}" target="_blank" class="inline-flex items-center gap-1 text-sm font-black text-miss-navy transition-colors hover:text-miss-gold">
+                                        {{ $program['cta'] }}
+                                        <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
+                                    <div class="text-right">
+                                        <span class="block text-base font-black text-miss-gold">Rp 50.000</span>
+                                        <span class="block text-[11px] font-bold text-slate-400">per sesi</span>
+                                    </div>
+                                </div>
+                            </div>
                         </article>
                     @endforeach
                 </div>

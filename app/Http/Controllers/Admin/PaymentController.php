@@ -58,21 +58,81 @@ class PaymentController extends Controller
             $query->whereNull('wa_sent_at');
         }
 
+        // Filter Laporan Tentor
+        $tutorStatusFilter = $request->input('tutor_status', 'all');
+        if ($tutorStatusFilter === 'incomplete') {
+            $query->whereHas('student.schedules', function ($q) use ($periodStart, $periodEnd) {
+                $q->whereBetween('date', [$periodStart, $periodEnd])
+                  ->whereHas('attendance', fn($a) => $a->whereIn('status', ['hadir', 'pindah_lokasi']))
+                  ->whereNotExists(function ($q2) use ($periodStart) {
+                      $q2->select(\Illuminate\Support\Facades\DB::raw(1))
+                         ->from('tutor_monthly_completions')
+                         ->whereColumn('tutor_monthly_completions.tutor_id', 'schedules.tutor_id')
+                         ->whereColumn('tutor_monthly_completions.student_id', 'schedules.student_id')
+                         ->where('tutor_monthly_completions.period_start', $periodStart->format('Y-m-d'))
+                         ->where('tutor_monthly_completions.is_completed', true);
+                  });
+            });
+        } elseif ($tutorStatusFilter === 'completed') {
+            $query->whereHas('student.schedules', function ($q) use ($periodStart, $periodEnd) {
+                $q->whereBetween('date', [$periodStart, $periodEnd])
+                  ->whereHas('attendance', fn($a) => $a->whereIn('status', ['hadir', 'pindah_lokasi']));
+            })->whereDoesntHave('student.schedules', function ($q) use ($periodStart, $periodEnd) {
+                $q->whereBetween('date', [$periodStart, $periodEnd])
+                  ->whereHas('attendance', fn($a) => $a->whereIn('status', ['hadir', 'pindah_lokasi']))
+                  ->whereNotExists(function ($q2) use ($periodStart) {
+                      $q2->select(\Illuminate\Support\Facades\DB::raw(1))
+                         ->from('tutor_monthly_completions')
+                         ->whereColumn('tutor_monthly_completions.tutor_id', 'schedules.tutor_id')
+                         ->whereColumn('tutor_monthly_completions.student_id', 'schedules.student_id')
+                         ->where('tutor_monthly_completions.period_start', $periodStart->format('Y-m-d'))
+                         ->where('tutor_monthly_completions.is_completed', true);
+                  });
+            });
+        }
+
         $payments = $query->paginate(15)->withQueryString();
 
-        // Load tutor names per payment
-        $payments->getCollection()->each(function ($payment) {
-            $periodEnd = Carbon::parse($payment->due_date)->subDays(7)->endOfDay();
-            $periodStart = $periodEnd->copy()->startOfMonth();
+        // Load tutor names per payment with completion status efficiently
+        $studentIds = $payments->pluck('student_id')->unique();
+        
+        // Use the same period as the filters
+        $globalPeriodStart = $date->copy()->startOfMonth();
+        $globalPeriodEnd = $date->copy()->endOfMonth();
 
-            $payment->tutor_names = Schedule::where('student_id', $payment->student_id)
-                ->whereBetween('date', [$periodStart, $periodEnd])
-                ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
-                ->with('tutor.user')
-                ->get()
-                ->pluck('tutor.user.name')
-                ->unique()
-                ->implode(', ');
+        $allSchedules = Schedule::whereIn('student_id', $studentIds)
+            ->whereBetween('date', [$globalPeriodStart, $globalPeriodEnd])
+            ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
+            ->with('tutor.user')
+            ->get();
+
+        $tutorIds = $allSchedules->pluck('tutor_id')->unique();
+
+        $allCompletions = \App\Models\TutorMonthlyCompletion::whereIn('tutor_id', $tutorIds)
+            ->whereIn('student_id', $studentIds)
+            ->where('period_start', $globalPeriodStart->format('Y-m-d'))
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->tutor_id . '_' . $item->student_id;
+            });
+
+        $schedulesByStudent = $allSchedules->groupBy('student_id');
+
+        $payments->getCollection()->each(function ($payment) use ($schedulesByStudent, $allCompletions) {
+            $schedules = $schedulesByStudent->get($payment->student_id, collect());
+            $tutors = $schedules->pluck('tutor')->unique('id');
+
+            $tutorDetails = $tutors->map(function ($tutor) use ($payment, $allCompletions) {
+                $key = $tutor->id . '_' . $payment->student_id;
+                $completion = $allCompletions->get($key);
+                
+                return (object) [
+                    'name' => $tutor->user->name,
+                    'is_completed' => $completion ? $completion->is_completed : false,
+                ];
+            });
+
+            $payment->tutors_with_status = $tutorDetails;
         });
 
         // Hitung jumlah anak yang dapat diskon per client (untuk display di kolom Diskon)
@@ -82,7 +142,7 @@ class PaymentController extends Controller
             ->map(fn ($group) => $group->count())
             ->toArray();
 
-        return view('admin.payments.index', compact('payments', 'statusFilter', 'waStatusFilter', 'clientDiscountCounts'));
+        return view('admin.payments.index', compact('payments', 'statusFilter', 'waStatusFilter', 'tutorStatusFilter', 'clientDiscountCounts'));
     }
 
     public function generate(Request $request)

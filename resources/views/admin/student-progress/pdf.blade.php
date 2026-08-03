@@ -63,18 +63,20 @@
     <table class="table">
         <thead>
             <tr>
+                <th width="5%" align="center">No</th>
                 <th width="15%">Tanggal & Mapel</th>
-                <th width="40%">Materi yang Diajarkan</th>
+                <th width="35%">Materi yang Diajarkan</th>
                 <th width="35%">Catatan</th>
                 <th width="10%">Pemahaman</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($schedules as $schedule)
+            @forelse($schedules as $index => $schedule)
                 @php
                     $report = $schedule->sessionReport;
                 @endphp
                 <tr>
+                    <td align="center"><strong>{{ $index + 1 }}</strong></td>
                     <td>
                         <strong>{{ \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') }}</strong><br>
                         {{ $schedule->subject->name ?? '-' }}
@@ -91,7 +93,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" align="center">Tidak ada sesi pembelajaran pada periode ini.</td>
+                    <td colspan="5" align="center">Tidak ada sesi pembelajaran pada periode ini.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -101,12 +103,13 @@
     <table class="table">
         <thead>
             <tr>
-                <th width="25%">Tanggal & Mapel</th>
+                <th width="5%" align="center">No</th>
+                <th width="20%">Tanggal & Mapel</th>
                 <th width="75%">Foto Dokumentasi</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($schedules as $schedule)
+            @forelse($schedules as $index => $schedule)
                 @php
                     $base64 = null;
                     if(isset($schedule->attendance) && $schedule->attendance->photo_path) {
@@ -119,6 +122,7 @@
                     }
                 @endphp
                 <tr>
+                    <td align="center"><strong>{{ $index + 1 }}</strong></td>
                     <td>
                         <strong>{{ \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') }}</strong><br>
                         {{ $schedule->subject->name ?? '-' }}
@@ -133,7 +137,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="2" align="center">Tidak ada dokumentasi foto pada periode ini.</td>
+                    <td colspan="3" align="center">Tidak ada dokumentasi foto pada periode ini.</td>
                 </tr>
             @endforelse
         </tbody>

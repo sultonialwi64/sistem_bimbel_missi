@@ -77,6 +77,57 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('tutor.dashboard', compact('stats', 'todaySchedules', 'upcomingSchedules', 'recentSessions'));
+        // Fetch students taught this month for the Monthly Completion widget
+        $schedulesThisMonth = Schedule::where('tutor_id', $tutor->id)
+            ->whereYear('date', now()->year)
+            ->whereMonth('date', now()->month)
+            ->whereHas('attendance', fn ($q) => $q->whereIn('status', ['hadir', 'pindah_lokasi']))
+            ->with(['student.client.user'])
+            ->get();
+            
+        $studentIds = $schedulesThisMonth->pluck('student_id')->unique();
+        
+        $completions = \App\Models\TutorMonthlyCompletion::where('tutor_id', $tutor->id)
+            ->whereIn('student_id', $studentIds)
+            ->where('period_start', now()->startOfMonth()->format('Y-m-d'))
+            ->get()
+            ->keyBy('student_id');
+
+        $studentsThisMonth = $schedulesThisMonth->groupBy('student_id')
+            ->map(function ($schedules) use ($completions) {
+                $student = $schedules->first()->student;
+                $student->sessions_count = $schedules->count();
+                
+                $completion = $completions->get($student->id);
+                $student->is_monthly_completed = $completion ? $completion->is_completed : false;
+                
+                return $student;
+            })
+            ->values();
+
+        return view('tutor.dashboard', compact('stats', 'todaySchedules', 'upcomingSchedules', 'recentSessions', 'studentsThisMonth'));
+    }
+
+    public function markMonthlyCompleted(\Illuminate\Http\Request $request, \App\Models\Student $student)
+    {
+        $tutor = Auth::user()->tutor;
+        
+        if (!$tutor) {
+            abort(403);
+        }
+
+        \App\Models\TutorMonthlyCompletion::updateOrCreate(
+            [
+                'tutor_id' => $tutor->id,
+                'student_id' => $student->id,
+                'period_start' => now()->startOfMonth()->format('Y-m-d'),
+            ],
+            [
+                'is_completed' => true,
+                'completed_at' => now(),
+            ]
+        );
+
+        return back()->with('success', 'Laporan bulan ini untuk murid ' . $student->name . ' berhasil ditandai selesai.');
     }
 }

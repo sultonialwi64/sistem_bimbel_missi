@@ -238,6 +238,7 @@ Route::middleware('auth')->group(function () {
     // Tutor routes
     Route::prefix('tutor')->middleware('role:tutor')->name('tutor.')->group(function () {
         Route::get('/dashboard', [TutorDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/dashboard/mark-monthly-completed/{student}', [TutorDashboardController::class, 'markMonthlyCompleted'])->name('dashboard.mark-monthly-completed');
 
         // Schedules
         Route::get('/schedules', [App\Http\Controllers\Tutor\ScheduleController::class, 'index'])->name('schedules.index');

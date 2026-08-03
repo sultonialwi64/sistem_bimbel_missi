@@ -251,7 +251,61 @@
                     </div>
                 @empty
                     <p class="text-gray-500 text-center py-8 font-bold">Belum ada riwayat sesi</p>
-                @endforelse
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Report Completion Widget -->
+        <div class="card-premium overflow-hidden">
+            <div class="bg-indigo-800 px-6 py-5 border-b border-indigo-700">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <svg class="h-5 w-5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                        Status Laporan Bulan Ini ({{ now()->translatedFormat('F Y') }})
+                    </h3>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    @forelse($studentsThisMonth as $student)
+                        <div class="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border {{ $student->is_monthly_completed ? 'border-green-200 bg-green-50/30' : 'border-gray-100' }} transition-all duration-300 gap-3 sm:gap-0">
+                            <div class="flex items-center gap-4">
+                                <div class="h-10 w-10 flex-shrink-0 rounded-xl {{ $student->is_monthly_completed ? 'bg-green-100 text-green-600' : 'bg-indigo-100 text-indigo-600' }} flex items-center justify-center font-bold text-xs transition-colors">
+                                    {{ substr($student->name, 0, 1) }}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-gray-900 truncate">{{ $student->name }}</p>
+                                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">
+                                        Total Sesi: {{ $student->sessions_count }} sesi
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-left sm:text-right mt-2 sm:mt-0">
+                                @if($student->is_monthly_completed)
+                                    <div class="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 text-green-700 rounded-xl text-xs font-black uppercase tracking-widest">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Selesai
+                                    </div>
+                                @else
+                                    <form action="{{ route('tutor.dashboard.mark-monthly-completed', $student) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-black hover:bg-indigo-700 transition-colors uppercase tracking-widest" onclick="return confirm('Apakah Anda yakin sudah mengisi SEMUA laporan sesi untuk murid ini di bulan berjalan?')">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            Tandai Selesai
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-8">
+                            <p class="text-gray-500 font-bold">Belum ada murid yang diajar bulan ini.</p>
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
