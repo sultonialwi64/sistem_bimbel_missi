@@ -26,49 +26,50 @@
 @section('content')
 <div class="space-y-6" x-data="{ previewOpen: false, previewUrl: '', downloadUrl: '', previewTitle: '', waConfirmOpen: false, waConfirmAction: '', waConfirmTitle: '' }">
     <div class="rounded-2xl border border-indigo-300/30 bg-indigo-900/35 p-4 shadow-sm">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4">
-            <div class="flex flex-wrap items-center gap-2 md:gap-3">
-                <div class="flex min-w-max flex-wrap items-center gap-2">
-                <span class="mr-1 text-xs font-bold uppercase tracking-widest text-indigo-200">Tagihan</span>
-                <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'all' ? 'bg-indigo-700 text-white shadow-md ring-1 ring-indigo-200/70' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+        <!-- Gunakan lg:flex-nowrap agar dipaksa satu baris di desktop, dan overflow-x-auto agar bisa di-scroll horizontal kalau layar terlalu sempit -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 lg:flex-nowrap overflow-x-auto pb-1 -mb-1">
+            <div class="flex flex-nowrap items-center gap-2 lg:gap-3 shrink-0">
+                <div class="flex min-w-max items-center gap-1 md:gap-1.5">
+                <span class="mr-1 text-[10px] font-bold uppercase tracking-widest text-indigo-200">Tagihan</span>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ $statusFilter === 'all' ? 'bg-indigo-700 text-white shadow-md ring-1 ring-indigo-200/70' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Semua
                 </a>
-                <a href="{{ request()->fullUrlWithQuery(['status' => 'unpaid']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'unpaid' ? 'bg-amber-500 text-white shadow-md ring-1 ring-amber-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'unpaid']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ $statusFilter === 'unpaid' ? 'bg-amber-500 text-white shadow-md ring-1 ring-amber-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Belum Lunas
                 </a>
-                <a href="{{ request()->fullUrlWithQuery(['status' => 'paid']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $statusFilter === 'paid' ? 'bg-emerald-500 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'paid']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ $statusFilter === 'paid' ? 'bg-emerald-500 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Lunas
                 </a>
             </div>
 
-            <div class="flex min-w-max flex-wrap items-center gap-2 md:border-l md:border-indigo-300/25 md:pl-4">
-                <span class="mr-1 text-xs font-bold uppercase tracking-widest text-indigo-200">WA</span>
-                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'all']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $waStatusFilter === 'all' ? 'bg-orange-600 text-white shadow-md ring-1 ring-orange-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+            <div class="flex min-w-max items-center gap-1 md:gap-1.5 border-l border-indigo-300/25 pl-2 lg:pl-3">
+                <span class="mr-1 text-[10px] font-bold uppercase tracking-widest text-indigo-200">WA</span>
+                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'all']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ $waStatusFilter === 'all' ? 'bg-orange-600 text-white shadow-md ring-1 ring-orange-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Semua
                 </a>
-                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'unsent']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $waStatusFilter === 'unsent' ? 'bg-slate-700 text-white shadow-md ring-1 ring-slate-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'unsent']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ $waStatusFilter === 'unsent' ? 'bg-slate-700 text-white shadow-md ring-1 ring-slate-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Belum
                 </a>
-                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'sent']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ $waStatusFilter === 'sent' ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                <a href="{{ request()->fullUrlWithQuery(['wa_status' => 'sent']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ $waStatusFilter === 'sent' ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Sudah
                 </a>
             </div>
 
-            <div class="flex min-w-max flex-wrap items-center gap-2 md:border-l md:border-indigo-300/25 md:pl-4">
-                <span class="mr-1 text-xs font-bold uppercase tracking-widest text-indigo-200">Tentor</span>
-                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'all']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ (!isset($tutorStatusFilter) || $tutorStatusFilter === 'all') ? 'bg-indigo-600 text-white shadow-md ring-1 ring-indigo-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+            <div class="flex min-w-max items-center gap-1 md:gap-1.5 border-l border-indigo-300/25 pl-2 lg:pl-3">
+                <span class="mr-1 text-[10px] font-bold uppercase tracking-widest text-indigo-200">Tentor</span>
+                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'all']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ (!isset($tutorStatusFilter) || $tutorStatusFilter === 'all') ? 'bg-indigo-600 text-white shadow-md ring-1 ring-indigo-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Semua
                 </a>
-                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'incomplete']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ (isset($tutorStatusFilter) && $tutorStatusFilter === 'incomplete') ? 'bg-amber-500 text-white shadow-md ring-1 ring-amber-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'incomplete']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ (isset($tutorStatusFilter) && $tutorStatusFilter === 'incomplete') ? 'bg-amber-500 text-white shadow-md ring-1 ring-amber-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Belum
                 </a>
-                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'completed']) }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ (isset($tutorStatusFilter) && $tutorStatusFilter === 'completed') ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
+                <a href="{{ request()->fullUrlWithQuery(['tutor_status' => 'completed']) }}" class="px-2 py-1 rounded-lg text-xs font-semibold transition-all {{ (isset($tutorStatusFilter) && $tutorStatusFilter === 'completed') ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-200/80' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-sm' }}">
                     Selesai
                 </a>
             </div>
             </div>
 
-            <form action="{{ route('admin.payments.index') }}" method="GET" class="flex w-full items-center gap-2 lg:max-w-md">
+            <form action="{{ route('admin.payments.index') }}" method="GET" class="flex w-full lg:w-auto flex-1 min-w-[150px] max-w-sm lg:justify-end items-center gap-2">
                 <div class="relative min-w-0 flex-1">
                     <svg class="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -125,35 +126,35 @@
 
         {{-- Desktop Table --}}
         <div class="hidden sm:block overflow-x-auto">
-            <table class="table-premium payment-table min-w-[1160px] table-fixed">
+            <table class="table-premium payment-table w-full min-w-[950px] table-fixed">
                 <colgroup>
-                    <col class="w-[22%]">
+                    <col class="w-[17%]">
                     <col class="w-[10%]">
+                    <col class="w-[10%]">
+                    <col class="w-[8%]">
+                    <col class="w-[7%]">
+                    <col class="w-[11%]">
                     <col class="w-[9%]">
-                    <col class="w-[8%]">
                     <col class="w-[7%]">
-                    <col class="w-[10%]">
-                    <col class="w-[8%]">
-                    <col class="w-[7%]">
-                    <col class="w-[19%]">
+                    <col class="w-[21%]">
                 </colgroup>
                 <thead>
                     <tr>
-                        <th class="text-left py-4 px-6">Klien</th>
-                        <th class="text-left py-4 px-6">Siswa</th>
-                        <th class="text-left py-4 px-6">Tentor</th>
-                        <th class="text-left py-4 px-6">Periode</th>
-                        <th class="text-left py-4 px-6">Diskon</th>
-                        <th class="text-left py-4 px-6">Tagihan</th>
-                        <th class="text-left py-4 px-6">Tanggal Bayar</th>
-                        <th class="text-left py-4 px-6">Status</th>
-                        <th class="text-right py-4 px-6">Aksi</th>
+                        <th class="text-left py-3 px-2">Klien</th>
+                        <th class="text-left py-3 px-2">Siswa</th>
+                        <th class="text-left py-3 px-2">Tentor</th>
+                        <th class="text-left py-3 px-2">Periode</th>
+                        <th class="text-left py-3 px-2">Diskon</th>
+                        <th class="text-left py-3 px-2">Tagihan</th>
+                        <th class="text-left py-3 px-2">Tanggal Bayar</th>
+                        <th class="text-left py-3 px-2">Status</th>
+                        <th class="text-right py-3 px-2">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($payments as $payment)
                         <tr class="group">
-                            <td class="py-4 px-6">
+                            <td class="py-3 px-2">
                                 <div class="flex min-w-0 items-center gap-3">
                                     <div class="h-10 w-10 rounded-xl bg-indigo-700 flex items-center justify-center shadow-lg flex-shrink-0">
                                         <span class="text-white font-bold text-xs">{{ substr($payment->client->user->name, 0, 2) }}</span>
@@ -167,10 +168,10 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-3 2xl:px-4">
                                 <p class="font-medium text-gray-900 break-words">{{ $payment->student->name }}</p>
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-3 2xl:px-4">
                                 @if(isset($payment->tutors_with_status) && $payment->tutors_with_status->count() > 0)
                                     <div class="flex flex-col gap-1.5">
                                         @foreach($payment->tutors_with_status as $tutor)
@@ -194,16 +195,16 @@
                                     <p class="text-sm text-gray-700 break-words">-</p>
                                 @endif
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-3 2xl:px-4">
                                 @php
                                     $periodMonth = \Carbon\Carbon::parse($payment->due_date)->subDays(7)->startOfMonth();
                                 @endphp
                                 <div>
-                                    <p class="text-sm font-bold text-gray-800">{{ $periodMonth->translatedFormat('F Y') }}</p>
+                                    <p class="text-sm font-bold text-gray-800 whitespace-nowrap">{{ $periodMonth->translatedFormat('F Y') }}</p>
                                     <p class="text-xs text-gray-400">{{ $periodMonth->format('01 M') }} – {{ $periodMonth->endOfMonth()->format('d M Y') }}</p>
                                 </div>
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-3 2xl:px-4">
                                 @if($payment->discount > 0)
                                     @php $countAnak = $clientDiscountCounts[$payment->client_id] ?? 0; @endphp
                                     <div>
@@ -216,18 +217,18 @@
                                     <p class="text-sm text-gray-400">-</p>
                                 @endif
                             </td>
-                            <td class="py-4 px-6">
-                                <p class="text-lg font-black text-gray-900 whitespace-nowrap">Rp {{ number_format($payment->amount, 0, ',', '.') }}</p>
+                            <td class="py-4 px-3 2xl:px-4">
+                                <p class="text-[15px] font-black text-gray-900 whitespace-nowrap">Rp {{ number_format($payment->amount, 0, ',', '.') }}</p>
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-3 2xl:px-4">
                                 @if($payment->payment_date)
-                                    <p class="text-sm font-bold text-emerald-700">{{ $payment->payment_date->format('d M Y') }}</p>
+                                    <p class="text-sm font-bold text-emerald-700 whitespace-nowrap">{{ $payment->payment_date->format('d M Y') }}</p>
                                     <p class="text-xs text-gray-400">{{ $payment->payment_date->format('H:i') }} WIB</p>
                                 @else
                                     <p class="text-sm text-gray-400">-</p>
                                 @endif
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-3 2xl:px-4">
                                 <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold
                                     @if($payment->status === 'paid') bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200
                                     @elseif($payment->status === 'pending') bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border border-amber-200
@@ -248,16 +249,16 @@
                                     @endif
                                 </div>
                             </td>
-                            <td class="payment-actions-cell py-4 px-6 text-right">
+                            <td class="payment-actions-cell py-4 px-3 2xl:px-4 text-right">
                                 @php
                                     $dlMonth = $periodMonth->format('Y-m');
                                     $dlLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $dlMonth]);
                                     $previewLink = URL::signedRoute('public.report.download', ['student' => $payment->student_id, 'month' => $dlMonth, 'preview' => 1]);
                                     $reportLink = URL::signedRoute('public.report.show', ['student' => $payment->student_id, 'month' => $dlMonth]);
                                 @endphp
-                                <div class="payment-actions">
-                                    <button type="button" @click="previewOpen = true; previewUrl = @js($previewLink); downloadUrl = @js($dlLink); previewTitle = @js('Laporan ' . $payment->student->name . ' - ' . \Carbon\Carbon::parse($dlMonth)->translatedFormat('F Y'))" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-xs hover:bg-gray-50 hover:border-gray-300 transition-all" title="Preview Laporan PDF">
-                                        <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <div class="payment-actions flex flex-nowrap items-center justify-end gap-1">
+                                    <button type="button" @click="previewOpen = true; previewUrl = @js($previewLink); downloadUrl = @js($dlLink); previewTitle = @js('Laporan ' . $payment->student->name . ' - ' . \Carbon\Carbon::parse($dlMonth)->translatedFormat('F Y'))" class="inline-flex items-center gap-1 px-2 py-1.5 bg-white text-gray-700 border border-gray-200 rounded-lg font-bold text-[11px] hover:bg-gray-50 hover:border-gray-300 transition-all" title="Preview Laporan PDF">
+                                        <svg class="h-3.5 w-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                         PDF
                                     </button>
                                     @if($payment->status !== 'paid' && $payment->client->user->phone)
@@ -285,22 +286,22 @@
                                             $waText .= "Terima kasih banyak! 🙏";
                                             $waUrl = "https://wa.me/" . $waNumber . "?text=" . urlencode($waText);
                                         @endphp
-                                        <a href="{{ $waUrl }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-green-600 text-white border border-green-700 rounded-xl font-bold text-xs hover:bg-green-700 shadow-sm hover:shadow-md transition-all" title="Kirim Tagihan & Rapor via WA">
-                                            <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.163-.173.353-.217.473-.217l.361.002c.118.002.277-.044.433.33.161.385.55 1.341.599 1.442.049.101.082.218.01.389-.071.171-.108.277-.215.398-.109.122-.23.267-.327.369-.108.114-.222.24-.097.455.124.216.55 0.912 1.178 1.472.812.723 1.498.948 1.708 1.054.21.106.331.088.455-.052.124-.14 0.536-.622.682-.835.145-.213.291-.177.485-.104.195.072 1.229.58 1.439.685.21.105.351.157.402.244.051.087.051.503-.093.908z" /></svg>
+                                        <a href="{{ $waUrl }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1.5 bg-green-600 text-white border border-green-700 rounded-lg font-bold text-[11px] hover:bg-green-700 shadow-sm hover:shadow-md transition-all" title="Kirim Tagihan & Rapor via WA">
+                                            <svg class="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.441-1.273.606-1.446c.163-.173.353-.217.473-.217l.361.002c.118.002.277-.044.433.33.161.385.55 1.341.599 1.442.049.101.082.218.01.389-.071.171-.108.277-.215.398-.109.122-.23.267-.327.369-.108.114-.222.24-.097.455.124.216.55 0.912 1.178 1.472.812.723 1.498.948 1.708 1.054.21.106.331.088.455-.052.124-.14 0.536-.622.682-.835.145-.213.291-.177.485-.104.195.072 1.229.58 1.439.685.21.105.351.157.402.244.051.087.051.503-.093.908z" /></svg>
                                             WA
                                         </a>
                                     @endif
                                     @if($payment->wa_sent_at)
-                                        <button type="button" class="inline-flex items-center justify-center px-3 py-2 bg-[#10b981] text-white border border-[#059669] rounded-xl font-bold hover:bg-[#059669] transition-all shadow-sm cursor-default" title="Sudah dikirim via WhatsApp pada {{ $payment->wa_sent_at->format('d M Y H:i') }}">
-                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        <button type="button" class="inline-flex items-center justify-center px-2 py-1.5 bg-[#10b981] text-white border border-[#059669] rounded-lg font-bold hover:bg-[#059669] transition-all shadow-sm cursor-default" title="Sudah dikirim via WhatsApp pada {{ $payment->wa_sent_at->format('d M Y H:i') }}">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                         </button>
                                     @else
-                                        <button type="button" @click="waConfirmOpen = true; waConfirmAction = @js(route('admin.payments.mark-wa-sent', $payment)); waConfirmTitle = @js($payment->client->user->name . ' - ' . $payment->student->name)" class="inline-flex items-center justify-center px-3 py-2 bg-[#fbbf24] text-[#78350f] border border-[#f59e0b] rounded-xl font-bold hover:bg-[#f59e0b] hover:text-white transition-all shadow-sm" title="Tandai sudah dikirim via WhatsApp">
-                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        <button type="button" @click="waConfirmOpen = true; waConfirmAction = @js(route('admin.payments.mark-wa-sent', $payment)); waConfirmTitle = @js($payment->client->user->name . ' - ' . $payment->student->name)" class="inline-flex items-center justify-center px-2 py-1.5 bg-[#fbbf24] text-[#78350f] border border-[#f59e0b] rounded-lg font-bold hover:bg-[#f59e0b] hover:text-white transition-all shadow-sm" title="Tandai sudah dikirim via WhatsApp">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                         </button>
                                     @endif
-                                    <a href="{{ route('admin.payments.show', ['payment' => $payment, 'return_url' => request()->fullUrl()]) }}" class="inline-flex items-center gap-1.5 px-2.5 py-2 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-xl font-bold text-xs hover:bg-indigo-50 transition-all">
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <a href="{{ route('admin.payments.show', ['payment' => $payment, 'return_url' => request()->fullUrl()]) }}" class="inline-flex items-center gap-1 px-2 py-1.5 bg-slate-50 text-indigo-700 border border-indigo-100 rounded-lg font-bold text-[11px] hover:bg-indigo-50 transition-all">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         View
                                     </a>
                                 </div>
