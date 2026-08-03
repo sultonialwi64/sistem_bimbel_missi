@@ -72,7 +72,7 @@
         }
         .meta-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 12px;
             margin-top: 22px;
         }
@@ -320,6 +320,10 @@
                 <p class="meta-value">{{ $student->client->user->name ?? '-' }}</p>
             </div>
             <div class="meta-card">
+                <p class="meta-label">Pengajar</p>
+                <p class="meta-value">{{ $schedules->pluck('tutor.user.name')->unique()->filter()->implode(', ') ?: ($progress->tutor->user->name ?? '-') }}</p>
+            </div>
+            <div class="meta-card">
                 <p class="meta-label">Kelas</p>
                 <p class="meta-value">{{ $student->grade_level ?? '-' }}</p>
             </div>
@@ -343,7 +347,6 @@
             <div class="summary-box">
                 @if($progress)
                     <p><strong>Mata Pelajaran:</strong> {{ $progress->subject->name ?? '-' }}</p>
-                    <p><strong>Tutor Penilai:</strong> {{ $progress->tutor->user->name ?? '-' }}</p>
                     <p><strong>Level:</strong> {{ ucfirst($progress->level_achieved ?? 'Evaluated') }}</p>
                     <p><strong>Rekomendasi:</strong><br>{{ $progress->recommendations ?? 'Tidak ada rekomendasi.' }}</p>
                 @else

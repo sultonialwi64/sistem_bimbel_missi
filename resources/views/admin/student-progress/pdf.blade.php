@@ -44,13 +44,16 @@
             <td class="info-label">Asal Sekolah</td>
             <td>: {{ $student->school_name ?? '-' }}</td>
         </tr>
+        <tr>
+            <td class="info-label">Nama Pengajar</td>
+            <td colspan="3">: {{ $schedules->pluck('tutor.user.name')->unique()->filter()->implode(', ') ?: ($progress->tutor->user->name ?? '-') }}</td>
+        </tr>
     </table>
 
     <div class="section-title">1. RANGKUMAN EVALUASI PERKEMBANGAN</div>
     @if($progress)
         <div class="summary-box">
             <p><strong>Mata Pelajaran:</strong> {{ $progress->subject->name ?? '-' }}</p>
-            <p><strong>Tutor Penilai:</strong> {{ $progress->tutor->user->name ?? '-' }}</p>
             <p><strong>Nilai Rata-rata / Score:</strong> {{ $progress->overall_score }}/100 ({{ ucfirst($progress->level_achieved ?? 'Evaluated') }})</p>
             <p><strong>Rekomendasi untuk Siswa/Orang Tua:</strong></p>
             <p>{{ $progress->recommendations ?? 'Tidak ada rekomendasi.' }}</p>
