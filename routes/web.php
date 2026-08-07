@@ -233,6 +233,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/student-progress', [StudentProgressController::class, 'index'])->name('student-progress.index');
         Route::get('/student-progress/{student}', [StudentProgressController::class, 'show'])->name('student-progress.show');
         Route::get('/student-progress/{student}/pdf', [StudentProgressController::class, 'exportPdf'])->name('student-progress.pdf');
+
+        // Learning Media
+        Route::resource('learning-media', App\Http\Controllers\Admin\LearningMediaController::class);
     });
 
     // Tutor routes
@@ -252,6 +255,10 @@ Route::middleware('auth')->group(function () {
         // Attendance (Photo & Status)
         Route::post('/attendance/submit/{schedule}', [AttendanceController::class, 'submitAttendance'])->name('attendance.submit');
         Route::post('/attendance/update-photo/{schedule}', [AttendanceController::class, 'updatePhoto'])->name('attendance.update-photo');
+
+        // Learning Media
+        Route::get('/learning-media', [App\Http\Controllers\Tutor\LearningMediaController::class, 'index'])->name('learning-media.index');
+        Route::get('/learning-media/{learningMedia}', [App\Http\Controllers\Tutor\LearningMediaController::class, 'show'])->name('learning-media.show');
 
         // Session Reports
         Route::get('/reports', [App\Http\Controllers\Tutor\ReportController::class, 'index'])->name('reports.index');
@@ -299,6 +306,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports', [App\Http\Controllers\Client\ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/{report}', [App\Http\Controllers\Client\ReportController::class, 'show'])->name('reports.show');
         Route::post('/reports/{report}/feedback', [App\Http\Controllers\Client\ReportController::class, 'submitFeedback'])->name('reports.feedback');
+
+        // Learning Media
+        Route::get('/learning-media', [App\Http\Controllers\Client\LearningMediaController::class, 'index'])->name('learning-media.index');
+        Route::get('/learning-media/{learningMedia}', [App\Http\Controllers\Client\LearningMediaController::class, 'show'])->name('learning-media.show');
 
         // Payments
         Route::get('/payments', [App\Http\Controllers\Client\PaymentController::class, 'index'])->name('payments.index');
