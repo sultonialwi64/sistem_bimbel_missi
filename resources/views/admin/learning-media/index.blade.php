@@ -30,6 +30,44 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">
+                    <!-- STATIC SPELLING GAME ROW -->
+                    <tr class="hover:bg-slate-50/50 transition-colors duration-200 group bg-yellow-50/30">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-5">
+                                <div class="shrink-0 w-16 h-16 rounded-2xl overflow-hidden bg-yellow-100 flex items-center justify-center border border-yellow-200 shadow-sm relative group-hover:shadow-md transition-shadow">
+                                    <svg class="h-8 w-8 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="font-bold text-slate-900 text-lg mb-1 truncate group-hover:text-amber-600 transition-colors">Spelling Game (Prototype)</h3>
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-yellow-100 text-yellow-700 border border-yellow-200">Mini Game</span>
+                                        <p class="text-sm text-slate-500 truncate max-w-[150px]">Latih kemampuan mengeja kosakata bahasa Inggris.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider bg-purple-50 text-purple-600 border border-purple-200">Game</span>
+                        </td>
+                        <td class="px-8 py-5">
+                            <div class="flex flex-col gap-2 items-start">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    Active
+                                </span>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide bg-slate-100 text-slate-600 border border-slate-200">Gratis</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('game.prototype') }}" 
+                                   class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition-colors shadow-sm shadow-amber-200">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Mainkan
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
                     @forelse($media as $item)
                         <tr class="hover:bg-slate-50/50 transition-colors duration-200 group">
                             <td class="px-8 py-5">

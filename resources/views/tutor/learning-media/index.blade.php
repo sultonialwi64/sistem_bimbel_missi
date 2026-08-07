@@ -49,6 +49,53 @@
 
     <!-- Gallery Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-2">
+        <!-- STATIC SPELLING GAME CARD -->
+        <a href="{{ route('game.prototype') }}" class="group block relative rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl border border-amber-200/60 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-amber-500/20">
+            <!-- Thumbnail Container -->
+            <div class="aspect-[4/3] w-full relative overflow-hidden bg-sky-100 p-2 sm:p-3 group-hover:p-1.5 transition-all duration-300">
+                <div class="w-full h-full border-[8px] border-[#5c3a21] rounded-2xl bg-[#143520] relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col items-center justify-center">
+                    
+                    <!-- Background pattern -->
+                    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                    <!-- Floating ABCs -->
+                    <div class="absolute top-2 left-2 text-yellow-300 font-bold text-lg transform -rotate-12" style="font-family: 'Comic Sans MS', cursive; text-shadow: 1px 1px 0 rgba(0,0,0,0.5);">A</div>
+                    <div class="absolute bottom-6 left-4 text-pink-300 font-bold text-xl transform rotate-12" style="font-family: 'Comic Sans MS', cursive; text-shadow: 1px 1px 0 rgba(0,0,0,0.5);">B</div>
+                    <div class="absolute top-4 right-3 text-sky-300 font-bold text-lg transform rotate-45" style="font-family: 'Comic Sans MS', cursive; text-shadow: 1px 1px 0 rgba(0,0,0,0.5);">C</div>
+
+                    <!-- Center Play Button (Chalk style or glossy) -->
+                    <div class="relative z-10 w-16 h-16 bg-gradient-to-br from-yellow-300 to-amber-500 rounded-full border-4 border-white flex items-center justify-center shadow-[0_5px_15px_rgba(0,0,0,0.4)] group-hover:scale-110 transition-transform duration-500 group-hover:rotate-12">
+                        <svg class="w-8 h-8 text-amber-900 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+
+                    <!-- Fake Chalk text below -->
+                    <div class="absolute bottom-2 text-white/80 font-bold text-xs tracking-wider" style="font-family: 'Comic Sans MS', cursive;">SPELLING GAME</div>
+                </div>
+
+                <!-- Overlay Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+                <!-- Type Badge (Top Right) -->
+                <div class="absolute top-4 right-4 z-10 flex flex-col gap-2 items-end">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-black tracking-widest bg-yellow-400 text-amber-950 shadow-lg border-2 border-yellow-200">NEW GAME</span>
+                </div>
+            </div>
+
+            <!-- Content Info -->
+            <div class="p-6 relative">
+                <div class="text-[11px] font-bold text-amber-500 mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Spesial Fitur Baru
+                </div>
+                
+                <h3 class="font-bold text-slate-900 text-xl mb-2 line-clamp-1 group-hover:text-amber-600 transition-all">Spelling Game</h3>
+                <p class="text-sm text-slate-500 line-clamp-2 leading-relaxed">Latih kemampuan mengeja kosakata bahasa Inggris dengan asisten suara cerdas.</p>
+                
+                <!-- Decorative line -->
+                <div class="h-1 w-12 bg-amber-500 rounded-full mt-5 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+            </div>
+        </a>
+
         @forelse($media as $item)
             <a href="{{ route('tutor.learning-media.show', $item) }}" class="group block relative rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-indigo-500/20">
                 <!-- Thumbnail Container -->

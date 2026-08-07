@@ -125,6 +125,11 @@ Route::get('/tutors', function () {
 })->name('tutors.public.index');
 
 Route::middleware('auth')->group(function () {
+    // Game Prototype (Logged in Access for Testing)
+    Route::get('/game-prototype', function () {
+        return view('client.game-prototype.index');
+    })->name('game.prototype');
+
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
