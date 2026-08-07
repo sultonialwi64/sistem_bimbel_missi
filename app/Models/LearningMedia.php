@@ -10,6 +10,7 @@ class LearningMedia extends Model
         'title',
         'description',
         'type',
+        'category',
         'file_path',
         'url',
         'thumbnail_path',

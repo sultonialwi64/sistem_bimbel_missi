@@ -37,6 +37,16 @@
         </div>
     </div>
 
+    <!-- Category Tabs -->
+    <div class="flex flex-wrap items-center gap-2 mb-8 px-2">
+        @foreach($categories as $category)
+            <a href="{{ route('client.learning-media.index', ['category' => $category]) }}" 
+               class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 {{ $currentCategory === $category ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30 ring-2 ring-indigo-500/50 ring-offset-2 ring-offset-slate-900' : 'bg-white/10 backdrop-blur-md text-slate-300 border border-white/10 hover:bg-white/20 hover:text-white' }}">
+                {{ $category }}
+            </a>
+        @endforeach
+    </div>
+
     <!-- Gallery Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-2">
         @forelse($media as $item)

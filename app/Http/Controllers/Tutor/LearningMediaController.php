@@ -8,11 +8,20 @@ use Illuminate\Http\Request;
 
 class LearningMediaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Only show active media
-        $media = LearningMedia::where('is_active', true)->latest()->paginate(12);
-        return view('tutor.learning-media.index', compact('media'));
+        $query = LearningMedia::where('is_active', true);
+
+        if ($request->filled('category') && $request->category !== 'Semua') {
+            $query->where('category', $request->category);
+        }
+
+        $media = $query->latest()->paginate(12)->withQueryString();
+        
+        $categories = ['Semua', 'Calistung', 'Bahasa Inggris', 'Matematika', 'Sains', 'Umum'];
+        $currentCategory = $request->category ?? 'Semua';
+
+        return view('tutor.learning-media.index', compact('media', 'categories', 'currentCategory'));
     }
 
     public function show(LearningMedia $learningMedia)

@@ -26,6 +26,7 @@ class LearningMediaController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => 'required|in:pdf,video,web_game',
+            'category' => 'required|string|max:100',
             'is_premium' => 'boolean',
             'is_active' => 'boolean',
             'file' => 'nullable|file|mimes:pdf|max:10240', // 10MB limit
@@ -33,7 +34,7 @@ class LearningMediaController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->only(['title', 'description', 'type']);
+        $data = $request->only(['title', 'description', 'type', 'category']);
         $data['is_premium'] = $request->has('is_premium');
         $data['is_active'] = $request->has('is_active');
 
@@ -68,6 +69,7 @@ class LearningMediaController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => 'required|in:pdf,video,web_game',
+            'category' => 'required|string|max:100',
             'is_premium' => 'boolean',
             'is_active' => 'boolean',
             'file' => 'nullable|file|mimes:pdf|max:10240',
@@ -75,7 +77,7 @@ class LearningMediaController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->only(['title', 'description', 'type']);
+        $data = $request->only(['title', 'description', 'type', 'category']);
         $data['is_premium'] = $request->has('is_premium');
         $data['is_active'] = $request->has('is_active');
 

@@ -55,8 +55,20 @@
 
                     <div>
                         <label for="description" class="block text-sm font-semibold text-slate-700 mb-2">Deskripsi Lengkap</label>
-                        <textarea name="description" id="description" rows="4" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors py-3 px-4 bg-slate-50 hover:bg-white focus:bg-white">{{ old('description', $learningMedia->description) }}</textarea>
+                        <textarea name="description" id="description" rows="4" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors py-3 px-4 bg-slate-50 hover:bg-white focus:bg-white" placeholder="Jelaskan secara singkat tentang materi ini...">{{ old('description', $learningMedia->description) }}</textarea>
                         @error('description') <p class="mt-2 text-sm text-rose-500">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="category" class="block text-sm font-semibold text-slate-700 mb-2">Kategori Materi <span class="text-rose-500">*</span></label>
+                        <select name="category" id="category" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors py-3 px-4 bg-slate-50 hover:bg-white focus:bg-white" required>
+                            <option value="Umum" {{ old('category', $learningMedia->category) == 'Umum' ? 'selected' : '' }}>Umum</option>
+                            <option value="Calistung" {{ old('category', $learningMedia->category) == 'Calistung' ? 'selected' : '' }}>Calistung</option>
+                            <option value="Bahasa Inggris" {{ old('category', $learningMedia->category) == 'Bahasa Inggris' ? 'selected' : '' }}>Bahasa Inggris</option>
+                            <option value="Matematika" {{ old('category', $learningMedia->category) == 'Matematika' ? 'selected' : '' }}>Matematika</option>
+                            <option value="Sains" {{ old('category', $learningMedia->category) == 'Sains' ? 'selected' : '' }}>Sains</option>
+                        </select>
+                        @error('category') <p class="mt-2 text-sm text-rose-500">{{ $message }}</p> @enderror
                     </div>
                 </div>
             </div>
@@ -125,25 +137,27 @@
                 </div>
 
                 <!-- PDF File Upload (Conditional) -->
-                <div x-show="mediaType === 'pdf'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Upload File PDF (Biarkan kosong jika tidak ingin mengubah)</label>
+                <div x-show="mediaType === 'pdf'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: {{ old('type', $learningMedia->type) === 'pdf' ? 'block' : 'none' }};" x-data="{ fileName: '' }">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Upload File PDF Baru (Opsional)</label>
                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors relative group">
                         <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-slate-400 group-hover:text-indigo-500 transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <svg class="mx-auto h-12 w-12 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                             <div class="flex text-sm text-slate-600 justify-center">
                                 <label for="file_pdf" class="relative cursor-pointer bg-transparent rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                    <span>Ganti file PDF</span>
-                                    <input id="file_pdf" name="file" type="file" class="sr-only" accept=".pdf">
+                                    <span x-text="fileName === '' ? 'Pilih file' : 'Ganti file'">Pilih file</span>
+                                    <input id="file_pdf" name="file" type="file" class="sr-only" accept=".pdf" @change="fileName = $event.target.files[0].name">
                                 </label>
-                                <p class="pl-1">atau drag & drop</p>
+                                <p class="pl-1" x-show="fileName === ''">atau drag & drop</p>
                             </div>
-                            <p class="text-xs text-slate-500">PDF maksimal 10MB.</p>
+                            <p class="text-xs font-bold text-indigo-600 mt-2" x-show="fileName !== ''" x-text="fileName"></p>
+                            <p class="text-xs text-slate-500" x-show="fileName === ''">PDF maksimal 10MB. Biarkan kosong jika tidak ingin mengubah file.</p>
                             @if($learningMedia->file_path && $learningMedia->type === 'pdf')
-                                <p class="text-xs font-semibold text-emerald-600 mt-2 bg-emerald-50 inline-block px-3 py-1 rounded-full border border-emerald-200">
-                                    File saat ini sudah tersedia.
-                                </p>
+                                <div class="mt-3 flex items-center justify-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-4 py-2 rounded-full border border-emerald-200 w-fit mx-auto" x-show="fileName === ''">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                    File saat ini: {{ basename($learningMedia->file_path) }}
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -151,7 +165,7 @@
                 </div>
 
                 <!-- External URL (Conditional) -->
-                <div x-show="mediaType !== 'pdf'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+                <div x-show="mediaType !== 'pdf'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: {{ old('type', $learningMedia->type) !== 'pdf' ? 'block' : 'none' }};">
                     <label for="url" class="block text-sm font-semibold text-slate-700 mb-2" x-text="mediaType === 'video' ? 'Link YouTube/Video URL' : 'Link Web Game/Iframe URL'">URL Eksternal</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -163,32 +177,28 @@
                 </div>
 
                 <!-- Thumbnail Upload -->
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Thumbnail Cover (Biarkan kosong jika tidak ingin mengubah)</label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors relative overflow-hidden group">
-                        
-                        @if($learningMedia->thumbnail_path)
-                            <div class="absolute inset-0 opacity-10 group-hover:opacity-5 transition-opacity">
-                                <img src="{{ Storage::url($learningMedia->thumbnail_path) }}" class="w-full h-full object-cover blur-sm">
-                            </div>
-                        @endif
-
-                        <div class="space-y-1 text-center relative z-10">
+                <div x-data="{ thumbName: '' }">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Thumbnail Cover Baru (Opsional)</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                        <div class="space-y-1 text-center">
                             @if($learningMedia->thumbnail_path)
-                                <img src="{{ Storage::url($learningMedia->thumbnail_path) }}" class="mx-auto h-20 w-20 object-cover rounded-xl shadow-md border border-slate-200 mb-3 group-hover:scale-105 transition-transform">
+                                <img src="{{ Storage::url($learningMedia->thumbnail_path) }}" class="mx-auto h-20 w-20 object-cover rounded-xl shadow-md border border-slate-200 mb-3" x-show="thumbName === ''">
+                                <svg class="mx-auto h-12 w-12 text-indigo-500" stroke="currentColor" fill="none" viewBox="0 0 48 48" x-show="thumbName !== ''" style="display: none;">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
                             @else
-                                <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <svg class="mx-auto h-12 w-12" :class="thumbName === '' ? 'text-slate-400' : 'text-indigo-500'" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             @endif
-
                             <div class="flex text-sm text-slate-600 justify-center">
                                 <label for="thumbnail" class="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500">
-                                    <span>Ganti gambar cover</span>
-                                    <input id="thumbnail" name="thumbnail" type="file" class="sr-only" accept="image/*">
+                                    <span x-text="thumbName === '' ? 'Upload gambar' : 'Ganti gambar'">Upload gambar</span>
+                                    <input id="thumbnail" name="thumbnail" type="file" class="sr-only" accept="image/*" @change="thumbName = $event.target.files[0].name">
                                 </label>
                             </div>
-                            <p class="text-xs text-slate-500">PNG, JPG, GIF hingga 2MB (Rasio 4:3)</p>
+                            <p class="text-xs font-bold text-indigo-600 mt-2" x-show="thumbName !== ''" x-text="thumbName"></p>
+                            <p class="text-xs text-slate-500" x-show="thumbName === ''">PNG, JPG, GIF hingga 2MB (Disarankan rasio 4:3). Biarkan kosong jika tidak diubah.</p>
                         </div>
                     </div>
                     @error('thumbnail') <p class="mt-2 text-sm text-rose-500">{{ $message }}</p> @enderror

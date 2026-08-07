@@ -235,7 +235,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/student-progress/{student}/pdf', [StudentProgressController::class, 'exportPdf'])->name('student-progress.pdf');
 
         // Learning Media
-        Route::resource('learning-media', App\Http\Controllers\Admin\LearningMediaController::class);
+        Route::resource('learning-media', App\Http\Controllers\Admin\LearningMediaController::class)->parameters([
+            'learning-media' => 'learningMedia'
+        ]);
     });
 
     // Tutor routes
