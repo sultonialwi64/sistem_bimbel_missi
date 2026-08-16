@@ -194,17 +194,17 @@
     </div>
 
     <!-- Game Arena (Scaled) -->
-    <div x-show="isStarted" class="absolute inset-0 flex flex-col justify-between items-center z-20 pt-[100px]">
+    <div x-show="isStarted" class="absolute inset-0 flex flex-col z-20 pt-[90px] sm:pt-[100px]">
         
         <!-- Conveyor Belt Area -->
-        <div class="w-full h-40 mt-10 relative overflow-hidden flex items-center conveyor-belt shadow-2xl">
+        <div class="w-full h-28 sm:h-40 mt-4 sm:mt-10 relative overflow-hidden flex items-center conveyor-belt shadow-2xl shrink-0">
             <!-- Items on belt -->
             <template x-for="item in activeItems" :key="item.id">
                 <div :id="'item-'+item.id"
                      draggable="false"
                      @mousedown="startDrag($event, item)"
                      @touchstart="startDrag($event, item)"
-                     class="absolute top-1/2 -translate-y-1/2 w-40 h-24 word-tile rounded-xl flex items-center justify-center text-white text-2xl font-bold z-10 transition-opacity duration-150"
+                     class="absolute top-1/2 -translate-y-1/2 w-32 h-16 sm:w-40 sm:h-24 word-tile rounded-xl flex items-center justify-center text-white text-lg sm:text-2xl font-bold z-10 transition-opacity duration-150"
                      :class="item.isGrabbed ? 'opacity-0' : 'opacity-100'"
                      :style="`left: ${item.x}px;`"
                      x-text="item.word">
@@ -223,33 +223,33 @@
         </div>
 
         <!-- Target Zones at Bottom -->
-        <div class="w-full h-1/2 wood-floor relative flex justify-center items-end pb-8 sm:pb-12 px-4 gap-6 sm:gap-16">
+        <div class="w-full flex-1 wood-floor relative flex justify-center items-start pt-10 sm:pt-16 px-2 sm:px-4 gap-4 sm:gap-16 mt-8 sm:mt-auto">
             <!-- Middle Bunting -->
             <div class="absolute top-0 inset-x-0 z-10 flex rotate-180">
                 <div class="bunting-container" id="mid-bunting"></div>
             </div>
 
-            <div id="zone-month" class="target-box w-40 sm:w-56 h-32 sm:h-40 rounded-2xl flex items-center justify-center relative" 
+            <div id="zone-month" class="target-box w-36 sm:w-56 h-28 sm:h-40 rounded-2xl flex items-center justify-center relative" 
                  :class="{ 
                      'drag-over': hoverZone === 'month',
-                     'animate-wiggle ring-8 ring-emerald-400 shadow-[0_0_40px_rgba(52,211,153,0.8)]': animatingZone === 'month' && animatingFeedback === 'success',
-                     'animate-wiggle ring-8 ring-rose-400 shadow-[0_0_40px_rgba(244,63,94,0.8)] !bg-rose-300 !border-rose-600': animatingZone === 'month' && animatingFeedback === 'error'
+                     'animate-wiggle ring-4 sm:ring-8 ring-emerald-400 shadow-[0_0_30px_rgba(52,211,153,0.8)]': animatingZone === 'month' && animatingFeedback === 'success',
+                     'animate-wiggle ring-4 sm:ring-8 ring-rose-400 shadow-[0_0_30px_rgba(244,63,94,0.8)] !bg-rose-300 !border-rose-600': animatingZone === 'month' && animatingFeedback === 'error'
                  }">
                 <div class="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                    <div class="absolute -bottom-4 -right-4 text-8xl opacity-20">📅</div>
+                    <div class="absolute -bottom-2 -right-2 text-6xl sm:text-8xl opacity-20">📅</div>
                 </div>
-                <span class="text-3xl sm:text-4xl font-black text-lime-900 drop-shadow-md z-10" :class="{'!text-rose-900': animatingZone === 'month' && animatingFeedback === 'error'}">Months</span>
+                <span class="text-2xl sm:text-4xl font-black text-lime-900 drop-shadow-md z-10" :class="{'!text-rose-900': animatingZone === 'month' && animatingFeedback === 'error'}">Months</span>
             </div>
-            <div id="zone-day" class="target-box w-40 sm:w-56 h-32 sm:h-40 rounded-2xl flex items-center justify-center relative" 
+            <div id="zone-day" class="target-box w-36 sm:w-56 h-28 sm:h-40 rounded-2xl flex items-center justify-center relative" 
                  :class="{ 
                      'drag-over': hoverZone === 'day',
-                     'animate-wiggle ring-8 ring-emerald-400 shadow-[0_0_40px_rgba(52,211,153,0.8)]': animatingZone === 'day' && animatingFeedback === 'success',
-                     'animate-wiggle ring-8 ring-rose-400 shadow-[0_0_40px_rgba(244,63,94,0.8)] !bg-rose-300 !border-rose-600': animatingZone === 'day' && animatingFeedback === 'error'
+                     'animate-wiggle ring-4 sm:ring-8 ring-emerald-400 shadow-[0_0_30px_rgba(52,211,153,0.8)]': animatingZone === 'day' && animatingFeedback === 'success',
+                     'animate-wiggle ring-4 sm:ring-8 ring-rose-400 shadow-[0_0_30px_rgba(244,63,94,0.8)] !bg-rose-300 !border-rose-600': animatingZone === 'day' && animatingFeedback === 'error'
                  }">
                 <div class="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                    <div class="absolute -bottom-4 -right-4 text-8xl opacity-20">☀️</div>
+                    <div class="absolute -bottom-2 -right-2 text-6xl sm:text-8xl opacity-20">☀️</div>
                 </div>
-                <span class="text-3xl sm:text-4xl font-black text-lime-900 drop-shadow-md z-10" :class="{'!text-rose-900': animatingZone === 'day' && animatingFeedback === 'error'}">Days</span>
+                <span class="text-2xl sm:text-4xl font-black text-lime-900 drop-shadow-md z-10" :class="{'!text-rose-900': animatingZone === 'day' && animatingFeedback === 'error'}">Days</span>
             </div>
         </div>
     </div>
