@@ -126,7 +126,7 @@
 <!-- Add overflow-hidden to body to prevent scrolling while dragging -->
 <style> body { overflow: hidden; touch-action: none; } </style>
 
-<div id="sort-game-wrapper" class="-mx-4 sm:-mx-6 lg:-mx-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100dvh-80px)] relative overflow-hidden font-game sm:rounded-t-[2.5rem] border-t-4 sm:border-x-4 border-indigo-200 party-bg shadow-2xl" x-data="sortGame()">
+<div id="sort-game-wrapper" class="-mx-4 sm:-mx-6 lg:-mx-8 -mb-4 sm:-mb-6 lg:-mb-8 h-[calc(100vh-80px)] min-h-[600px] relative overflow-hidden font-game sm:rounded-t-[2.5rem] border-t-4 sm:border-x-4 border-indigo-200 party-bg shadow-2xl" x-data="sortGame()">
     
     <!-- Top Bunting -->
     <div class="absolute top-0 inset-x-0 z-10 flex">
