@@ -59,3 +59,6 @@
 - Scratch scripts in root (`scratch_fix_*.php`, `seed_completed_session.php`) — not part of app
 - Controller layout: `app/Http/Controllers/{Admin,Tutor,Client}/` (26 controllers total)
 - 14 Eloquent models, 29 migrations, 3 seeders
+
+## General Rules
+- **Asset Copyright**: Pastikan semua aset, gambar, font, icon, dan library yang dipakai dalam sistem bebas hak cipta (free copyright / open-source).

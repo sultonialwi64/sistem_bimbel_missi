@@ -96,6 +96,61 @@
             </div>
         </a>
 
+        <!-- SORT GAME CARD -->
+        <a href="{{ route('game.sort') }}" class="group block relative rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl border border-indigo-200/60 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-indigo-500/20">
+            <!-- Thumbnail Container -->
+            <div class="aspect-[4/3] w-full relative overflow-hidden bg-[#fcebd1] p-2 sm:p-3 group-hover:p-1.5 transition-all duration-300">
+                <div class="w-full h-full border-[6px] border-amber-300 rounded-2xl bg-indigo-50 relative shadow-inner overflow-hidden flex flex-col items-center justify-center">
+                    
+                    <!-- Background pattern (Balloons) -->
+                    <div class="absolute -top-4 -left-4 w-16 h-20 bg-pink-300 rounded-[50%] opacity-60 transform -rotate-12 blur-sm"></div>
+                    <div class="absolute top-4 -right-2 w-20 h-24 bg-blue-300 rounded-[50%] opacity-60 transform rotate-12 blur-sm"></div>
+                    <div class="absolute -bottom-6 left-1/2 w-16 h-20 bg-emerald-300 rounded-[50%] opacity-60 transform -translate-x-1/2 blur-sm"></div>
+
+                    <!-- Target Boxes Concept -->
+                    <div class="flex gap-4 mt-6">
+                        <div class="w-10 h-10 border-2 border-dashed border-lime-600 bg-lime-200 rounded flex items-center justify-center shadow-inner"><span class="text-[8px] font-bold text-lime-800">Days</span></div>
+                        <div class="w-10 h-10 border-2 border-dashed border-lime-600 bg-lime-200 rounded flex items-center justify-center shadow-inner"><span class="text-[8px] font-bold text-lime-800">Months</span></div>
+                    </div>
+                    
+                    <!-- Dragging Item Concept -->
+                    <div class="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-8 bg-purple-500 rounded border-2 border-white shadow-lg flex items-center justify-center rotate-3 transform group-hover:scale-110 group-hover:translate-y-4 group-hover:rotate-0 transition-all duration-500">
+                        <span class="text-[10px] text-white font-bold">Monday</span>
+                    </div>
+
+                    <!-- Bunting -->
+                    <div class="absolute top-0 w-full flex justify-around">
+                        <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-transparent border-t-pink-500"></div>
+                        <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-transparent border-t-blue-500"></div>
+                        <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-transparent border-t-yellow-500"></div>
+                        <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-transparent border-t-emerald-500"></div>
+                    </div>
+                </div>
+
+                <!-- Overlay Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+                <!-- Type Badge (Top Right) -->
+                <div class="absolute top-4 right-4 z-10 flex flex-col gap-2 items-end">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-black tracking-widest bg-indigo-500 text-white shadow-lg border-2 border-indigo-300">NEW GAME</span>
+                </div>
+            </div>
+
+            <!-- Content Info -->
+            <div class="p-6 relative">
+                <div class="text-[11px] font-bold text-indigo-500 mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                    Interactive Game
+                </div>
+                
+                <h3 class="font-bold text-slate-900 text-xl mb-2 line-clamp-1 group-hover:text-indigo-600 transition-all">Sort The Days</h3>
+                <p class="text-sm text-slate-500 line-clamp-2 leading-relaxed">Sortir nama-nama hari dan bulan ke dalam kotak yang tepat (Drag & Drop).</p>
+                
+                <!-- Decorative line -->
+                <div class="h-1 w-12 bg-indigo-500 rounded-full mt-5 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+            </div>
+        </a>
+
         @forelse($media as $item)
             <a href="{{ route('tutor.learning-media.show', $item) }}" class="group block relative rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-indigo-500/20">
                 <!-- Thumbnail Container -->

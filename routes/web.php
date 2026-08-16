@@ -129,6 +129,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/game-prototype', function () {
         return view('client.game-prototype.index');
     })->name('game.prototype');
+    
+    // Sort Game
+    Route::get('/game-sort', function () {
+        return view('client.game-sort.index');
+    })->name('game.sort');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
