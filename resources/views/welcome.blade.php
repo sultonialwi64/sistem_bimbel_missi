@@ -66,7 +66,7 @@
     <title>Les Privat ke Rumah untuk Anak | Bimbel Missi</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('images/logo.png') }}?v=2" type="image/png">
+    <link rel="icon" href="{{ asset('images/logo.png') }}?v=3" type="image/png">
 
     <meta name="description" content="Bimbel Missi menyediakan tutor privat ke rumah untuk Calistung, SD, SMP, SMA, Bahasa Inggris, bahasa asing, mengaji, renang, seni, dan workshop anak. Area layanan mencakup Wonosobo, Magelang, dan Purwokerto.">
     <link rel="canonical" href="{{ $canonicalUrl }}">
