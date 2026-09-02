@@ -50,7 +50,11 @@ class DashboardController extends Controller
             return $schedule->student->client->company_margin ?? 10000;
         });
 
-        $stats['net_income'] = $netIncome;
+        // Kurangi pendapatan bersih dengan total diskon yang diberikan ke klien bulan ini
+        $totalDiscountThisMonth = Payment::whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
+            ->sum('discount');
+
+        $stats['net_income'] = max(0, $netIncome - $totalDiscountThisMonth);
         $stats['net_income_sessions'] = $validSessionsThisMonth->count();
         $stats['net_income_rate'] = null; // Dinamis
 

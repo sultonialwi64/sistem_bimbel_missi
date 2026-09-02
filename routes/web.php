@@ -23,7 +23,12 @@ use App\Http\Controllers\Tutor\DashboardController as TutorDashboardController;
 use App\Http\Controllers\Tutor\EarningController;
 use App\Models\Schedule;
 use App\Models\Tutor;
+use App\Models\Payment;
+use App\Models\Salary;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
+
+
 
 Route::get('/', function () {
     $sessionCount = Schedule::where('status', 'completed')
