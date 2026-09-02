@@ -132,10 +132,10 @@
                     <col class="w-[11%]"> <!-- Siswa -->
                     <col class="w-[12%]"> <!-- Tentor -->
                     <col class="w-[8%]">  <!-- Periode -->
-                    <col class="w-[8%]">  <!-- Diskon -->
+                    <col class="w-[9%]">  <!-- Diskon -->
                     <col class="w-[11%]"> <!-- Tagihan -->
                     <col class="w-[9%]">  <!-- Status -->
-                    <col class="w-[25%]"> <!-- Aksi -->
+                    <col class="w-[24%]"> <!-- Aksi -->
                 </colgroup>
                 <thead>
                     <tr>
@@ -205,7 +205,7 @@
                                 @if($payment->discount > 0)
                                     @php $countAnak = $clientDiscountCounts[$payment->client_id] ?? 0; @endphp
                                     <div>
-                                        <p class="text-sm font-semibold text-red-600 whitespace-nowrap">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
+                                        <p class="text-[13px] font-semibold text-red-600 whitespace-nowrap">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
                                         @if($countAnak > 0)
                                             <p class="text-[10px] text-gray-400 leading-tight whitespace-nowrap">{{ $countAnak }} anak</p>
                                         @endif
