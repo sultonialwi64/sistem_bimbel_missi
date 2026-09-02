@@ -126,17 +126,16 @@
 
         {{-- Desktop Table --}}
         <div class="hidden sm:block overflow-x-auto">
-            <table class="table-premium payment-table w-full min-w-[950px] table-fixed">
+            <table class="table-premium payment-table w-full min-w-[1150px] table-fixed">
                 <colgroup>
-                    <col class="w-[17%]">
-                    <col class="w-[10%]">
-                    <col class="w-[10%]">
-                    <col class="w-[8%]">
-                    <col class="w-[7%]">
-                    <col class="w-[11%]">
-                    <col class="w-[9%]">
-                    <col class="w-[7%]">
-                    <col class="w-[21%]">
+                    <col class="w-[16%]"> <!-- Klien -->
+                    <col class="w-[11%]"> <!-- Siswa -->
+                    <col class="w-[12%]"> <!-- Tentor -->
+                    <col class="w-[8%]">  <!-- Periode -->
+                    <col class="w-[8%]">  <!-- Diskon -->
+                    <col class="w-[11%]"> <!-- Tagihan -->
+                    <col class="w-[9%]">  <!-- Status -->
+                    <col class="w-[25%]"> <!-- Aksi -->
                 </colgroup>
                 <thead>
                     <tr>
@@ -146,9 +145,8 @@
                         <th class="text-left py-3 px-2">Periode</th>
                         <th class="text-left py-3 px-2">Diskon</th>
                         <th class="text-left py-3 px-2">Tagihan</th>
-                        <th class="text-left py-3 px-2">Tanggal Bayar</th>
                         <th class="text-left py-3 px-2">Status</th>
-                        <th class="text-right py-3 px-2">Aksi</th>
+                        <th class="!text-right py-3 px-2">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -200,17 +198,16 @@
                                     $periodMonth = \Carbon\Carbon::parse($payment->due_date)->subDays(7)->startOfMonth();
                                 @endphp
                                 <div>
-                                    <p class="text-sm font-bold text-gray-800 whitespace-nowrap">{{ $periodMonth->translatedFormat('F Y') }}</p>
-                                    <p class="text-xs text-gray-400">{{ $periodMonth->format('01 M') }} – {{ $periodMonth->endOfMonth()->format('d M Y') }}</p>
+                                    <p class="text-[13px] font-bold text-gray-800 whitespace-nowrap">{{ $periodMonth->translatedFormat('F Y') }}</p>
                                 </div>
                             </td>
                             <td class="py-4 px-3 2xl:px-4">
                                 @if($payment->discount > 0)
                                     @php $countAnak = $clientDiscountCounts[$payment->client_id] ?? 0; @endphp
                                     <div>
-                                        <p class="text-sm font-semibold text-red-600">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
+                                        <p class="text-sm font-semibold text-red-600 whitespace-nowrap">- Rp {{ number_format($payment->discount, 0, ',', '.') }}</p>
                                         @if($countAnak > 0)
-                                            <p class="text-[10px] text-gray-400 leading-tight">{{ $countAnak }} anak</p>
+                                            <p class="text-[10px] text-gray-400 leading-tight whitespace-nowrap">{{ $countAnak }} anak</p>
                                         @endif
                                     </div>
                                 @else
@@ -221,29 +218,21 @@
                                 <p class="text-[15px] font-black text-gray-900 whitespace-nowrap">Rp {{ number_format($payment->amount, 0, ',', '.') }}</p>
                             </td>
                             <td class="py-4 px-3 2xl:px-4">
-                                @if($payment->payment_date)
-                                    <p class="text-sm font-bold text-emerald-700 whitespace-nowrap">{{ $payment->payment_date->format('d M Y') }}</p>
-                                    <p class="text-xs text-gray-400">{{ $payment->payment_date->format('H:i') }} WIB</p>
-                                @else
-                                    <p class="text-sm text-gray-400">-</p>
-                                @endif
-                            </td>
-                            <td class="py-4 px-3 2xl:px-4">
-                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold
-                                    @if($payment->status === 'paid') bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200
-                                    @elseif($payment->status === 'pending') bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border border-amber-200
-                                    @elseif($payment->status === 'overdue') bg-gradient-to-r from-red-50 to-pink-50 text-red-700 border border-red-200
-                                    @else bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 border border-gray-200
-                                    @endif">
-                                    {{ ucfirst($payment->status) }}
-                                </span>
-                                <div class="mt-2">
+                                <div class="flex flex-col items-start gap-1.5">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold
+                                        @if($payment->status === 'paid') bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200
+                                        @elseif($payment->status === 'pending') bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border border-amber-200
+                                        @elseif($payment->status === 'overdue') bg-gradient-to-r from-red-50 to-pink-50 text-red-700 border border-red-200
+                                        @else bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 border border-gray-200
+                                        @endif">
+                                        {{ ucfirst($payment->status) }}
+                                    </span>
                                     @if($payment->wa_sent_at)
-                                        <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-700" title="Ditandai oleh {{ $payment->waSentBy->name ?? 'Admin' }}">
+                                        <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-700 whitespace-nowrap" title="Ditandai oleh {{ $payment->waSentBy->name ?? 'Admin' }}">
                                             WA {{ $payment->wa_sent_at->format('d M H:i') }}
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-500">
+                                        <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-bold text-slate-500 whitespace-nowrap">
                                             Belum WA
                                         </span>
                                     @endif
