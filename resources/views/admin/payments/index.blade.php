@@ -126,33 +126,33 @@
 
         {{-- Desktop Table --}}
         <div class="hidden sm:block overflow-x-auto">
-            <table class="table-premium payment-table w-full min-w-[1150px] table-fixed">
+            <table class="table-premium payment-table w-full min-w-[1200px] table-fixed">
                 <colgroup>
-                    <col class="w-[16%]"> <!-- Klien -->
-                    <col class="w-[11%]"> <!-- Siswa -->
+                    <col class="w-[14%]"> <!-- Klien -->
+                    <col class="w-[10%]"> <!-- Siswa -->
                     <col class="w-[12%]"> <!-- Tentor -->
-                    <col class="w-[8%]">  <!-- Periode -->
-                    <col class="w-[9%]">  <!-- Diskon -->
+                    <col class="w-[11%]"> <!-- Periode -->
+                    <col class="w-[11%]"> <!-- Diskon -->
                     <col class="w-[11%]"> <!-- Tagihan -->
                     <col class="w-[9%]">  <!-- Status -->
-                    <col class="w-[24%]"> <!-- Aksi -->
+                    <col class="w-[22%]"> <!-- Aksi -->
                 </colgroup>
                 <thead>
                     <tr>
-                        <th class="text-left py-3 px-2">Klien</th>
-                        <th class="text-left py-3 px-2">Siswa</th>
-                        <th class="text-left py-3 px-2">Tentor</th>
-                        <th class="text-left py-3 px-2">Periode</th>
-                        <th class="text-left py-3 px-2">Diskon</th>
-                        <th class="text-left py-3 px-2">Tagihan</th>
-                        <th class="text-left py-3 px-2">Status</th>
-                        <th class="!text-right py-3 px-2">Aksi</th>
+                        <th class="text-left py-3.5 px-3 2xl:px-4">Klien</th>
+                        <th class="text-left py-3.5 px-3 2xl:px-4">Siswa</th>
+                        <th class="text-left py-3.5 px-3 2xl:px-4">Tentor</th>
+                        <th class="text-left py-3.5 px-3 2xl:px-4">Periode</th>
+                        <th class="text-left py-3.5 px-3 2xl:px-4">Diskon</th>
+                        <th class="text-left py-3.5 px-3 2xl:px-4">Tagihan</th>
+                        <th class="text-left py-3.5 px-3 2xl:px-4">Status</th>
+                        <th class="!text-right py-3.5 px-3 2xl:px-4">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($payments as $payment)
                         <tr class="group">
-                            <td class="py-3 px-2">
+                            <td class="py-4 px-3 2xl:px-4">
                                 <div class="flex min-w-0 items-center gap-3">
                                     <div class="h-10 w-10 rounded-xl bg-indigo-700 flex items-center justify-center shadow-lg flex-shrink-0">
                                         <span class="text-white font-bold text-xs">{{ substr($payment->client->user->name, 0, 2) }}</span>
