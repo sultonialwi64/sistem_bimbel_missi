@@ -276,7 +276,7 @@
                                             $waText .= "*Rincian:*\n";
                                             $waText .= "- Jumlah Pertemuan: {$sessionCount} sesi\n";
                                             if ($payment->discount > 0) {
-                                                $waText .= "- Potongan Diskon: -Rp {$diskonFormatted}\n";
+                                                $waText .= "- Potongan Diskon: Rp {$diskonFormatted}\n";
                                             }
                                             $waText .= "\n";
                                             $waText .= "Mohon berkenan untuk melakukan pembayaran melalui rekening:\n";
@@ -424,7 +424,7 @@
                                 $waText .= "*Rincian:*\n";
                                 $waText .= "- Jumlah Pertemuan: {$sessionCount} sesi\n";
                                 if ($payment->discount > 0) {
-                                    $waText .= "- Potongan Diskon: -Rp {$diskonFormatted}\n";
+                                    $waText .= "- Potongan Diskon: Rp {$diskonFormatted}\n";
                                 }
                                 $waText .= "\n";
                                 $waText .= "Mohon berkenan untuk melakukan pembayaran melalui rekening:\n";
