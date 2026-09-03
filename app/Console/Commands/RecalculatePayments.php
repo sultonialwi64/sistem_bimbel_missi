@@ -47,10 +47,9 @@ class RecalculatePayments extends Command
             $pricePerSession = $payment->client->session_price;
             $baseAmount = $sessionCount * $pricePerSession;
 
-            $discount = 0;
-            if ($sessionCount >= config('bimbel.discount.threshold', 8)) {
-                $discount = $payment->client->discount;
-            }
+            $threshold = config('bimbel.discount.threshold', 8);
+            $discountMultiplier = floor($sessionCount / $threshold);
+            $discount = $discountMultiplier * $payment->client->discount;
 
             $newAmount = $baseAmount - $discount;
 

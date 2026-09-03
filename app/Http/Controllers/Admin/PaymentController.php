@@ -186,9 +186,9 @@ class PaymentController extends Controller
 
             $client = $student->client;
             $baseAmount = $sessionCount * $client->session_price;
-            $discount = $sessionCount >= config('bimbel.discount.threshold', 8)
-                ? $client->discount
-                : 0;
+            $threshold = config('bimbel.discount.threshold', 8);
+            $discountMultiplier = floor($sessionCount / $threshold);
+            $discount = $discountMultiplier * $client->discount;
             $amount = $baseAmount - $discount;
             $notes = 'Auto-generated for '.$date->translatedFormat('F Y')." ($sessionCount sesi)";
 
