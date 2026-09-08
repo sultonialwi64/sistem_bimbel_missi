@@ -58,22 +58,55 @@ class DashboardController extends Controller
         $stats['net_income_sessions'] = $validSessionsThisMonth->count();
         $stats['net_income_rate'] = null; // Dinamis
 
-        $recentSchedules = Schedule::with(['tutor.user', 'student', 'subject'])
-            ->latest()
-            ->take(10)
-            ->get();
+        // Prepare chart data
+        $dailySessions = [];
+        $tutorDailySessions = [];
+        
+        $daysInMonth = \Carbon\Carbon::parse($financialMonth)->daysInMonth;
+        for ($i = 1; $i <= $daysInMonth; $i++) {
+            $dateStr = \Carbon\Carbon::parse($financialMonth)->format('Y-m') . '-' . str_pad($i, 2, '0', STR_PAD_LEFT);
+            $dailySessions[$dateStr] = 0;
+        }
+
+        foreach ($validSessionsThisMonth as $session) {
+            $dateStr = \Carbon\Carbon::parse($session->date)->format('Y-m-d');
+            $tutorName = $session->tutor->user->name ?? 'Unknown';
+
+            if (isset($dailySessions[$dateStr])) {
+                $dailySessions[$dateStr]++;
+            }
+
+            if (!isset($tutorDailySessions[$tutorName])) {
+                $tutorDailySessions[$tutorName] = array_fill_keys(array_keys($dailySessions), 0);
+            }
+            if (isset($tutorDailySessions[$tutorName][$dateStr])) {
+                $tutorDailySessions[$tutorName][$dateStr]++;
+            }
+        }
+
+        $categories = array_map(function($date) {
+            return \Carbon\Carbon::parse($date)->format('d M');
+        }, array_keys($dailySessions));
+
+        $chart2Series = [];
+        foreach ($tutorDailySessions as $tutor => $data) {
+            $chart2Series[] = [
+                'name' => $tutor,
+                'data' => array_values($data)
+            ];
+        }
+
+        $chartData = [
+            'categories' => $categories,
+            'daily_sessions' => array_values($dailySessions),
+            'tutor_series' => $chart2Series
+        ];
 
         $recentPayments = Payment::with(['client.user', 'student'])
             ->latest()
             ->take(10)
             ->get();
 
-        $topTutors = Tutor::with('user')
-            ->where('status', 'active')
-            ->orderBy('rating_avg', 'desc')
-            ->take(5)
-            ->get();
-
-        return view('admin.dashboard', compact('stats', 'recentSchedules', 'recentPayments', 'topTutors', 'financialMonth'));
+        return view('admin.dashboard', compact('stats', 'recentPayments', 'chartData', 'financialMonth'));
     }
 }

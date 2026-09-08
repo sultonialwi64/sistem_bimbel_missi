@@ -120,208 +120,131 @@
     </div>
 
     <!-- Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Recent Schedules -->
+    <div class="grid grid-cols-1 gap-8 mb-8">
+        <!-- Daily Sessions Chart -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300">
             <div class="bg-indigo-800 border-b border-indigo-900 px-6 py-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
                         <svg class="h-5 w-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
                         </svg>
-                        Recent Schedules
+                        Sesi per Hari (Bulan Ini)
                     </h3>
-                    <a href="{{ route('admin.schedules.index') }}" class="text-white hover:text-indigo-200 text-sm font-semibold flex items-center gap-1 transition-colors">
-                        View All
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </a>
                 </div>
             </div>
             <div class="p-6">
-                <div class="space-y-3">
-                    @forelse($recentSchedules as $schedule)
-                        <div class="group p-4 bg-white rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-sm transition-all duration-300">
-                            <div class="flex items-center justify-between gap-2 mb-2">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm">
-                                        <span class="text-indigo-700 font-bold text-xs">{{ substr($schedule->student->name, 0, 2) }}</span>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <p class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors text-sm truncate">{{ $schedule->student->name }}</p>
-                                        <p class="text-xs text-gray-500 truncate">{{ $schedule->subject->name }} • {{ Str::limit($schedule->tutor->user->name, 15) }}</p>
-                                    </div>
-                                </div>
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold flex-shrink-0
-                                    @if($schedule->status === 'completed') bg-green-100 text-green-700
-                                    @elseif($schedule->status === 'scheduled') bg-blue-100 text-blue-700
-                                    @elseif($schedule->status === 'cancelled') bg-red-100 text-red-700
-                                    @else bg-amber-100 text-amber-700
-                                    @endif">
-                                    {{ ucfirst($schedule->status) }}
-                                </span>
-                            </div>
-                            <p class="text-xs text-gray-400 ml-12">{{ $schedule->date->translatedFormat('d M Y') }} • {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}</p>
-                        </div>
-                    @empty
-                        <p class="text-gray-500 text-center py-8">No schedules yet</p>
-                    @endforelse
-                </div>
+                <div id="chart-daily-sessions" class="w-full h-80"></div>
             </div>
         </div>
 
-        <!-- Top Tutors -->
+        <!-- Tutors Performance Chart -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300">
             <div class="bg-indigo-800 border-b border-indigo-900 px-6 py-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Top Tutors
+                        Performa Harian per Tentor
                     </h3>
-                    <a href="{{ route('admin.tutors.index') }}" class="text-white hover:text-indigo-200 text-sm font-semibold flex items-center gap-1 transition-colors">
-                        View All
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </a>
                 </div>
             </div>
             <div class="p-6">
-                <div class="space-y-3">
-                    @foreach($topTutors as $index => $tutor)
-                        <div class="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-sm transition-all duration-300 gap-3 sm:gap-0">
-                            <div class="flex items-center gap-4">
-                                <div class="relative flex-shrink-0">
-                                    <div class="h-10 w-10 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm">
-                                        <span class="text-indigo-700 font-bold text-sm">{{ substr($tutor->user->name, 0, 2) }}</span>
-                                    </div>
-                                    @if($index < 3)
-                                        <div class="absolute -top-2 -right-2 h-5 w-5 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                                            <span class="text-white text-[10px] font-bold">{{ $index + 1 }}</span>
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="font-bold text-gray-900 group-hover:text-amber-600 transition-colors truncate">{{ $tutor->user->name }}</p>
-                                    <p class="text-sm text-gray-500 truncate">{{ implode(', ', $tutor->specialization ?? []) }}</p>
-                                </div>
-                            </div>
-                            <div class="text-left sm:text-right ml-14 sm:ml-0 mt-2 sm:mt-0 flex flex-row sm:flex-col justify-between sm:justify-end items-center sm:items-end w-full sm:w-auto">
-                                <div class="flex items-center gap-1">
-                                    <svg class="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <span class="text-lg font-black text-gray-900">{{ number_format($tutor->rating_avg, 1) }}</span>
-                                </div>
-                                <p class="text-xs text-gray-500">{{ $tutor->total_sessions }} sessions</p>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+                <div id="chart-tutor-performance" class="w-full h-80"></div>
             </div>
-        </div>
-    </div>
-
-    <!-- Recent Payments -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300">
-        <div class="bg-indigo-800 border-b border-indigo-900 px-6 py-4">
-            <div class="flex items-center justify-between">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <svg class="h-5 w-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm11 0a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-                    </svg>
-                    Recent Payments
-                </h3>
-                <a href="{{ route('admin.payments.index') }}" class="text-white hover:text-indigo-200 text-sm font-semibold flex items-center gap-1 transition-colors">
-                    View All
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </a>
-            </div>
-        </div>
-        {{-- Desktop Table (hidden on mobile) --}}
-        <div class="hidden sm:block p-0">
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead>
-                        <tr class="border-b border-gray-100">
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wide">Client</th>
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wide">Student</th>
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wide">Amount</th>
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wide">Status</th>
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wide">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($recentPayments as $payment)
-                            <tr class="group hover:bg-slate-50 transition-all duration-300">
-                                <td class="py-4 px-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-8 w-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm flex-shrink-0">
-                                            <span class="text-indigo-700 font-bold text-xs">{{ substr($payment->client->user->name, 0, 2) }}</span>
-                                        </div>
-                                        <span class="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">{{ $payment->client->user->name }}</span>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-4 text-sm text-gray-600">{{ $payment->student->name }}</td>
-                                <td class="py-4 px-4">
-                                    <span class="text-base font-black text-gray-900">Rp {{ number_format($payment->amount, 0, ',', '.') }}</span>
-                                </td>
-                                <td class="py-4 px-4">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
-                                        @if($payment->status === 'paid') bg-green-100 text-green-700
-                                        @elseif($payment->status === 'pending') bg-amber-100 text-amber-700
-                                        @else bg-red-100 text-red-700
-                                        @endif">
-                                        {{ ucfirst($payment->status) }}
-                                    </span>
-                                </td>
-                                <td class="py-4 px-4 text-sm text-gray-600">{{ $payment->created_at->format('d M Y') }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-8 text-center text-gray-500">No payments yet</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {{-- Mobile Card List (hidden on desktop) --}}
-        <div class="sm:hidden p-4 space-y-3">
-            @forelse($recentPayments as $payment)
-                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <div class="h-9 w-9 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm flex-shrink-0">
-                                <span class="text-indigo-700 font-bold text-xs">{{ substr($payment->client->user->name, 0, 2) }}</span>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="font-bold text-gray-900 truncate text-sm">{{ $payment->client->user->name }}</p>
-                                <p class="text-xs text-gray-500 truncate">untuk: {{ $payment->student->name }}</p>
-                            </div>
-                        </div>
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold flex-shrink-0 ml-2
-                            @if($payment->status === 'paid') bg-green-100 text-green-700
-                            @elseif($payment->status === 'pending') bg-amber-100 text-amber-700
-                            @else bg-red-100 text-red-700
-                            @endif">
-                            {{ ucfirst($payment->status) }}
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-gray-50">
-                        <p class="text-base font-black text-gray-900">Rp {{ number_format($payment->amount, 0, ',', '.') }}</p>
-                        <p class="text-xs text-gray-400">{{ $payment->created_at->format('d M Y') }}</p>
-                    </div>
-                </div>
-            @empty
-                <p class="text-gray-500 text-center py-8 text-sm">No payments yet</p>
-            @endforelse
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartData = @json($chartData);
+    
+    // Daily Sessions Chart
+    const dailyOptions = {
+        series: [{
+            name: 'Total Sesi',
+            data: chartData.daily_sessions
+        }],
+        chart: {
+            height: 320,
+            type: 'area',
+            toolbar: { show: false },
+            fontFamily: 'inherit'
+        },
+        colors: ['#4f46e5'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.4,
+                opacityTo: 0.05,
+                stops: [0, 90, 100]
+            }
+        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2 },
+        xaxis: {
+            categories: chartData.categories,
+            labels: { style: { colors: '#64748b' } },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: {
+            decimalsInFloat: 0,
+            labels: { 
+                style: { colors: '#64748b' },
+                formatter: function(val) { return Math.round(val); }
+            }
+        },
+        grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+    };
+
+    new ApexCharts(document.querySelector("#chart-daily-sessions"), dailyOptions).render();
+
+    // Tutor Performance Chart
+    const tutorOptions = {
+        series: chartData.tutor_series,
+        chart: {
+            height: 320,
+            type: 'bar',
+            stacked: true,
+            toolbar: { show: false },
+            fontFamily: 'inherit'
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '50%',
+                borderRadius: 4
+            },
+        },
+        dataLabels: { enabled: false },
+        xaxis: {
+            categories: chartData.categories,
+            labels: { style: { colors: '#64748b' } },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: {
+            decimalsInFloat: 0,
+            labels: { 
+                style: { colors: '#64748b' },
+                formatter: function(val) { return Math.round(val); }
+            }
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'left'
+        },
+        grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+    };
+
+    new ApexCharts(document.querySelector("#chart-tutor-performance"), tutorOptions).render();
+});
+</script>
+@endpush
