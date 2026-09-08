@@ -22,23 +22,6 @@ class DashboardController extends Controller
         $invoiceDueStart = $financialStart->copy()->addDays(7);
         $invoiceDueEnd = $financialEnd->copy()->addDays(7);
 
-        $stats = [
-            'total_tutors' => Tutor::count(),
-            'active_tutors' => Tutor::where('status', 'active')->count(),
-            'total_clients' => Client::count(),
-            'total_students' => Student::where('is_active', true)->count(),
-            'total_schedules' => Schedule::count(),
-            'today_schedules' => Schedule::whereDate('date', today())->count(),
-            'pending_payments' => Payment::where('status', 'pending')
-                ->whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
-                ->sum('amount'),
-            'monthly_revenue' => Payment::where('status', 'paid')
-                ->whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
-                ->sum('amount'),
-        ];
-
-        // Pendapatan bersih perusahaan bulan ini
-        // = jumlah sesi terlaksana (kehadiran terverifikasi) × margin perusahaan per sesi (berdasarkan tipe klien)
         $validSessionsThisMonth = Schedule::with('student.client')
             ->whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
             ->where('status', 'completed')
@@ -46,15 +29,49 @@ class DashboardController extends Controller
                 $q->whereIn('status', ['hadir', 'pindah_lokasi']);
             })->get();
 
+        // Calculate real-time Expected Gross Revenue and Discounts
+        $expectedGrossRevenue = 0;
+        $realtimeTotalDiscount = 0;
+        $sessionsByStudent = $validSessionsThisMonth->groupBy('student_id');
+        
+        foreach ($sessionsByStudent as $studentId => $sessions) {
+            $count = $sessions->count();
+            $client = $sessions->first()->student->client;
+            if ($client) {
+                $baseAmount = $count * $client->session_price;
+                $threshold = config('bimbel.discount.threshold', 8);
+                $discountMultiplier = floor($count / $threshold);
+                $discount = $discountMultiplier * $client->discount;
+                
+                $expectedGrossRevenue += ($baseAmount - $discount);
+                $realtimeTotalDiscount += $discount;
+            }
+        }
+
+        $monthlyRevenue = Payment::where('status', 'paid')
+            ->whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
+            ->sum('amount');
+            
+        $pendingPayments = max(0, $expectedGrossRevenue - $monthlyRevenue);
+
+        $stats = [
+            'total_tutors' => Tutor::count(),
+            'active_tutors' => Tutor::where('status', 'active')->count(),
+            'total_clients' => Client::count(),
+            'total_students' => Student::where('is_active', true)->count(),
+            'total_schedules' => Schedule::count(),
+            'today_schedules' => Schedule::whereDate('date', today())->count(),
+            'pending_payments' => $pendingPayments,
+            'monthly_revenue' => $monthlyRevenue,
+        ];
+
+        // Pendapatan bersih perusahaan bulan ini
+        // = jumlah sesi terlaksana (kehadiran terverifikasi) × margin perusahaan per sesi
         $netIncome = $validSessionsThisMonth->sum(function ($schedule) {
             return $schedule->student->client->company_margin ?? 10000;
         });
 
-        // Kurangi pendapatan bersih dengan total diskon yang diberikan ke klien bulan ini
-        $totalDiscountThisMonth = Payment::whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
-            ->sum('discount');
-
-        $stats['net_income'] = max(0, $netIncome - $totalDiscountThisMonth);
+        $stats['net_income'] = max(0, $netIncome - $realtimeTotalDiscount);
         $stats['net_income_sessions'] = $validSessionsThisMonth->count();
         $stats['net_income_rate'] = null; // Dinamis
 
