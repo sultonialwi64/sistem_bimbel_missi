@@ -22,29 +22,45 @@ class DashboardController extends Controller
         $invoiceDueStart = $financialStart->copy()->addDays(7);
         $invoiceDueEnd = $financialEnd->copy()->addDays(7);
 
-        $validSessionsThisMonth = Schedule::with('student.client')
-            ->whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
+        // 1. Hitung omset, diskon, dan net income dengan Aggregate Query
+        $validStudentCounts = Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
             ->where('status', 'completed')
             ->whereHas('attendance', function ($q) {
                 $q->whereIn('status', ['hadir', 'pindah_lokasi']);
-            })->get();
+            })
+            ->selectRaw('student_id, count(*) as count')
+            ->groupBy('student_id')
+            ->get();
 
-        // Calculate real-time Expected Gross Revenue and Discounts
+        $validSessionsCount = 0;
         $expectedGrossRevenue = 0;
         $realtimeTotalDiscount = 0;
-        $sessionsByStudent = $validSessionsThisMonth->groupBy('student_id');
-        
-        foreach ($sessionsByStudent as $studentId => $sessions) {
-            $count = $sessions->count();
-            $client = $sessions->first()->student->client;
-            if ($client) {
-                $baseAmount = $count * $client->session_price;
-                $threshold = config('bimbel.discount.threshold', 8);
-                $discountMultiplier = floor($count / $threshold);
-                $discount = $discountMultiplier * $client->discount;
+        $netIncome = 0;
+
+        if ($validStudentCounts->isNotEmpty()) {
+            $studentIds = $validStudentCounts->pluck('student_id');
+            // Hanya load Student dan Client yang ada sesinya saja
+            $students = Student::with('client')->whereIn('id', $studentIds)->get()->keyBy('id');
+
+            foreach ($validStudentCounts as $item) {
+                $count = $item->count;
+                $validSessionsCount += $count;
+                $student = $students->get($item->student_id);
                 
-                $expectedGrossRevenue += ($baseAmount - $discount);
-                $realtimeTotalDiscount += $discount;
+                if ($student && $student->client) {
+                    $client = $student->client;
+                    $baseAmount = $count * $client->session_price;
+                    $threshold = config('bimbel.discount.threshold', 8);
+                    $discountMultiplier = floor($count / $threshold);
+                    $discount = $discountMultiplier * $client->discount;
+                    
+                    $expectedGrossRevenue += ($baseAmount - $discount);
+                    $realtimeTotalDiscount += $discount;
+                    
+                    // Net income
+                    $margin = $client->company_margin ?? 10000;
+                    $netIncome += ($count * $margin);
+                }
             }
         }
 
@@ -63,21 +79,23 @@ class DashboardController extends Controller
             'today_schedules' => Schedule::whereDate('date', today())->count(),
             'pending_payments' => $pendingPayments,
             'monthly_revenue' => $monthlyRevenue,
+            'net_income' => max(0, $netIncome - $realtimeTotalDiscount),
+            'net_income_sessions' => $validSessionsCount,
+            'net_income_rate' => null, // Dinamis
         ];
 
-        // Pendapatan bersih perusahaan bulan ini
-        // = jumlah sesi terlaksana (kehadiran terverifikasi) × margin perusahaan per sesi
-        $netIncome = $validSessionsThisMonth->sum(function ($schedule) {
-            return $schedule->student->client->company_margin ?? 10000;
-        });
+        // 2. Prepare chart data using DB Aggregates (ALL schedules)
+        $dailySessionsDb = Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
+            ->selectRaw('date, count(*) as count')
+            ->groupBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
 
-        $stats['net_income'] = max(0, $netIncome - $realtimeTotalDiscount);
-        $stats['net_income_sessions'] = $validSessionsThisMonth->count();
-        $stats['net_income_rate'] = null; // Dinamis
-
-        // Prepare chart data using ALL schedules (not just completed/absen ones) as requested by user
-        $allSessionsThisMonth = Schedule::with('tutor.user')
-            ->whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
+        $tutorDailySessionsDb = Schedule::join('tutors', 'schedules.tutor_id', '=', 'tutors.id')
+            ->join('users', 'tutors.user_id', '=', 'users.id')
+            ->selectRaw('users.name as tutor_name, date, count(*) as count')
+            ->whereBetween('schedules.date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
+            ->groupBy('users.name', 'date')
             ->get();
 
         $dailySessions = [];
@@ -86,22 +104,18 @@ class DashboardController extends Controller
         $daysInMonth = \Carbon\Carbon::parse($financialMonth)->daysInMonth;
         for ($i = 1; $i <= $daysInMonth; $i++) {
             $dateStr = \Carbon\Carbon::parse($financialMonth)->format('Y-m') . '-' . str_pad($i, 2, '0', STR_PAD_LEFT);
-            $dailySessions[$dateStr] = 0;
+            $dailySessions[$dateStr] = $dailySessionsDb[$dateStr] ?? 0;
         }
 
-        foreach ($allSessionsThisMonth as $session) {
-            $dateStr = \Carbon\Carbon::parse($session->date)->format('Y-m-d');
-            $tutorName = $session->tutor->user->name ?? 'Unknown';
-
-            if (isset($dailySessions[$dateStr])) {
-                $dailySessions[$dateStr]++;
-            }
+        foreach ($tutorDailySessionsDb as $row) {
+            $dateStr = \Carbon\Carbon::parse($row->date)->format('Y-m-d');
+            $tutorName = $row->tutor_name;
 
             if (!isset($tutorDailySessions[$tutorName])) {
                 $tutorDailySessions[$tutorName] = array_fill_keys(array_keys($dailySessions), 0);
             }
             if (isset($tutorDailySessions[$tutorName][$dateStr])) {
-                $tutorDailySessions[$tutorName][$dateStr]++;
+                $tutorDailySessions[$tutorName][$dateStr] = $row->count;
             }
         }
 
