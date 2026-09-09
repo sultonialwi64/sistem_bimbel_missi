@@ -75,7 +75,11 @@ class DashboardController extends Controller
         $stats['net_income_sessions'] = $validSessionsThisMonth->count();
         $stats['net_income_rate'] = null; // Dinamis
 
-        // Prepare chart data
+        // Prepare chart data using ALL schedules (not just completed/absen ones) as requested by user
+        $allSessionsThisMonth = Schedule::with('tutor.user')
+            ->whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
+            ->get();
+
         $dailySessions = [];
         $tutorDailySessions = [];
         
@@ -85,7 +89,7 @@ class DashboardController extends Controller
             $dailySessions[$dateStr] = 0;
         }
 
-        foreach ($validSessionsThisMonth as $session) {
+        foreach ($allSessionsThisMonth as $session) {
             $dateStr = \Carbon\Carbon::parse($session->date)->format('Y-m-d');
             $tutorName = $session->tutor->user->name ?? 'Unknown';
 
