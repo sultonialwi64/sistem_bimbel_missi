@@ -6,13 +6,27 @@
 
 @php
     $calendarEvents = $allSchedules->map(function($s) {
-        $color = match($s->status) {
-            'completed' => '#10b981',
-            'scheduled' => '#6366f1',
-            'cancelled' => '#ef4444',
-            'rescheduled' => '#f59e0b',
-            default => '#64748b',
-        };
+        if ($s->status === 'completed') {
+            $bgColor = '#10b981'; // Green
+            $borderColor = '#059669';
+            $textColor = '#ffffff';
+        } else if ($s->status === 'scheduled') {
+            $bgColor = '#ffffff'; // White
+            $borderColor = '#e2e8f0'; // Gray
+            $textColor = '#1e293b'; // Dark
+        } else if ($s->status === 'cancelled') {
+            $bgColor = '#ef4444';
+            $borderColor = '#dc2626';
+            $textColor = '#ffffff';
+        } else if ($s->status === 'rescheduled') {
+            $bgColor = '#f59e0b';
+            $borderColor = '#d97706';
+            $textColor = '#ffffff';
+        } else {
+            $bgColor = '#f1f5f9';
+            $borderColor = '#cbd5e1';
+            $textColor = '#475569';
+        }
 
         return [
             'id' => $s->id,
@@ -20,13 +34,15 @@
             'start' => $s->date->format('Y-m-d') . 'T' . $s->start_time->format('H:i:s'),
             'end' => $s->date->format('Y-m-d') . 'T' . $s->end_time->format('H:i:s'),
             'url' => route('tutor.schedules.show', $s->id),
-            'backgroundColor' => $color,
-            'borderColor' => $color,
-            'textColor' => '#ffffff',
+            'backgroundColor' => $bgColor,
+            'borderColor' => $borderColor,
+            'textColor' => $textColor,
+            'display' => 'block',
             'extendedProps' => [
                 'student_name' => $s->student->name,
                 'subject' => $s->subject->name,
                 'status' => $s->status,
+                'textColor' => $textColor,
             ],
         ];
     })->values()->toArray();
@@ -303,6 +319,10 @@
         color: #64748b;
         padding: 0.5rem !important;
     }
+    .fc-popover-body {
+        max-height: 250px;
+        overflow-y: auto;
+    }
     .fc-day-today {
         background: #f8fafc !important;
     }
@@ -400,7 +420,7 @@
             eventContent: function(arg) {
                 var p = arg.event.extendedProps;
                 return {
-                    html: '<div style="padding:3px 6px;line-height:1.3;overflow:hidden;">' +
+                    html: '<div style="padding:3px 6px;line-height:1.3;overflow:hidden;color:'+p.textColor+';">' +
                           '<div style="font-size:10px;font-weight:700;opacity:0.9;">' + arg.timeText + '</div>' +
                           '<div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.student_name + '</div>' +
                           '<div style="font-size:10px;opacity:0.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.subject + '</div>' +
