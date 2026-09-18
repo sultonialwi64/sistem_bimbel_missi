@@ -43,7 +43,7 @@
                         <h1 class="text-2xl font-bold text-white">{{ $subject->name }}</h1>
                         <div class="flex items-center gap-3 mt-2 flex-wrap">
                             <span class="inline-flex items-center px-3 py-1 bg-white/20 text-white rounded-full text-xs font-bold backdrop-blur-sm">
-                                📚 Jenjang {{ $subject->level }}
+                                📚 Jenjang {{ $subject->gradeLevel->name ?? $subject->level }}
                             </span>
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
                                 {{ $subject->is_active

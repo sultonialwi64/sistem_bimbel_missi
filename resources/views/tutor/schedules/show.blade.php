@@ -28,7 +28,7 @@
                 <div>
                     <label class="text-sm text-gray-500">Mata Pelajaran</label>
                     <p class="text-lg font-semibold">{{ $schedule->subject->name }}</p>
-                    <p class="text-sm text-gray-600">{{ $schedule->subject->level }}</p>
+                    <p class="text-sm text-gray-600">{{ $schedule->subject->gradeLevel->name ?? $schedule->subject->level }}</p>
                 </div>
                 <div>
                     <label class="text-sm text-gray-500">Tanggal & Waktu</label>

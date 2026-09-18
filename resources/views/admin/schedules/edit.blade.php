@@ -96,7 +96,9 @@
                     <label class="block text-sm font-medium text-gray-700">Subject</label>
                     <select name="subject_id" required class="mt-1 block w-full rounded-md border-gray-300">
                         @foreach($subjects as $subject)
-                            <option value="{{ $subject->id }}" {{ $schedule->subject_id == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
+                            <option value="{{ $subject->id }}" {{ $schedule->subject_id == $subject->id ? 'selected' : '' }}>
+                                {{ $subject->name }} — {{ $subject->gradeLevel->name ?? $subject->level }}
+                            </option>
                         @endforeach
                     </select>
                 </div>

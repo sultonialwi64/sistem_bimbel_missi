@@ -60,7 +60,7 @@
                 <div>
                     <p class="text-xs text-purple-500 font-semibold uppercase tracking-wide">Mata Pelajaran</p>
                     <p class="font-bold text-gray-900 text-sm">{{ $schedule->subject->name }}</p>
-                    <p class="text-xs text-gray-500">{{ $schedule->subject->level }}</p>
+                    <p class="text-xs text-gray-500">{{ $schedule->subject->gradeLevel->name ?? $schedule->subject->level }}</p>
                 </div>
             </div>
             {{-- Waktu --}}

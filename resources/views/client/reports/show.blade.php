@@ -84,7 +84,7 @@
                     <div>
                         <p class="text-sm text-amber-600 font-semibold mb-1">Mata Pelajaran</p>
                         <p class="font-bold text-gray-900">{{ $report->schedule->subject->name }}</p>
-                        <p class="text-sm text-gray-500">{{ $report->schedule->subject->level }}</p>
+                        <p class="text-sm text-gray-500">{{ $report->schedule->subject->gradeLevel->name ?? $report->schedule->subject->level }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-amber-600 font-semibold mb-1">Tanggal & Waktu</p>

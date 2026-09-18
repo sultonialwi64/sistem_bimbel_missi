@@ -14,7 +14,6 @@ class Subject extends Model
         'name',
         'description',
         'grade_level_id',
-        'level', // Keep for backward compatibility during transition
         'is_active',
     ];
 

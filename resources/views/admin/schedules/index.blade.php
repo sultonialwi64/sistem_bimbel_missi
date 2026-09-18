@@ -169,7 +169,7 @@
                             <td class="py-4 px-6">
                                 <div>
                                     <p class="font-medium text-gray-900">{{ $schedule->subject->name }}</p>
-                                    <span class="inline-flex items-center px-2 py-0.5 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded text-xs font-semibold">{{ $schedule->subject->level }}</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded text-xs font-semibold">{{ $schedule->subject->gradeLevel->name ?? $schedule->subject->level }}</span>
                                 </div>
                             </td>
                             <td class="py-4 px-6">
