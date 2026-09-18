@@ -11,7 +11,7 @@
     selectedStudentName: '',
     students: [
         @foreach($students as $student)
-            { id: '{{ $student->id }}', name: '{{ addslashes($student->name) }}', parent: '{{ addslashes($student->client->user->name ?? '-') }}', address: '{{ addslashes($student->client->address ?? '-') }}' },
+            { id: '{{ $student->id }}', name: '{{ addslashes($student->name) }}', parent: '{{ addslashes($student->client->user->name ?? '-') }}', email: '{{ addslashes($student->client->user->email ?? '-') }}', phone: '{{ addslashes($student->client->user->phone ?? '-') }}', address: '{{ addslashes($student->client->address ?? '-') }}' },
         @endforeach
     ],
     init() {
@@ -193,11 +193,13 @@
                 </div>
             </div>
             <div class="p-0 overflow-y-auto flex-1 bg-slate-50/50 relative">
-                <table class="w-full text-left border-collapse">
+                <!-- Desktop Table View -->
+                <table class="w-full text-left border-collapse hidden md:table">
                     <thead class="bg-white/90 backdrop-blur-md sticky top-0 shadow-sm z-10">
                         <tr>
                             <th class="py-4 px-6 text-xs font-black text-indigo-900 uppercase tracking-widest border-b border-slate-200 bg-indigo-50/30">Siswa</th>
                             <th class="py-4 px-6 text-xs font-black text-indigo-900 uppercase tracking-widest border-b border-slate-200 bg-indigo-50/30">Wali</th>
+                            <th class="py-4 px-6 text-xs font-black text-indigo-900 uppercase tracking-widest border-b border-slate-200 bg-indigo-50/30">Kontak</th>
                             <th class="py-4 px-6 text-xs font-black text-indigo-900 uppercase tracking-widest border-b border-slate-200 bg-indigo-50/30">Alamat</th>
                             <th class="py-4 px-6 text-xs font-black text-indigo-900 uppercase tracking-widest text-right border-b border-slate-200 bg-indigo-50/30">Aksi</th>
                         </tr>
@@ -221,6 +223,12 @@
                                         <p class="text-sm font-bold text-slate-700 group-hover:text-slate-900" x-text="s.parent"></p>
                                     </div>
                                 </td>
+                                <td class="py-4 px-6">
+                                    <div class="text-xs text-slate-500 flex flex-col">
+                                        <span class="font-medium text-slate-700" x-text="s.email"></span>
+                                        <span x-show="s.phone && s.phone !== '-'" x-text="s.phone" class="mt-0.5"></span>
+                                    </div>
+                                </td>
                                 <td class="py-4 px-6 text-sm text-slate-600">
                                     <div class="flex items-start gap-2">
                                         <svg class="h-4 w-4 text-slate-400 shrink-0 mt-0.5 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -236,7 +244,7 @@
                             </tr>
                         </template>
                         <tr x-show="filteredStudents().length === 0">
-                            <td colspan="4" class="py-20 text-center bg-slate-50/50">
+                            <td colspan="5" class="py-20 text-center bg-slate-50/50">
                                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white shadow-sm border border-slate-100 mb-5 relative">
                                     <div class="absolute inset-0 rounded-full bg-indigo-50 animate-ping opacity-20"></div>
                                     <svg class="h-10 w-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -247,6 +255,50 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <!-- Mobile Card View -->
+                <div class="md:hidden flex flex-col divide-y divide-slate-100 bg-white w-full">
+                    <template x-for="s in filteredStudents()" :key="s.id">
+                        <div class="p-4 hover:bg-indigo-50/80 transition-all cursor-pointer flex flex-col gap-3" @click="selectedStudentId = s.id; selectedStudentName = s.name + ' — (Wali: ' + s.parent + ')'; showStudentModal = false">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center shrink-0 border border-white shadow-sm">
+                                        <span class="text-indigo-700 font-black text-xs" x-text="s.name.substring(0, 2).toUpperCase()"></span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-slate-900 text-sm" x-text="s.name"></p>
+                                        <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                                            <svg class="h-3 w-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                            <span x-text="s.parent"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <button type="button" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold shrink-0 border border-indigo-100">
+                                    Pilih
+                                </button>
+                            </div>
+                            <div class="bg-slate-50 rounded-xl p-3 space-y-2 border border-slate-100">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Kontak</span>
+                                    <span class="text-xs font-medium text-slate-700" x-text="s.email"></span>
+                                    <span x-show="s.phone && s.phone !== '-'" class="text-xs font-medium text-slate-700" x-text="s.phone"></span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Alamat</span>
+                                    <span class="text-xs text-slate-600 line-clamp-2 leading-relaxed" x-text="s.address"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <div x-show="filteredStudents().length === 0" class="py-12 text-center bg-slate-50/50">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-sm border border-slate-100 mb-4 relative">
+                            <div class="absolute inset-0 rounded-full bg-indigo-50 animate-ping opacity-20"></div>
+                            <svg class="h-8 w-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h4 class="text-slate-800 font-black text-base">Tidak Ada Siswa</h4>
+                        <p class="text-slate-500 text-xs mt-1 max-w-[200px] mx-auto leading-relaxed">Coba kata kunci lain.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div></div>
