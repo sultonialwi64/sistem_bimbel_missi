@@ -57,7 +57,19 @@
 @endphp
 
 @section('content')
-<div class="space-y-8" x-data="{ viewMode: 'calendar' }">
+<div class="space-y-8" x-data="{ 
+    viewMode: 'calendar', 
+    showLogDrawer: false, 
+    logsHtml: '<div class=\'flex justify-center py-10\'><i class=\'fa-solid fa-spinner fa-spin text-3xl text-indigo-500\'></i></div>',
+    fetchLogs() {
+        this.showLogDrawer = true;
+        this.logsHtml = '<div class=\'flex justify-center py-10\'><i class=\'fa-solid fa-spinner fa-spin text-3xl text-indigo-500\'></i></div>';
+        fetch('{{ route('admin.schedules.logs') }}')
+            .then(res => res.json())
+            .then(data => { this.logsHtml = data.html; })
+            .catch(err => { this.logsHtml = '<div class=\'text-center py-10 text-red-500\'>Gagal memuat log.</div>'; });
+    }
+}">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <p class="text-gray-500 text-sm">Manage all tutoring schedules</p>
@@ -82,6 +94,12 @@
                     <span class="hidden sm:inline">List</span>
                 </button>
             </div>
+
+            {{-- Log Button --}}
+            <button @click="fetchLogs()" class="px-3 py-2 bg-white rounded-xl text-sm font-bold text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 shadow-sm flex items-center gap-2 transition-all duration-200">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span class="hidden sm:inline">Log Aktivitas</span>
+            </button>
 
             <a href="{{ route('admin.schedules.create') }}" class="btn-primary-gradient text-white font-bold px-4 py-2.5 rounded-xl hover:shadow-2xl flex items-center gap-2 shadow-xl shadow-indigo-500/30 transition-all flex-1 sm:flex-auto justify-center">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,14 +192,44 @@
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         Edit
                                     </a>
-                                    <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" onsubmit="return confirm('Hapus jadwal ini?');" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 text-red-700 border border-red-100 rounded-xl font-semibold text-xs hover:bg-red-50 transition-all">
+                                    <div x-data="{ showDeleteModal: false }" class="inline">
+                                        <button type="button" @click="showDeleteModal = true" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 text-red-700 border border-red-100 rounded-xl font-semibold text-xs hover:bg-red-50 transition-all">
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             Delete
                                         </button>
-                                    </form>
+                                        
+                                        <!-- Delete Confirmation Modal -->
+                                        <div x-show="showDeleteModal" style="display: none;" class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                                            <div x-show="showDeleteModal" x-transition.opacity class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                                            <div class="fixed inset-0 z-10 overflow-y-auto">
+                                                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                                                    <div x-show="showDeleteModal" @click.away="showDeleteModal = false" x-transition.scale class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100">
+                                                        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                                            <div class="sm:flex sm:items-start">
+                                                                <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                                    <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
+                                                                </div>
+                                                                <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                                                    <h3 class="text-lg font-bold leading-6 text-gray-900">Hapus Jadwal</h3>
+                                                                    <div class="mt-2 text-wrap">
+                                                                        <p class="text-sm text-gray-500 whitespace-normal">Yakin ingin menghapus jadwal ini? Data ini tidak dapat dikembalikan.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                                            <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Hapus Permanen</button>
+                                                            </form>
+                                                            <button type="button" @click="showDeleteModal = false" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Batal</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -270,6 +318,40 @@
                 {{ $schedules->links() }}
             </div>
         @endif
+    </div>
+
+    {{-- Slide-over Drawer for Logs --}}
+    <div x-show="showLogDrawer" style="display: none;" class="relative z-50" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <!-- Background backdrop -->
+        <div x-show="showLogDrawer" x-transition:enter="ease-in-out duration-500" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+      
+        <div class="fixed inset-0 overflow-hidden">
+          <div class="absolute inset-0 overflow-hidden">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+              <!-- Slide-over panel -->
+              <div x-show="showLogDrawer" @click.away="showLogDrawer = false" x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full" class="pointer-events-auto relative w-screen max-w-md">
+                
+                <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl rounded-l-3xl border-l border-gray-100">
+                  <div class="px-4 sm:px-6 py-6 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100/50 sticky top-0 z-10 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600" id="slide-over-title">Log Aktivitas</h2>
+                        <p class="text-xs text-indigo-600/70 font-medium mt-1">Riwayat penambahan, pengubahan, & penghapusan jadwal</p>
+                    </div>
+                    <button type="button" @click="showLogDrawer = false" class="rounded-full bg-white p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm border border-gray-100">
+                      <span class="sr-only">Close panel</span>
+                      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="relative flex-1" x-html="logsHtml">
+                    <!-- Logs injected via AJAX -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
 </div>
 @endsection

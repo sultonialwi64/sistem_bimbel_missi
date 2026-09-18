@@ -230,14 +230,44 @@
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 Edit
                             </a>
-                            <form action="{{ route('tutor.schedules.destroy', $schedule) }}" method="POST" onsubmit="return confirm('Hapus jadwal ini?');" class="inline flex-1">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-700 rounded-xl font-semibold text-xs hover:bg-red-100 transition-all">
+                            <div x-data="{ showDeleteModal: false }" class="inline flex-1">
+                                <button type="button" @click="showDeleteModal = true" class="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-700 rounded-xl font-semibold text-xs hover:bg-red-100 transition-all">
                                     <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     Hapus
                                 </button>
-                            </form>
+                                
+                                <!-- Delete Confirmation Modal -->
+                                <div x-show="showDeleteModal" style="display: none;" class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                                    <div x-show="showDeleteModal" x-transition.opacity class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                                    <div class="fixed inset-0 z-10 overflow-y-auto">
+                                        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                                            <div x-show="showDeleteModal" @click.away="showDeleteModal = false" x-transition.scale class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100">
+                                                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                                    <div class="sm:flex sm:items-start">
+                                                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                            <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
+                                                        </div>
+                                                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                                            <h3 class="text-lg font-bold leading-6 text-gray-900">Hapus Jadwal</h3>
+                                                            <div class="mt-2 text-wrap">
+                                                                <p class="text-sm text-gray-500 whitespace-normal">Yakin ingin menghapus jadwal ini? Data ini tidak dapat dikembalikan.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                                    <form action="{{ route('tutor.schedules.destroy', $schedule) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Hapus Permanen</button>
+                                                    </form>
+                                                    <button type="button" @click="showDeleteModal = false" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Batal</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @endif
                     </div>
                 </div>

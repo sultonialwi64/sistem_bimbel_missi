@@ -23,6 +23,46 @@ class Schedule extends Model
         'created_by',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($schedule) {
+            self::logActivity($schedule, 'created');
+        });
+
+        static::updated(function ($schedule) {
+            self::logActivity($schedule, 'updated');
+        });
+
+        static::deleted(function ($schedule) {
+            self::logActivity($schedule, 'deleted');
+        });
+    }
+
+    protected static function logActivity($schedule, $action)
+    {
+        $actor = auth()->user();
+        $actorName = $actor ? $actor->name : 'Sistem';
+        
+        $studentName = $schedule->student->name ?? 'Siswa';
+        $time = \Carbon\Carbon::parse($schedule->date)->format('d/m/Y') . ' ' . 
+                \Carbon\Carbon::parse($schedule->start_time)->format('H:i');
+
+        $description = match($action) {
+            'created' => "{$actorName} membuat jadwal untuk {$studentName} ({$time})",
+            'updated' => "{$actorName} mengubah jadwal {$studentName} ({$time})",
+            'deleted' => "{$actorName} menghapus jadwal {$studentName} ({$time})",
+            default => "Aktivitas pada jadwal {$studentName}"
+        };
+
+        \App\Models\ScheduleLog::create([
+            'schedule_id' => $schedule->id,
+            'user_id' => $actor ? $actor->id : null,
+            'action' => $action,
+            'description' => $description,
+            'changes' => $action === 'updated' ? $schedule->getChanges() : null
+        ]);
+    }
+
     protected function casts(): array
     {
         return [

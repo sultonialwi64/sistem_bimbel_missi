@@ -216,6 +216,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('grade-levels', GradeLevelController::class);
 
         // Schedules management
+        Route::get('/schedules/logs', [ScheduleController::class, 'logs'])->name('schedules.logs');
         Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
         Route::get('/schedules/create', [ScheduleController::class, 'create'])->name('schedules.create');
         Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');

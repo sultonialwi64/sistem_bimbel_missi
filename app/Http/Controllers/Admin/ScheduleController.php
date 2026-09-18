@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\{Schedule, Student, Tutor, Subject};
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Models\ScheduleLog;
 
 class ScheduleController extends Controller
 {
@@ -63,7 +65,7 @@ class ScheduleController extends Controller
 
         foreach ($datesToCreate as $date) {
             // Cek jadwal tutor bentrok
-            $tutorConflict = Schedule::where('tutor_id', $validated['tutor_id'])
+            $tutorConflict = Schedule::with('student')->where('tutor_id', $validated['tutor_id'])
                 ->where('date', $date)
                 ->where(function($query) use ($validated) {
                     $query->where(function($q) use ($validated) {
@@ -71,16 +73,18 @@ class ScheduleController extends Controller
                           ->where('end_time', '>', $validated['start_time']);
                     });
                 })
-                ->where('status', 'scheduled')
-                ->exists();
+                ->whereIn('status', ['scheduled', 'completed'])
+                ->first();
 
             if ($tutorConflict) {
                 $formattedDate = \Carbon\Carbon::parse($date)->translatedFormat('d F Y');
-                $conflicts[] = "Tutor sudah memiliki jadwal mengajar pada tanggal {$formattedDate} di jam tersebut.";
+                $conflictTime = \Carbon\Carbon::parse($tutorConflict->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($tutorConflict->end_time)->format('H:i');
+                $studentName = $tutorConflict->student ? $tutorConflict->student->name : 'Siswa Lain';
+                $conflicts[] = "Tabrakan jadwal: Tutor sudah memiliki sesi pada {$formattedDate} jam {$conflictTime} (Siswa: {$studentName}).";
             }
 
             // Cek jadwal murid bentrok
-            $studentConflict = Schedule::where('student_id', $validated['student_id'])
+            $studentConflict = Schedule::with('tutor.user')->where('student_id', $validated['student_id'])
                 ->where('date', $date)
                 ->where(function($query) use ($validated) {
                     $query->where(function($q) use ($validated) {
@@ -88,12 +92,14 @@ class ScheduleController extends Controller
                           ->where('end_time', '>', $validated['start_time']);
                     });
                 })
-                ->where('status', 'scheduled')
-                ->exists();
+                ->whereIn('status', ['scheduled', 'completed'])
+                ->first();
 
             if ($studentConflict) {
                 $formattedDate = \Carbon\Carbon::parse($date)->translatedFormat('d F Y');
-                $conflicts[] = "Murid sudah memiliki jadwal bimbel pada tanggal {$formattedDate} di jam tersebut.";
+                $conflictTime = \Carbon\Carbon::parse($studentConflict->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($studentConflict->end_time)->format('H:i');
+                $tutorName = $studentConflict->tutor && $studentConflict->tutor->user ? $studentConflict->tutor->user->name : 'Tutor Lain';
+                $conflicts[] = "Tabrakan jadwal: Murid ini sudah memiliki sesi dengan Tutor {$tutorName} pada {$formattedDate} jam {$conflictTime}.";
             }
         }
 
@@ -133,6 +139,44 @@ class ScheduleController extends Controller
         return view('admin.schedules.show', compact('schedule'));
     }
 
+    public function logs()
+    {
+        $logs = ScheduleLog::with('user')->latest()->take(50)->get();
+
+        $html = '';
+        if ($logs->isEmpty()) {
+            $html = '<div class="text-center py-10 text-gray-500"><i class="fa-solid fa-clock-rotate-left text-4xl mb-3 text-gray-300"></i><p>Belum ada riwayat aktivitas jadwal.</p></div>';
+        } else {
+            foreach ($logs as $log) {
+                $icon = match($log->action) {
+                    'created' => '<div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-plus text-blue-600 text-xs"></i></div>',
+                    'updated' => '<div class="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-pen text-orange-600 text-xs"></i></div>',
+                    'deleted' => '<div class="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-trash text-red-600 text-xs"></i></div>',
+                    default => '<div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-clock-rotate-left text-gray-600 text-xs"></i></div>'
+                };
+                
+                $time = \Carbon\Carbon::parse($log->created_at)->diffForHumans();
+                $date = \Carbon\Carbon::parse($log->created_at)->translatedFormat('d M Y, H:i');
+                
+                $html .= '<div class="flex gap-4 p-4 hover:bg-gray-50 border-b border-gray-100 transition-colors">';
+                $html .= $icon;
+                $html .= '<div>';
+                $html .= '<p class="text-sm font-medium text-gray-800">' . htmlspecialchars($log->description) . '</p>';
+                $html .= '<div class="flex items-center gap-2 mt-1">';
+                $html .= '<span class="text-xs text-gray-500" title="'.$date.'">' . $time . '</span>';
+                if ($log->user) {
+                    $html .= '<span class="text-xs font-medium px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">' . htmlspecialchars($log->user->name) . '</span>';
+                } else {
+                    $html .= '<span class="text-xs font-medium px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">Sistem</span>';
+                }
+                $html .= '</div>';
+                $html .= '</div></div>';
+            }
+        }
+
+        return response()->json(['html' => $html]);
+    }
+
     public function edit(Schedule $schedule)
     {
         $tutors = Tutor::where('status', 'active')->get();
@@ -159,8 +203,58 @@ class ScheduleController extends Controller
             'status' => ['required', 'in:scheduled,completed,cancelled,rescheduled'],
             'notes' => ['nullable', 'string'],
         ]);
+        // Validation 1: Cek jadwal tutor bentrok (exclude jadwal ini sendiri)
+        $tutorConflict = Schedule::with('student')->where('id', '!=', $schedule->id)
+            ->where('tutor_id', $validated['tutor_id'])
+            ->where('date', $validated['date'])
+            ->where(function($query) use ($validated) {
+                $query->where(function($q) use ($validated) {
+                    $q->where('start_time', '<', $validated['end_time'])
+                      ->where('end_time', '>', $validated['start_time']);
+                });
+            })
+            ->whereIn('status', ['scheduled', 'completed'])
+            ->first();
 
+        if ($tutorConflict) {
+            $conflictTime = \Carbon\Carbon::parse($tutorConflict->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($tutorConflict->end_time)->format('H:i');
+            $studentName = $tutorConflict->student ? $tutorConflict->student->name : 'Siswa Lain';
+            return back()->withInput()->withErrors(['time_conflict' => "Tabrakan jadwal: Tutor sudah memiliki sesi pada jam {$conflictTime} (Siswa: {$studentName})."]);
+        }
+
+        // Validation 2: Cek jadwal murid bentrok (exclude jadwal ini sendiri)
+        $studentConflict = Schedule::with('tutor.user')->where('id', '!=', $schedule->id)
+            ->where('student_id', $validated['student_id'])
+            ->where('date', $validated['date'])
+            ->where(function($query) use ($validated) {
+                $query->where(function($q) use ($validated) {
+                    $q->where('start_time', '<', $validated['end_time'])
+                      ->where('end_time', '>', $validated['start_time']);
+                });
+            })
+            ->whereIn('status', ['scheduled', 'completed'])
+            ->first();
+
+        if ($studentConflict) {
+            $conflictTime = \Carbon\Carbon::parse($studentConflict->start_time)->format('H:i') . ' - ' . \Carbon\Carbon::parse($studentConflict->end_time)->format('H:i');
+            $tutorName = $studentConflict->tutor && $studentConflict->tutor->user ? $studentConflict->tutor->user->name : 'Tutor Lain';
+            return back()->withInput()->withErrors(['time_conflict' => "Tabrakan jadwal: Murid ini sudah memiliki sesi dengan {$tutorName} pada jam {$conflictTime}."]);
+        }
         $schedule->update($validated);
+
+        // Sinkronisasi data ke laporan sesi dan absensi jika tutor atau muridnya diubah
+        if ($schedule->sessionReport) {
+            $schedule->sessionReport->update([
+                'student_id' => $schedule->student_id,
+                'tutor_id' => $schedule->tutor_id,
+            ]);
+        }
+        
+        if ($schedule->attendance) {
+            $schedule->attendance->update([
+                'tutor_id' => $schedule->tutor_id,
+            ]);
+        }
 
         return redirect()->route('admin.schedules.index')
             ->with('success', 'Jadwal berhasil diupdate!');
