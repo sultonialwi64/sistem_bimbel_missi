@@ -27,16 +27,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Parent/Client</label>
-                            <select name="client_id" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="">Select Parent</option>
-                                @foreach($clients as $client)
-                                    <option value="{{ $client->id }}" {{ old('client_id') == $client->id ? 'selected' : '' }}>
-                                        {{ $client->user->name }} ({{ $client->user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Parent/Client</label>
+                            <x-client-selector name="client_id" :value="old('client_id')" />
                         </div>
                         
                         <div>

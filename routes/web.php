@@ -129,7 +129,12 @@ Route::get('/tutors', function () {
     return view('tutors.index', compact('tutors'));
 })->name('tutors.public.index');
 
+use App\Http\Controllers\SearchClientController;
+
 Route::middleware('auth')->group(function () {
+    // API Route for Client Search Component
+    Route::get('/search-clients', [SearchClientController::class, 'search'])->name('search.clients');
+    
     // Game Prototype (Logged in Access for Testing)
     Route::get('/game-prototype', function () {
         return view('client.game-prototype.index');

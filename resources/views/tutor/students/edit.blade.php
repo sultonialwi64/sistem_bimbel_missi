@@ -11,19 +11,15 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Full Name</label>
                     <input type="text" name="name" value="{{ old('name', $student->name) }}" required class="mt-1 block w-full rounded-md border-gray-300">
-                </div>
+                    </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Birth Date</label>
                         <input type="date" name="birth_date" value="{{ old('birth_date', $student->birth_date?->format('Y-m-d')) }}" class="mt-1 block w-full rounded-md border-gray-300">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Parent</label>
-                        <select name="client_id" required class="mt-1 block w-full rounded-md border-gray-300">
-                            @foreach($clients as $client)
-                                <option value="{{ $client->id }}" {{ $student->client_id == $client->id ? 'selected' : '' }}>{{ $client->user->name }}</option>
-                            @endforeach
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Parent</label>
+                        <x-client-selector name="client_id" :value="$student->client_id" />
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
