@@ -28,6 +28,11 @@
             $textColor = '#475569';
         }
 
+        $classNames = [];
+        if ($s->status === 'completed' && $s->sessionReport === null) {
+            $classNames[] = 'needs-report-pulse';
+        }
+
         return [
             'id' => $s->id,
             'title' => $s->student->name,
@@ -43,7 +48,9 @@
                 'subject' => $s->subject->name,
                 'status' => $s->status,
                 'textColor' => $textColor,
+                'has_report' => $s->sessionReport !== null,
             ],
+            'classNames' => $classNames,
         ];
     })->values()->toArray();
 @endphp
@@ -314,6 +321,15 @@
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         z-index: 50 !important;
     }
+    @keyframes pulse-glow {
+        0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); }
+        70% { box-shadow: 0 0 0 5px rgba(234, 179, 8, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+    }
+    .needs-report-pulse {
+        border: 2px solid #fbbf24 !important;
+        animation: pulse-glow 2s infinite ease-in-out;
+    }
     .fc-daygrid-day-number {
         font-weight: 600;
         color: #64748b;
@@ -419,9 +435,10 @@
             },
             eventContent: function(arg) {
                 var p = arg.event.extendedProps;
+                var reportIcon = p.has_report ? '<span style="background:rgba(0,0,0,0.2);padding:2px 4px;border-radius:4px;margin-left:4px;font-size:9px;display:inline-flex;align-items:center;color:#ffffff;"><svg style="width:10px;height:10px;margin-right:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="hidden sm:inline">Laporan</span></span>' : '';
                 return {
                     html: '<div style="padding:3px 6px;line-height:1.3;overflow:hidden;color:'+p.textColor+';">' +
-                          '<div style="font-size:10px;font-weight:700;opacity:0.9;">' + arg.timeText + '</div>' +
+                          '<div style="font-size:10px;font-weight:700;opacity:0.9;">' + arg.timeText + reportIcon + '</div>' +
                           '<div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.student_name + '</div>' +
                           '<div style="font-size:10px;opacity:0.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.subject + '</div>' +
                           '</div>'

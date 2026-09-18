@@ -16,7 +16,7 @@ class ScheduleController extends Controller
             ->paginate(15);
             
         // Get all schedules for the calendar view
-        $allSchedules = Schedule::with(['tutor.user', 'student', 'subject'])->get();
+        $allSchedules = Schedule::with(['tutor.user', 'student', 'subject', 'sessionReport'])->get();
         
         $tutors = Tutor::where('status', 'active')->get();
         $students = Student::where('is_active', true)
