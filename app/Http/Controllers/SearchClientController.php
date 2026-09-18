@@ -21,7 +21,6 @@ class SearchClientController extends Controller
                 });
             })
             ->latest()
-            ->limit(20)
             ->get()
             ->map(function ($client) {
                 return [
