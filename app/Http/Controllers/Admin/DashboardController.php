@@ -120,7 +120,11 @@ class DashboardController extends Controller
         }
 
         $categories = array_map(function($date) {
-            return \Carbon\Carbon::parse($date)->format('d M');
+            $carbon = \Carbon\Carbon::parse($date)->locale('id');
+            return [
+                $carbon->format('d M'),
+                $carbon->translatedFormat('l')
+            ];
         }, array_keys($dailySessions));
 
         $chart2Series = [];
