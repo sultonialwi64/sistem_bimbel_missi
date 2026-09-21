@@ -4,56 +4,6 @@
 @section('page-title', 'My Schedules')
 @section('page-subtitle', 'View and manage your teaching schedules')
 
-@php
-    $calendarEvents = $allSchedules->map(function($s) {
-        if ($s->status === 'completed') {
-            $bgColor = '#10b981'; // Green
-            $borderColor = '#059669';
-            $textColor = '#ffffff';
-        } else if ($s->status === 'scheduled') {
-            $bgColor = '#ffffff'; // White
-            $borderColor = '#e2e8f0'; // Gray
-            $textColor = '#1e293b'; // Dark
-        } else if ($s->status === 'cancelled') {
-            $bgColor = '#ef4444';
-            $borderColor = '#dc2626';
-            $textColor = '#ffffff';
-        } else if ($s->status === 'rescheduled') {
-            $bgColor = '#f59e0b';
-            $borderColor = '#d97706';
-            $textColor = '#ffffff';
-        } else {
-            $bgColor = '#f1f5f9';
-            $borderColor = '#cbd5e1';
-            $textColor = '#475569';
-        }
-
-        $classNames = [];
-        if ($s->status === 'completed' && $s->sessionReport === null) {
-            $classNames[] = 'needs-report-pulse';
-        }
-
-        return [
-            'id' => $s->id,
-            'title' => $s->student->name,
-            'start' => $s->date->format('Y-m-d') . 'T' . $s->start_time->format('H:i:s'),
-            'end' => $s->date->format('Y-m-d') . 'T' . $s->end_time->format('H:i:s'),
-            'url' => route('tutor.schedules.show', $s->id),
-            'backgroundColor' => $bgColor,
-            'borderColor' => $borderColor,
-            'textColor' => $textColor,
-            'display' => 'block',
-            'extendedProps' => [
-                'student_name' => $s->student->name,
-                'subject' => $s->subject->name,
-                'status' => $s->status,
-                'textColor' => $textColor,
-                'has_report' => $s->sessionReport !== null,
-            ],
-            'classNames' => $classNames,
-        ];
-    })->values()->toArray();
-@endphp
 
 @section('content')
 <div class="space-y-8" x-data="{ 
@@ -550,7 +500,6 @@
         var calendarEl = document.getElementById('calendar');
         if (!calendarEl) return;
 
-        var eventsData = @json($calendarEvents);
         var isMobile = window.innerWidth < 640;
         var lastWidth = window.innerWidth;
 
@@ -559,14 +508,14 @@
             headerToolbar: isMobile ? {
                 left: 'prev,next',
                 center: 'title',
-                right: 'today,dayGridMonth,listWeek'
+                right: 'today,listWeek,dayGridMonth'
             } : {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             themeSystem: 'standard',
-            events: eventsData,
+            events: '{{ route('tutor.schedules.calendar-events') }}',
             eventTimeFormat: {
                 hour: '2-digit',
                 minute: '2-digit',

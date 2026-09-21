@@ -17,16 +17,13 @@ class ScheduleController extends Controller
             ->latest()
             ->paginate(15);
             
-        // Get all schedules for the calendar view
-        $allSchedules = Schedule::with(['tutor.user', 'student', 'subject', 'sessionReport'])->get();
-        
         $tutors = Tutor::where('status', 'active')->get();
         $students = Student::where('is_active', true)
             ->whereHas('client', fn ($query) => $query->where('is_active', true))
             ->get();
         $subjects = Subject::where('is_active', true)->get();
         
-        return view('admin.schedules.index', compact('schedules', 'allSchedules', 'tutors', 'students', 'subjects'));
+        return view('admin.schedules.index', compact('schedules', 'tutors', 'students', 'subjects'));
     }
 
     public function create()
@@ -265,6 +262,75 @@ class ScheduleController extends Controller
         $schedule->delete();
         return redirect()->route('admin.schedules.index')
             ->with('success', 'Jadwal berhasil dihapus!');
+    }
+
+    public function calendarEvents(Request $request)
+    {
+        $start = $request->query('start');
+        $end = $request->query('end');
+
+        $query = Schedule::with(['tutor.user', 'student', 'subject', 'sessionReport']);
+
+        if ($start && $end) {
+            $query->whereBetween('date', [
+                Carbon::parse($start)->format('Y-m-d'),
+                Carbon::parse($end)->format('Y-m-d')
+            ]);
+        }
+
+        $schedules = $query->get();
+
+        $events = $schedules->map(function($s) {
+            if ($s->status === 'completed') {
+                $bgColor = '#10b981'; // Green
+                $borderColor = '#059669';
+                $textColor = '#ffffff';
+            } else if ($s->status === 'scheduled') {
+                $bgColor = '#ffffff'; // White
+                $borderColor = '#e2e8f0'; // Gray
+                $textColor = '#1e293b'; // Dark
+            } else if ($s->status === 'cancelled') {
+                $bgColor = '#ef4444';
+                $borderColor = '#dc2626';
+                $textColor = '#ffffff';
+            } else if ($s->status === 'rescheduled') {
+                $bgColor = '#f59e0b';
+                $borderColor = '#d97706';
+                $textColor = '#ffffff';
+            } else {
+                $bgColor = '#f1f5f9';
+                $borderColor = '#cbd5e1';
+                $textColor = '#475569';
+            }
+
+            $classNames = [];
+            if ($s->status === 'completed' && $s->sessionReport === null) {
+                $classNames[] = 'needs-report-pulse';
+            }
+
+            return [
+                'id' => $s->id,
+                'title' => $s->student->name . ' - ' . ($s->tutor->user->name ?? ''),
+                'start' => $s->date->format('Y-m-d') . 'T' . $s->start_time->format('H:i:s'),
+                'end' => $s->date->format('Y-m-d') . 'T' . $s->end_time->format('H:i:s'),
+                'url' => route('admin.schedules.show', $s->id),
+                'backgroundColor' => $bgColor,
+                'borderColor' => $borderColor,
+                'textColor' => $textColor,
+                'display' => 'block',
+                'extendedProps' => [
+                    'tutor_name' => $s->tutor->user->name ?? '',
+                    'student_name' => $s->student->name,
+                    'subject' => $s->subject->name,
+                    'status' => $s->status,
+                    'textColor' => $textColor,
+                    'has_report' => $s->sessionReport !== null,
+                ],
+                'classNames' => $classNames,
+            ];
+        });
+
+        return response()->json($events);
     }
 
     public function missingRecords(Request $request)

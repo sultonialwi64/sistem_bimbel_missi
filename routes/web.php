@@ -222,6 +222,7 @@ Route::middleware('auth')->group(function () {
 
         // Schedules management
         Route::get('/schedules/missing-records', [ScheduleController::class, 'missingRecords'])->name('schedules.missing-records');
+        Route::get('/schedules/calendar-events', [ScheduleController::class, 'calendarEvents'])->name('schedules.calendar-events');
         Route::get('/schedules/logs', [ScheduleController::class, 'logs'])->name('schedules.logs');
         Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
         Route::get('/schedules/create', [ScheduleController::class, 'create'])->name('schedules.create');
@@ -269,6 +270,7 @@ Route::middleware('auth')->group(function () {
 
         // Schedules
         Route::get('/schedules/missing-records', [App\Http\Controllers\Tutor\ScheduleController::class, 'missingRecords'])->name('schedules.missing-records');
+        Route::get('/schedules/calendar-events', [App\Http\Controllers\Tutor\ScheduleController::class, 'calendarEvents'])->name('schedules.calendar-events');
         Route::get('/schedules', [App\Http\Controllers\Tutor\ScheduleController::class, 'index'])->name('schedules.index');
         Route::get('/schedules/create', [App\Http\Controllers\Tutor\ScheduleController::class, 'create'])->name('schedules.create');
         Route::post('/schedules', [App\Http\Controllers\Tutor\ScheduleController::class, 'store'])->name('schedules.store');
