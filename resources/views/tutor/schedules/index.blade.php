@@ -56,7 +56,34 @@
 @endphp
 
 @section('content')
-<div class="space-y-8" x-data="{ viewMode: 'calendar' }">
+<div class="space-y-8" x-data="{ 
+    viewMode: 'calendar',
+    showMissingModal: false,
+    missingData: { missingAttendances: [], missingReports: [] },
+    isFetchingMissing: false,
+    activeMissingTab: 'attendance',
+    fetchMissingRecords() {
+        this.showMissingModal = true;
+        this.isFetchingMissing = true;
+        let month = '';
+        if (window.fullCalendarInstance) {
+            let date = window.fullCalendarInstance.getDate();
+            let m = date.getMonth() + 1;
+            let y = date.getFullYear();
+            month = '?month=' + y + '-' + (m < 10 ? '0' + m : m);
+        }
+        fetch('{{ route('tutor.schedules.missing-records') }}' + month)
+            .then(res => res.json())
+            .then(data => {
+                this.missingData = data;
+                this.isFetchingMissing = false;
+            })
+            .catch(err => {
+                this.isFetchingMissing = false;
+                alert('Gagal memuat data tunggakan.');
+            });
+    }
+}">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <p class="text-gray-500 text-sm">Kelola jadwal mengajar Anda</p>
@@ -81,6 +108,12 @@
                     <span class="hidden sm:inline text-xs">Daftar</span>
                 </button>
             </div>
+
+            {{-- Cek Tunggakan Button --}}
+            <button @click="fetchMissingRecords()" class="px-3 py-2 bg-red-50 rounded-xl text-sm font-bold text-red-600 hover:bg-red-100 hover:text-red-700 border border-red-200 shadow-sm flex items-center gap-2 transition-all duration-200">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span class="hidden sm:inline">Cek Tunggakan</span>
+            </button>
 
             <a href="{{ route('tutor.schedules.create') }}" class="btn-primary-gradient text-white font-bold px-4 py-2.5 rounded-xl hover:shadow-2xl flex items-center gap-2 shadow-xl shadow-indigo-500/30 transition-all flex-1 sm:flex-auto justify-center">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,6 +317,107 @@
             </div>
         @endif
     </div>
+
+    {{-- Missing Records Modal --}}
+    <div x-show="showMissingModal" 
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         aria-labelledby="modal-title" 
+         role="dialog" 
+         aria-modal="true"
+         style="display: none;">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div x-show="showMissingModal" 
+                 x-transition:enter="ease-out duration-300" 
+                 x-transition:enter-start="opacity-0" 
+                 x-transition:enter-end="opacity-100" 
+                 x-transition:leave="ease-in duration-200" 
+                 x-transition:leave-start="opacity-100" 
+                 x-transition:leave-end="opacity-0" 
+                 class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" 
+                 @click="showMissingModal = false"
+                 aria-hidden="true"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div x-show="showMissingModal" 
+                 x-transition:enter="ease-out duration-300" 
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+                 x-transition:leave="ease-in duration-200" 
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                 class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                
+                <div class="bg-red-600 px-4 py-4 sm:px-6 flex justify-between items-center">
+                    <h3 class="text-lg leading-6 font-bold text-white flex items-center gap-2" id="modal-title">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Daftar Tunggakan Anda
+                    </h3>
+                    <button @click="showMissingModal = false" class="text-red-100 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="px-4 pt-5 pb-4 sm:p-6">
+                    <div class="flex border-b border-gray-200 mb-4">
+                        <button @click="activeMissingTab = 'attendance'" :class="activeMissingTab === 'attendance' ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-2 px-4 border-b-2 font-medium text-sm transition-colors">
+                            Tunggakan Absen
+                            <span x-show="!isFetchingMissing" x-text="missingData.missingAttendances.length" class="ml-2 bg-red-100 text-red-600 py-0.5 px-2 rounded-full text-xs"></span>
+                        </button>
+                        <button @click="activeMissingTab = 'report'" :class="activeMissingTab === 'report' ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-2 px-4 border-b-2 font-medium text-sm transition-colors">
+                            Tunggakan Laporan
+                            <span x-show="!isFetchingMissing" x-text="missingData.missingReports.length" class="ml-2 bg-red-100 text-red-600 py-0.5 px-2 rounded-full text-xs"></span>
+                        </button>
+                    </div>
+
+                    <div x-show="isFetchingMissing" class="py-10 text-center">
+                        <i class="fa-solid fa-spinner fa-spin text-3xl text-red-500"></i>
+                        <p class="mt-2 text-gray-500">Memuat data...</p>
+                    </div>
+
+                    <div x-show="!isFetchingMissing" class="overflow-y-auto max-h-96 pr-2 custom-scrollbar">
+                        {{-- Attendance Tab --}}
+                        <div x-show="activeMissingTab === 'attendance'">
+                            <template x-if="missingData.missingAttendances.length === 0">
+                                <div class="text-center py-8 text-gray-500">
+                                    <i class="fa-solid fa-check-circle text-4xl text-green-400 mb-2"></i>
+                                    <p>Hore! Anda tidak ada tunggakan absen.</p>
+                                </div>
+                            </template>
+                            <template x-for="item in missingData.missingAttendances" :key="item.id">
+                                <div class="bg-red-50 border border-red-100 rounded-xl p-3 mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:shadow-md transition-shadow">
+                                    <div>
+                                        <div class="font-bold text-gray-800" x-text="item.student_name"></div>
+                                        <div class="text-sm text-red-600 font-medium" x-text="item.date_formatted + ' | ' + item.time_formatted"></div>
+                                    </div>
+                                    <a :href="item.url" class="btn-primary-gradient px-3 py-1.5 text-xs text-white rounded-lg whitespace-nowrap">Isi Absen</a>
+                                </div>
+                            </template>
+                        </div>
+
+                        {{-- Report Tab --}}
+                        <div x-show="activeMissingTab === 'report'">
+                            <template x-if="missingData.missingReports.length === 0">
+                                <div class="text-center py-8 text-gray-500">
+                                    <i class="fa-solid fa-check-circle text-4xl text-green-400 mb-2"></i>
+                                    <p>Hore! Anda tidak ada tunggakan laporan.</p>
+                                </div>
+                            </template>
+                            <template x-for="item in missingData.missingReports" :key="item.id">
+                                <div class="bg-orange-50 border border-orange-100 rounded-xl p-3 mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:shadow-md transition-shadow">
+                                    <div>
+                                        <div class="font-bold text-gray-800" x-text="item.student_name"></div>
+                                        <div class="text-sm text-orange-600 font-medium" x-text="item.date_formatted + ' | ' + item.time_formatted"></div>
+                                    </div>
+                                    <a :href="item.url" class="btn-primary-gradient px-3 py-1.5 text-xs text-white rounded-lg whitespace-nowrap">Isi Laporan</a>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -477,6 +611,7 @@
         });
 
         calendar.render();
+        window.fullCalendarInstance = calendar;
     });
 </script>
 @endpush

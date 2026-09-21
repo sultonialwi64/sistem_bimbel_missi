@@ -221,6 +221,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('grade-levels', GradeLevelController::class);
 
         // Schedules management
+        Route::get('/schedules/missing-records', [ScheduleController::class, 'missingRecords'])->name('schedules.missing-records');
         Route::get('/schedules/logs', [ScheduleController::class, 'logs'])->name('schedules.logs');
         Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
         Route::get('/schedules/create', [ScheduleController::class, 'create'])->name('schedules.create');
@@ -267,6 +268,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/dashboard/mark-monthly-completed/{student}', [TutorDashboardController::class, 'markMonthlyCompleted'])->name('dashboard.mark-monthly-completed');
 
         // Schedules
+        Route::get('/schedules/missing-records', [App\Http\Controllers\Tutor\ScheduleController::class, 'missingRecords'])->name('schedules.missing-records');
         Route::get('/schedules', [App\Http\Controllers\Tutor\ScheduleController::class, 'index'])->name('schedules.index');
         Route::get('/schedules/create', [App\Http\Controllers\Tutor\ScheduleController::class, 'create'])->name('schedules.create');
         Route::post('/schedules', [App\Http\Controllers\Tutor\ScheduleController::class, 'store'])->name('schedules.store');

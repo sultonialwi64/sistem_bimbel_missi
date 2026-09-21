@@ -246,4 +246,62 @@ class ScheduleController extends Controller
 
         return redirect()->route('tutor.schedules.index')->with('success', 'Jadwal berhasil dihapus.');
     }
+
+    public function missingRecords(Request $request)
+    {
+        $month = $request->query('month');
+        $tutorId = Auth::user()->tutor->id;
+        
+        $queryAttendances = Schedule::with(['student'])
+            ->where('tutor_id', $tutorId)
+            ->where('status', 'scheduled')
+            ->whereDoesntHave('attendance');
+
+        $queryReports = Schedule::with(['student'])
+            ->where('tutor_id', $tutorId)
+            ->where('status', 'completed')
+            ->whereDoesntHave('sessionReport');
+
+        if ($month) {
+            $startDate = \Carbon\Carbon::parse($month)->startOfMonth();
+            $endDate = \Carbon\Carbon::parse($month)->endOfMonth();
+            $queryAttendances->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+            $queryReports->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+        }
+
+        $missingAttendances = $queryAttendances
+            ->orderBy('date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->get()
+            ->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'date_formatted' => $s->date->format('d M Y'),
+                    'time_formatted' => $s->start_time->format('H:i') . ' - ' . $s->end_time->format('H:i'),
+                    'tutor_name' => '-', // Tutor views their own schedule, not needed
+                    'student_name' => $s->student->name ?? '-',
+                    'url' => route('tutor.schedules.show', $s->id)
+                ];
+            });
+
+        $missingReports = $queryReports
+            ->orderBy('date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->get()
+            ->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'date_formatted' => $s->date->format('d M Y'),
+                    'time_formatted' => $s->start_time->format('H:i') . ' - ' . $s->end_time->format('H:i'),
+                    'tutor_name' => '-',
+                    'student_name' => $s->student->name ?? '-',
+                    'url' => route('tutor.schedules.show', $s->id)
+                ];
+            });
+
+        return response()->json([
+            'missingAttendances' => $missingAttendances,
+            'missingReports' => $missingReports
+        ]);
+    }
 }
