@@ -78,9 +78,7 @@ class DashboardController extends Controller
             'total_schedules' => Schedule::count(),
             'today_schedules' => Schedule::whereDate('date', today())->count(),
             'this_month_schedules' => Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])->count(),
-            'average_monthly_schedules' => Schedule::min('date') 
-                ? round(Schedule::count() / max(1, Carbon::parse(Schedule::min('date'))->startOfMonth()->diffInMonths(now()->startOfMonth()) + 1)) 
-                : 0,
+            'average_daily_schedules' => round(Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])->count() / $financialDate->daysInMonth, 1),
             'pending_payments' => $pendingPayments,
             'monthly_revenue' => $monthlyRevenue,
             'net_income' => max(0, $netIncome - $realtimeTotalDiscount),
