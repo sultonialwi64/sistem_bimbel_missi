@@ -72,15 +72,9 @@
                 </div>
             </div>
             <p class="text-4xl font-black text-white leading-none mb-4">{{ $stats['today_schedules'] }}</p>
-            <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-{{ $stats['growth']['sessions'] >= 0 ? 'green' : 'red' }}-100 text-{{ $stats['growth']['sessions'] >= 0 ? 'green' : 'red' }}-700 rounded-full text-xs font-bold">
-                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $stats['growth']['sessions'] >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6' }}"/></svg>
-                    {{ $stats['growth']['sessions'] > 0 ? '+' : '' }}{{ $stats['growth']['sessions'] }}% vs Lalu
-                </span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
-                    {{ $stats['total_schedules'] }} Total
-                </span>
-            </div>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
+                {{ $stats['total_schedules'] }} Total
+            </span>
         </div>
 
         <!-- 4. Monthly Revenue -->
