@@ -131,6 +131,15 @@
                         </svg>
                         Sesi per Hari (Bulan Ini)
                     </h3>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-900/50 text-indigo-100 border border-indigo-700">
+                            Total: {{ $stats['this_month_schedules'] }} Sesi
+                        </span>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-{{ $stats['this_month_schedules'] >= $stats['average_monthly_schedules'] ? 'green' : 'amber' }}-500/20 text-{{ $stats['this_month_schedules'] >= $stats['average_monthly_schedules'] ? 'green' : 'amber' }}-300 border border-{{ $stats['this_month_schedules'] >= $stats['average_monthly_schedules'] ? 'green' : 'amber' }}-500/30">
+                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            Rata-rata: {{ $stats['average_monthly_schedules'] }} / bln
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="p-6">
