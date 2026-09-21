@@ -22,53 +22,14 @@ class DashboardController extends Controller
         $invoiceDueStart = $financialStart->copy()->addDays(7);
         $invoiceDueEnd = $financialEnd->copy()->addDays(7);
 
-        // 1. Hitung omset, diskon, dan net income dengan Aggregate Query
-        $validStudentCounts = Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
-            ->where('status', 'completed')
-            ->whereHas('attendance', function ($q) {
-                $q->whereIn('status', ['hadir', 'pindah_lokasi']);
-            })
-            ->selectRaw('student_id, count(*) as count')
-            ->groupBy('student_id')
-            ->get();
+        $currentStats = $this->getMonthlyStats($financialStart, $financialEnd);
+        $prevStats = $this->getMonthlyStats($financialStart->copy()->subMonth()->startOfMonth(), $financialStart->copy()->subMonth()->endOfMonth());
 
-        $validSessionsCount = 0;
-        $expectedGrossRevenue = 0;
-        $realtimeTotalDiscount = 0;
-        $netIncome = 0;
-
-        if ($validStudentCounts->isNotEmpty()) {
-            $studentIds = $validStudentCounts->pluck('student_id');
-            // Hanya load Student dan Client yang ada sesinya saja
-            $students = Student::with('client')->whereIn('id', $studentIds)->get()->keyBy('id');
-
-            foreach ($validStudentCounts as $item) {
-                $count = $item->count;
-                $validSessionsCount += $count;
-                $student = $students->get($item->student_id);
-                
-                if ($student && $student->client) {
-                    $client = $student->client;
-                    $baseAmount = $count * $client->session_price;
-                    $threshold = config('bimbel.discount.threshold', 8);
-                    $discountMultiplier = floor($count / $threshold);
-                    $discount = $discountMultiplier * $client->discount;
-                    
-                    $expectedGrossRevenue += ($baseAmount - $discount);
-                    $realtimeTotalDiscount += $discount;
-                    
-                    // Net income
-                    $margin = $client->company_margin ?? 10000;
-                    $netIncome += ($count * $margin);
-                }
-            }
-        }
-
-        $monthlyRevenue = Payment::where('status', 'paid')
-            ->whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
-            ->sum('amount');
-            
-        $pendingPayments = max(0, $expectedGrossRevenue - $monthlyRevenue);
+        $growth = [
+            'revenue' => $prevStats['revenue'] > 0 ? round((($currentStats['revenue'] - $prevStats['revenue']) / $prevStats['revenue']) * 100, 1) : ($currentStats['revenue'] > 0 ? 100 : 0),
+            'sessions' => $prevStats['total_schedules'] > 0 ? round((($currentStats['total_schedules'] - $prevStats['total_schedules']) / $prevStats['total_schedules']) * 100, 1) : ($currentStats['total_schedules'] > 0 ? 100 : 0),
+            'net_income' => $prevStats['net_income'] > 0 ? round((($currentStats['net_income'] - $prevStats['net_income']) / $prevStats['net_income']) * 100, 1) : ($currentStats['net_income'] > 0 ? 100 : 0),
+        ];
 
         $stats = [
             'total_tutors' => Tutor::count(),
@@ -77,14 +38,42 @@ class DashboardController extends Controller
             'total_students' => Student::where('is_active', true)->count(),
             'total_schedules' => Schedule::count(),
             'today_schedules' => Schedule::whereDate('date', today())->count(),
-            'this_month_schedules' => Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])->count(),
-            'average_daily_schedules' => round(Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])->count() / $financialDate->daysInMonth, 1),
-            'pending_payments' => $pendingPayments,
-            'monthly_revenue' => $monthlyRevenue,
-            'net_income' => max(0, $netIncome - $realtimeTotalDiscount),
-            'net_income_sessions' => $validSessionsCount,
+            'this_month_schedules' => $currentStats['total_schedules'],
+            'average_daily_schedules' => round($currentStats['total_schedules'] / $financialDate->daysInMonth, 1),
+            'pending_payments' => max(0, $currentStats['expected_gross'] - $currentStats['revenue']),
+            'monthly_revenue' => $currentStats['revenue'],
+            'net_income' => $currentStats['net_income'],
+            'net_income_sessions' => $currentStats['valid_sessions'],
             'net_income_rate' => null, // Dinamis
+            'growth' => $growth,
         ];
+
+        // Top Subjects (Donut Chart)
+        $topSubjectsDb = Schedule::whereBetween('schedules.date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
+            ->where('schedules.status', 'completed')
+            ->join('subjects', 'schedules.subject_id', '=', 'subjects.id')
+            ->join('grade_levels', 'subjects.grade_level_id', '=', 'grade_levels.id')
+            ->selectRaw('CONCAT(subjects.name, " - ", grade_levels.name) as name, count(*) as count')
+            ->groupBy('subjects.id', 'subjects.name', 'grade_levels.name')
+            ->orderByDesc('count')
+            ->take(5)
+            ->get();
+            
+        $topSubjects = [
+            'labels' => $topSubjectsDb->pluck('name'),
+            'series' => $topSubjectsDb->pluck('count')
+        ];
+
+        // Top 5 Tutors (Leaderboard)
+        $topTutors = Schedule::whereBetween('schedules.date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
+            ->where('schedules.status', 'completed')
+            ->join('tutors', 'schedules.tutor_id', '=', 'tutors.id')
+            ->join('users', 'tutors.user_id', '=', 'users.id')
+            ->selectRaw('users.name as tutor_name, count(*) as count')
+            ->groupBy('tutors.id', 'users.name')
+            ->orderByDesc('count')
+            ->take(5)
+            ->get();
 
         // 2. Prepare chart data using DB Aggregates (ALL schedules)
         $dailySessionsDb = Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
@@ -129,6 +118,11 @@ class DashboardController extends Controller
             ];
         }, array_keys($dailySessions));
 
+        $fullDates = array_map(function($date) {
+            $carbon = \Carbon\Carbon::parse($date)->locale('id');
+            return $carbon->translatedFormat('l, d F Y');
+        }, array_keys($dailySessions));
+
         $chart2Series = [];
         foreach ($tutorDailySessions as $tutor => $data) {
             $chart2Series[] = [
@@ -139,6 +133,7 @@ class DashboardController extends Controller
 
         $chartData = [
             'categories' => $categories,
+            'full_dates' => $fullDates,
             'daily_sessions' => array_values($dailySessions),
             'tutor_series' => $chart2Series
         ];
@@ -148,6 +143,65 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentPayments', 'chartData', 'financialMonth'));
+        return view('admin.dashboard', compact('stats', 'recentPayments', 'chartData', 'financialMonth', 'topSubjects', 'topTutors'));
+    }
+
+    private function getMonthlyStats(Carbon $start, Carbon $end)
+    {
+        $invoiceDueStart = $start->copy()->addDays(7);
+        $invoiceDueEnd = $end->copy()->addDays(7);
+
+        $validStudentCounts = Schedule::whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
+            ->where('status', 'completed')
+            ->whereHas('attendance', function ($q) {
+                $q->whereIn('status', ['hadir', 'pindah_lokasi']);
+            })
+            ->selectRaw('student_id, count(*) as count')
+            ->groupBy('student_id')
+            ->get();
+
+        $validSessionsCount = 0;
+        $expectedGrossRevenue = 0;
+        $realtimeTotalDiscount = 0;
+        $netIncome = 0;
+
+        if ($validStudentCounts->isNotEmpty()) {
+            $studentIds = $validStudentCounts->pluck('student_id');
+            $students = Student::with('client')->whereIn('id', $studentIds)->get()->keyBy('id');
+
+            foreach ($validStudentCounts as $item) {
+                $count = $item->count;
+                $validSessionsCount += $count;
+                $student = $students->get($item->student_id);
+                
+                if ($student && $student->client) {
+                    $client = $student->client;
+                    $baseAmount = $count * $client->session_price;
+                    $threshold = config('bimbel.discount.threshold', 8);
+                    $discountMultiplier = floor($count / $threshold);
+                    $discount = $discountMultiplier * $client->discount;
+                    
+                    $expectedGrossRevenue += ($baseAmount - $discount);
+                    $realtimeTotalDiscount += $discount;
+                    
+                    $margin = $client->company_margin ?? 10000;
+                    $netIncome += ($count * $margin);
+                }
+            }
+        }
+
+        $monthlyRevenue = Payment::where('status', 'paid')
+            ->whereBetween('due_date', [$invoiceDueStart->format('Y-m-d'), $invoiceDueEnd->format('Y-m-d')])
+            ->sum('amount');
+
+        $totalSchedules = Schedule::whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])->count();
+
+        return [
+            'revenue' => $monthlyRevenue,
+            'expected_gross' => $expectedGrossRevenue,
+            'net_income' => max(0, $netIncome - $realtimeTotalDiscount),
+            'valid_sessions' => $validSessionsCount,
+            'total_schedules' => $totalSchedules,
+        ];
     }
 }

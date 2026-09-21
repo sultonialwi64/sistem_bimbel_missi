@@ -72,9 +72,15 @@
                 </div>
             </div>
             <p class="text-4xl font-black text-white leading-none mb-4">{{ $stats['today_schedules'] }}</p>
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
-                {{ $stats['total_schedules'] }} Total
-            </span>
+            <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-{{ $stats['growth']['sessions'] >= 0 ? 'green' : 'red' }}-100 text-{{ $stats['growth']['sessions'] >= 0 ? 'green' : 'red' }}-700 rounded-full text-xs font-bold">
+                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $stats['growth']['sessions'] >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6' }}"/></svg>
+                    {{ $stats['growth']['sessions'] > 0 ? '+' : '' }}{{ $stats['growth']['sessions'] }}% vs Lalu
+                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
+                    {{ $stats['total_schedules'] }} Total
+                </span>
+            </div>
         </div>
 
         <!-- 4. Monthly Revenue -->
@@ -91,10 +97,16 @@
                 </div>
             </div>
             <p class="text-2xl font-black text-white leading-none mb-4 whitespace-nowrap">Rp {{ number_format($stats['monthly_revenue'], 0, ',', '.') }}</p>
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold whitespace-nowrap">
-                <svg class="h-3 w-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/></svg>
-                Pending: Rp {{ number_format($stats['pending_payments'], 0, ',', '.') }}
-            </span>
+            <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-{{ $stats['growth']['revenue'] >= 0 ? 'green' : 'red' }}-100 text-{{ $stats['growth']['revenue'] >= 0 ? 'green' : 'red' }}-700 rounded-full text-xs font-bold">
+                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $stats['growth']['revenue'] >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6' }}"/></svg>
+                    {{ $stats['growth']['revenue'] > 0 ? '+' : '' }}{{ $stats['growth']['revenue'] }}%
+                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold whitespace-nowrap">
+                    <svg class="h-3 w-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/></svg>
+                    Pending: Rp {{ number_format($stats['pending_payments'], 0, ',', '.') }}
+                </span>
+            </div>
         </div>
 
         <!-- 5. Net Income (Pendapatan Bersih) -->
@@ -111,20 +123,26 @@
                 </div>
             </div>
             <p class="text-2xl font-black text-white leading-none mb-4 whitespace-nowrap">Rp {{ number_format($stats['net_income'], 0, ',', '.') }}</p>
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
-                <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                {{ $stats['net_income_sessions'] }} sesi terlaksana
-            </span>
+            <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-{{ $stats['growth']['net_income'] >= 0 ? 'green' : 'red' }}-100 text-{{ $stats['growth']['net_income'] >= 0 ? 'green' : 'red' }}-700 rounded-full text-xs font-bold">
+                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $stats['growth']['net_income'] >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6' }}"/></svg>
+                    {{ $stats['growth']['net_income'] > 0 ? '+' : '' }}{{ $stats['growth']['net_income'] }}%
+                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                    <svg class="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {{ $stats['net_income_sessions'] }} sesi terlaksana
+                </span>
+            </div>
         </div>
 
     </div>
 
     <!-- Content Grid -->
-    <div class="grid grid-cols-1 gap-8 mb-8">
-        <!-- Daily Sessions Chart -->
+    <div class="space-y-8 mb-8">
+        <!-- Row 1: Daily Sessions (Full Width) -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300">
             <div class="bg-indigo-800 border-b border-indigo-900 px-6 py-4">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
                         <svg class="h-5 w-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
@@ -147,7 +165,75 @@
             </div>
         </div>
 
-        <!-- Tutors Performance Chart -->
+        <!-- Row 2: Top Subjects & Top Tutors Leaderboard (50/50) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Top Subjects -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col">
+                <div class="bg-indigo-800 border-b border-indigo-900 px-6 py-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <svg class="h-5 w-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                        </svg>
+                        Mata Pelajaran Terlaris
+                    </h3>
+                </div>
+                <div class="p-6 flex-1 flex flex-col justify-center items-center relative min-h-[350px]">
+                    @if(count($topSubjects['series']) === 0)
+                        <div class="text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                            <p class="text-gray-500 text-sm font-medium">Belum ada data sesi.</p>
+                        </div>
+                    @else
+                        <div id="chart-top-subjects" class="w-full absolute inset-0 pt-6"></div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Top Tutors Leaderboard -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col">
+                <div class="bg-indigo-800 border-b border-indigo-900 px-6 py-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                        Top 5 Tentor Aktif
+                    </h3>
+                </div>
+                <div class="p-0 flex-1 overflow-y-auto max-h-[350px]">
+                    @if($topTutors->isEmpty())
+                        <div class="p-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <p class="text-gray-500 text-sm font-medium">Belum ada data tentor.</p>
+                        </div>
+                    @else
+                        <ul class="divide-y divide-gray-100 h-full flex flex-col justify-center">
+                            @foreach($topTutors as $index => $tutor)
+                                @php
+                                    $bgColors = ['bg-yellow-100 text-yellow-600 ring-yellow-500/30', 'bg-slate-100 text-slate-600 ring-slate-500/30', 'bg-orange-100 text-orange-600 ring-orange-500/30', 'bg-indigo-50 text-indigo-600 ring-indigo-500/30', 'bg-indigo-50 text-indigo-600 ring-indigo-500/30'];
+                                    $colorClass = $bgColors[$index] ?? 'bg-indigo-50 text-indigo-600 ring-indigo-500/30';
+                                @endphp
+                                <li class="p-4 flex items-center hover:bg-gray-50 transition-colors flex-1">
+                                    <div class="flex-shrink-0 mr-4">
+                                        <div class="h-10 w-10 rounded-full {{ $colorClass }} ring-1 flex items-center justify-center font-black text-lg">
+                                            #{{ $index + 1 }}
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold text-gray-900 truncate">{{ $tutor->tutor_name }}</p>
+                                    </div>
+                                    <div class="inline-flex items-center text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                                        {{ $tutor->count }} Sesi
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Tutor Performance Chart (Full Width) -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300">
             <div class="bg-indigo-800 border-b border-indigo-900 px-6 py-4">
                 <div class="flex items-center justify-between">
@@ -199,9 +285,22 @@ document.addEventListener('DOMContentLoaded', function() {
         stroke: { curve: 'smooth', width: 2 },
         xaxis: {
             categories: chartData.categories,
-            labels: { style: { colors: '#64748b' } },
+            labels: { 
+                style: { colors: '#64748b' },
+                rotate: 0
+            },
             axisBorder: { show: false },
             axisTicks: { show: false }
+        },
+        tooltip: {
+            x: {
+                formatter: function(val, opts) {
+                    if (chartData.full_dates && chartData.full_dates[opts.dataPointIndex]) {
+                        return chartData.full_dates[opts.dataPointIndex];
+                    }
+                    return val;
+                }
+            }
         },
         yaxis: {
             decimalsInFloat: 0,
@@ -214,6 +313,36 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     new ApexCharts(document.querySelector("#chart-daily-sessions"), dailyOptions).render();
+
+    // Top Subjects Donut Chart
+    const topSubjects = @json($topSubjects);
+    if(topSubjects.series && topSubjects.series.length > 0) {
+        const topSubjectsOptions = {
+            series: topSubjects.series,
+            labels: topSubjects.labels,
+            chart: {
+                type: 'donut',
+                height: 300,
+                fontFamily: 'inherit'
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '70%',
+                        labels: {
+                            show: true,
+                            name: { show: true },
+                            value: { show: true }
+                        }
+                    }
+                }
+            },
+            dataLabels: { enabled: false },
+            legend: { position: 'bottom' },
+            stroke: { width: 0 }
+        };
+        new ApexCharts(document.querySelector("#chart-top-subjects"), topSubjectsOptions).render();
+    }
 
     // Tutor Performance Chart
     const tutorOptions = {
@@ -235,9 +364,22 @@ document.addEventListener('DOMContentLoaded', function() {
         dataLabels: { enabled: false },
         xaxis: {
             categories: chartData.categories,
-            labels: { style: { colors: '#64748b' } },
+            labels: { 
+                style: { colors: '#64748b' },
+                rotate: 0
+            },
             axisBorder: { show: false },
             axisTicks: { show: false }
+        },
+        tooltip: {
+            x: {
+                formatter: function(val, opts) {
+                    if (chartData.full_dates && chartData.full_dates[opts.dataPointIndex]) {
+                        return chartData.full_dates[opts.dataPointIndex];
+                    }
+                    return val;
+                }
+            }
         },
         yaxis: {
             decimalsInFloat: 0,
