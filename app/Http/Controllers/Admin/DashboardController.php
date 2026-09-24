@@ -64,16 +64,34 @@ class DashboardController extends Controller
             'series' => $topSubjectsDb->pluck('count')
         ];
 
-        // Top 5 Tutors (Leaderboard)
+        // Top 5 Tutors (Leaderboard) - Berdasarkan sesi yang sudah diabsen (seperti di Salary)
         $topTutors = Schedule::whereBetween('schedules.date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])
-            ->where('schedules.status', 'completed')
+            ->whereHas('attendance', function ($query) {
+                $query->whereIn('status', ['hadir', 'pindah_lokasi']);
+            })
             ->join('tutors', 'schedules.tutor_id', '=', 'tutors.id')
             ->join('users', 'tutors.user_id', '=', 'users.id')
-            ->selectRaw('users.name as tutor_name, count(*) as count')
+            ->selectRaw('tutors.id as tutor_id, users.name as tutor_name, count(*) as count')
             ->groupBy('tutors.id', 'users.name')
             ->orderByDesc('count')
             ->take(5)
             ->get();
+
+        $tutorRatePerSession = config('bimbel.salary.session_rate_tutor', 40000);
+        $topTutors->map(function ($tutor) use ($financialStart, $tutorRatePerSession) {
+            $salary = \App\Models\Salary::where('tutor_id', $tutor->tutor_id)
+                ->where('period_start', $financialStart->format('Y-m-d'))
+                ->first();
+                
+            $baseSalary = $tutor->count * $tutorRatePerSession;
+            
+            if ($salary) {
+                $tutor->income = $baseSalary + $salary->bonus - $salary->deduction;
+            } else {
+                $tutor->income = $baseSalary;
+            }
+            return $tutor;
+        });
 
         // 2. Prepare chart data using DB Aggregates (ALL schedules)
         $dailySessionsDb = Schedule::whereBetween('date', [$financialStart->format('Y-m-d'), $financialEnd->format('Y-m-d')])

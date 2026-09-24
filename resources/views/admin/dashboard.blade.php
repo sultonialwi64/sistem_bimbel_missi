@@ -216,8 +216,13 @@
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-bold text-gray-900 truncate">{{ $tutor->tutor_name }}</p>
                                     </div>
-                                    <div class="inline-flex items-center text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
-                                        {{ $tutor->count }} Sesi
+                                    <div class="flex items-center gap-2">
+                                        <div class="inline-flex items-center text-xs font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100" title="Pendapatan Bulan Ini (Sesuai Absensi)">
+                                            Rp {{ number_format($tutor->income, 0, ',', '.') }}
+                                        </div>
+                                        <div class="inline-flex items-center text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                                            {{ $tutor->count }} Sesi
+                                        </div>
                                     </div>
                                 </li>
                             @endforeach
