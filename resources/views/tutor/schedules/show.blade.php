@@ -132,9 +132,16 @@
                     <form action="{{ route('tutor.attendance.submit', $schedule) }}" method="POST">
                         @csrf
                         
-                        <input type="hidden" name="status" x-model="status">
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Status Kehadiran <span class="text-red-500">*</span></label>
+                            <select name="status" x-model="status" @change="handleStatusChange()" required 
+                                    class="block w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all">
+                                <option value="">-- Pilih Status --</option>
+                                <option value="hadir">Hadir di Lokasi</option>
+                            </select>
+                        </div>
 
-                        <div x-show="requiresPhoto" class="mb-4 space-y-4">
+                        <div x-show="requiresPhoto" class="mb-4 space-y-4" style="display: none;">
                             <div class="flex items-center gap-2 p-1 bg-gray-100 rounded-lg">
                                 <button type="button" @click="inputMode = 'camera'; if(!photoCaptured) startCamera()" :class="inputMode === 'camera' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2 text-sm font-semibold rounded-md transition-all">Gunakan Kamera</button>
                                 <button type="button" @click="inputMode = 'upload'; stopCamera()" :class="inputMode === 'upload' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2 text-sm font-semibold rounded-md transition-all">Upload File</button>
@@ -380,7 +387,7 @@
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('attendanceForm', () => ({
-        status: 'hadir',
+        status: '',
         inputMode: 'camera',
         stream: null,
         photoCaptured: false,
@@ -393,11 +400,7 @@ document.addEventListener('alpine:init', () => {
         locationLoaded: false,
 
         get requiresPhoto() {
-            return true;
-        },
-
-        init() {
-            this.handleStatusChange();
+            return this.status === 'hadir';
         },
 
 
