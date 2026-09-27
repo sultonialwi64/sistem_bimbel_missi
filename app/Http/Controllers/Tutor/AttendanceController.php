@@ -35,7 +35,7 @@ class AttendanceController extends Controller
         */
 
         $validated = $request->validate([
-            'status' => ['required', 'string', 'in:hadir,libur_sakit,pindah_lokasi,batal'],
+            'status' => ['required', 'string', 'in:hadir'],
             'photo_base64' => ['nullable', 'string'],
             'captured_at' => ['nullable', 'date'],
             'notes' => ['nullable', 'string', 'max:5000'],
@@ -44,108 +44,76 @@ class AttendanceController extends Controller
             'tutor_subdistrict' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $status = $validated['status'];
-        $requiresPhoto = in_array($status, ['hadir', 'pindah_lokasi']);
+        $status = $validated['status']; // Selalu 'hadir'
 
-        if ($requiresPhoto) {
-            if (empty($validated['photo_base64']) || empty($validated['captured_at'])) {
-                return back()->with('error', 'Foto dan waktu pengambilan (captured_at) wajib ada untuk status ini.');
-            }
-
-            // Server-side validation: max 2 menit dari waktu saat ini
-            $capturedAt = Carbon::parse($validated['captured_at']);
-            $diffInMinutes = $capturedAt->diffInMinutes(now());
-            
-            $verificationStatus = 'verified';
-            if ($diffInMinutes > 2) {
-                $verificationStatus = 'manual_review';
-            }
-
-            // Handle base64 decode
-            $photoPath = null;
-            if (preg_match('/^data:image\/(\w+);base64,/', $validated['photo_base64'], $type)) {
-                $data = substr($validated['photo_base64'], strpos($validated['photo_base64'], ',') + 1);
-                $type = strtolower($type[1]); // jpg, png, dll
-
-                if (!in_array($type, ['jpg', 'jpeg', 'png', 'webp'])) {
-                    return back()->with('error', 'Format gambar tidak valid.');
-                }
-
-                $data = base64_decode($data);
-                if ($data === false) {
-                    return back()->with('error', 'Gagal memproses gambar foto.');
-                }
-
-                // Generate nama file unik
-                $fileName = now()->format('Ymd_His') . '_' . uniqid() . '.' . $type;
-                $photoPath = 'attendances/' . $fileName;
-
-                // Simpan ke storage (storage/app/public/attendances)
-                Storage::disk('public')->put($photoPath, $data);
-            } else {
-                return back()->with('error', 'Data foto rusak atau tidak valid.');
-            }
-
-            // Create/Update Attendance
-            Attendance::updateOrCreate(
-                ['schedule_id' => $schedule->id],
-                [
-                    'tutor_id' => $schedule->tutor_id,
-                    'status' => $status,
-                    'photo_path' => $photoPath,
-                    'captured_at' => $capturedAt,
-                    'verification_status' => $verificationStatus,
-                    'notes' => $validated['notes'] ?? null,
-                    'tutor_lat' => $validated['tutor_lat'] ?? null,
-                    'tutor_lng' => $validated['tutor_lng'] ?? null,
-                    'tutor_subdistrict' => $validated['tutor_subdistrict'] ?? null,
-                ]
-            );
-
-            // Update status schedule
-            $schedule->update(['status' => 'completed']);
-            $schedule->refresh();
-
-            if (! $schedule->sessionReport()->exists()) {
-                app(NotificationService::class)->notifyAdminsMissingReport($schedule);
-            }
-
-            $msg = 'Absensi berhasil disubmit.';
-            if ($verificationStatus === 'manual_review') {
-                $msg .= ' (Waktu melebihi batas, perlu Review Admin)';
-            }
-            
-            return redirect()->route('tutor.schedules.show', $schedule)->with('success', $msg);
-
-        } else {
-            // Status libur_sakit atau batal -> skip foto
-            Attendance::updateOrCreate(
-                ['schedule_id' => $schedule->id],
-                [
-                    'tutor_id' => $schedule->tutor_id,
-                    'status' => $status,
-                    'photo_path' => null,
-                    'captured_at' => now(), // catat waktu submit
-                    'verification_status' => 'verified',
-                    'notes' => $validated['notes'] ?? null,
-                ]
-            );
-
-            if ($status === 'batal') {
-                $schedule->update(['status' => 'cancelled']);
-            } else {
-                // libur_sakit
-                $schedule->update(['status' => 'completed']);
-                $schedule->refresh();
-
-                if (! $schedule->sessionReport()->exists()) {
-                    app(NotificationService::class)->notifyAdminsMissingReport($schedule);
-                }
-            }
-
-            return redirect()->route('tutor.schedules.show', $schedule)
-                ->with('success', 'Status jadwal berhasil diperbarui menjadi: ' . str_replace('_', ' ', $status));
+        if (empty($validated['photo_base64']) || empty($validated['captured_at'])) {
+            return back()->with('error', 'Foto dan waktu pengambilan (captured_at) wajib dilampirkan.');
         }
+
+        // Server-side validation: max 2 menit dari waktu saat ini
+        $capturedAt = Carbon::parse($validated['captured_at']);
+        $diffInMinutes = $capturedAt->diffInMinutes(now());
+        
+        $verificationStatus = 'verified';
+        if ($diffInMinutes > 2) {
+            $verificationStatus = 'manual_review';
+        }
+
+        // Handle base64 decode
+        $photoPath = null;
+        if (preg_match('/^data:image\/(\w+);base64,/', $validated['photo_base64'], $type)) {
+            $data = substr($validated['photo_base64'], strpos($validated['photo_base64'], ',') + 1);
+            $type = strtolower($type[1]); // jpg, png, dll
+
+            if (!in_array($type, ['jpg', 'jpeg', 'png', 'webp'])) {
+                return back()->with('error', 'Format gambar tidak valid.');
+            }
+
+            $data = base64_decode($data);
+            if ($data === false) {
+                return back()->with('error', 'Gagal memproses gambar foto.');
+            }
+
+            // Generate nama file unik
+            $fileName = now()->format('Ymd_His') . '_' . uniqid() . '.' . $type;
+            $photoPath = 'attendances/' . $fileName;
+
+            // Simpan ke storage (storage/app/public/attendances)
+            Storage::disk('public')->put($photoPath, $data);
+        } else {
+            return back()->with('error', 'Data foto rusak atau tidak valid.');
+        }
+
+        // Create/Update Attendance
+        Attendance::updateOrCreate(
+            ['schedule_id' => $schedule->id],
+            [
+                'tutor_id' => $schedule->tutor_id,
+                'status' => $status,
+                'photo_path' => $photoPath,
+                'captured_at' => $capturedAt,
+                'verification_status' => $verificationStatus,
+                'notes' => $validated['notes'] ?? null,
+                'tutor_lat' => $validated['tutor_lat'] ?? null,
+                'tutor_lng' => $validated['tutor_lng'] ?? null,
+                'tutor_subdistrict' => $validated['tutor_subdistrict'] ?? null,
+            ]
+        );
+
+        // Update status schedule
+        $schedule->update(['status' => 'completed']);
+        $schedule->refresh();
+
+        if (! $schedule->sessionReport()->exists()) {
+            app(NotificationService::class)->notifyAdminsMissingReport($schedule);
+        }
+
+        $msg = 'Absensi berhasil disubmit.';
+        if ($verificationStatus === 'manual_review') {
+            $msg .= ' (Waktu melebihi batas, perlu Review Admin)';
+        }
+        
+        return redirect()->route('tutor.schedules.show', $schedule)->with('success', $msg);
     }
 
     /**
