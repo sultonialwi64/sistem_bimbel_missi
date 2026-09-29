@@ -362,16 +362,22 @@
                  x-transition:leave="ease-in duration-200" 
                  x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
                  x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
-                 class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                 class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"
+                 id="missing-modal-content">
                 
                 <div class="bg-red-600 px-4 py-4 sm:px-6 flex justify-between items-center">
                     <h3 class="text-lg leading-6 font-bold text-white flex items-center gap-2" id="modal-title">
                         <i class="fa-solid fa-triangle-exclamation"></i>
                         Daftar Tunggakan
                     </h3>
-                    <button @click="showMissingModal = false" class="text-red-100 hover:text-white transition-colors">
-                        <i class="fa-solid fa-xmark text-xl"></i>
-                    </button>
+                    <div class="flex items-center gap-2" data-html2canvas-ignore="true">
+                        <button type="button" onclick="downloadMissingImage()" id="btn-download-missing" class="bg-white/20 hover:bg-white/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors flex items-center gap-1.5 border border-white/20">
+                            <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Download Gambar</span>
+                        </button>
+                        <button @click="showMissingModal = false" class="text-red-100 hover:text-white transition-colors ml-2">
+                            <i class="fa-solid fa-xmark text-xl"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="px-4 pt-5 pb-4 sm:p-6">
@@ -406,7 +412,7 @@
                                         <div class="font-bold text-gray-800" x-text="item.student_name + ' - ' + item.tutor_name"></div>
                                         <div class="text-sm text-red-600 font-medium" x-text="item.date_formatted + ' | ' + item.time_formatted"></div>
                                     </div>
-                                    <a :href="item.url" class="btn-primary-gradient px-3 py-1.5 text-xs text-white rounded-lg whitespace-nowrap">Lihat Jadwal</a>
+                                    <a :href="item.url" class="btn-primary-gradient px-3 py-1.5 text-xs text-white rounded-lg whitespace-nowrap" data-html2canvas-ignore="true">Lihat Jadwal</a>
                                 </div>
                             </template>
                         </div>
@@ -425,7 +431,7 @@
                                         <div class="font-bold text-gray-800" x-text="item.student_name + ' - ' + item.tutor_name"></div>
                                         <div class="text-sm text-orange-600 font-medium" x-text="item.date_formatted + ' | ' + item.time_formatted"></div>
                                     </div>
-                                    <a :href="item.url" class="btn-primary-gradient px-3 py-1.5 text-xs text-white rounded-lg whitespace-nowrap">Lihat Jadwal</a>
+                                    <a :href="item.url" class="btn-primary-gradient px-3 py-1.5 text-xs text-white rounded-lg whitespace-nowrap" data-html2canvas-ignore="true">Lihat Jadwal</a>
                                 </div>
                             </template>
                         </div>
@@ -662,5 +668,51 @@
         calendar.render();
         window.fullCalendarInstance = calendar;
     });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+    function downloadMissingImage() {
+        var modalContent = document.getElementById('missing-modal-content');
+        if (!modalContent) return;
+        
+        var btn = document.getElementById('btn-download-missing');
+        var originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span class="hidden sm:inline">Processing...</span>';
+        btn.disabled = true;
+
+        var scrollContainer = modalContent.querySelector('.overflow-y-auto');
+        var originalScrollMaxHeight = scrollContainer ? scrollContainer.style.maxHeight : '';
+        
+        if (scrollContainer) {
+            scrollContainer.style.maxHeight = 'none';
+        }
+
+        html2canvas(modalContent, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            windowWidth: modalContent.scrollWidth,
+            windowHeight: modalContent.scrollHeight
+        }).then(function(canvas) {
+            if (scrollContainer) {
+                scrollContainer.style.maxHeight = originalScrollMaxHeight;
+            }
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+
+            var link = document.createElement('a');
+            link.download = 'Daftar_Tunggakan_' + new Date().toISOString().slice(0,10) + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }).catch(function(error) {
+            console.error('Error generating image:', error);
+            if (scrollContainer) {
+                scrollContainer.style.maxHeight = originalScrollMaxHeight;
+            }
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+            alert('Gagal mendownload gambar. Silakan coba lagi.');
+        });
+    }
 </script>
 @endpush
