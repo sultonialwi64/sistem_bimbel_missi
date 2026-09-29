@@ -81,8 +81,8 @@
                 <span>Log Aktivitas</span>
             </button>
 
-            <a href="{{ route('admin.schedules.create') }}" class="btn-primary-gradient text-white font-bold px-4 py-2 rounded-xl hover:shadow-2xl flex items-center gap-2 shadow-xl shadow-indigo-500/30 transition-all text-sm justify-center">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{{ route('admin.schedules.create') }}" class="btn-primary-gradient text-white font-bold px-5 py-2.5 rounded-xl hover:shadow-2xl flex items-center gap-2 shadow-xl shadow-indigo-500/30 transition-all justify-center">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
                 New
@@ -511,10 +511,10 @@
         animation: pulse-glow 2s infinite ease-in-out;
     }
     .fc-daygrid-day-number {
-        font-weight: 600;
-        color: #64748b;
-        padding: 0.4rem !important;
-        font-size: 0.8rem;
+        font-weight: 700;
+        color: #475569;
+        padding: 8px 8px 2px 8px !important;
+        font-size: 0.9rem;
     }
     .fc-popover-body {
         max-height: 250px;
@@ -617,7 +617,7 @@
             },
             displayEventEnd: true,
             height: 'auto',
-            dayMaxEvents: isMobile ? 2 : 4,
+            dayMaxEvents: 4,
             windowResize: function(view) {
                 if (window.innerWidth === lastWidth) return; // Ignore vertical resize (mobile scroll)
                 lastWidth = window.innerWidth;
