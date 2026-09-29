@@ -48,7 +48,7 @@
         <div>
             <p class="text-gray-500 text-sm">Manage all tutoring schedules</p>
         </div>
-        <div class="flex items-center gap-3 w-full sm:w-auto">
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
             {{-- View Mode Toggle --}}
             <div class="bg-gray-100 p-1 rounded-xl flex items-center shadow-inner">
                 <button @@click="viewMode = 'calendar'"
@@ -72,17 +72,17 @@
             {{-- Cek Tunggakan Button --}}
             <button @click="fetchMissingRecords()" class="px-3 py-2 bg-red-50 rounded-xl text-sm font-bold text-red-600 hover:bg-red-100 hover:text-red-700 border border-red-200 shadow-sm flex items-center gap-2 transition-all duration-200">
                 <i class="fa-solid fa-triangle-exclamation"></i>
-                <span class="hidden sm:inline">Cek Tunggakan</span>
+                <span>Cek Tunggakan</span>
             </button>
 
             {{-- Log Button --}}
             <button @click="fetchLogs()" class="px-3 py-2 bg-white rounded-xl text-sm font-bold text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 shadow-sm flex items-center gap-2 transition-all duration-200">
                 <i class="fa-solid fa-clock-rotate-left"></i>
-                <span class="hidden sm:inline">Log Aktivitas</span>
+                <span>Log Aktivitas</span>
             </button>
 
-            <a href="{{ route('admin.schedules.create') }}" class="btn-primary-gradient text-white font-bold px-4 py-2.5 rounded-xl hover:shadow-2xl flex items-center gap-2 shadow-xl shadow-indigo-500/30 transition-all flex-1 sm:flex-auto justify-center">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{{ route('admin.schedules.create') }}" class="btn-primary-gradient text-white font-bold px-4 py-2 rounded-xl hover:shadow-2xl flex items-center gap-2 shadow-xl shadow-indigo-500/30 transition-all text-sm justify-center">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
                 New
