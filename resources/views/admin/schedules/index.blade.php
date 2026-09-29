@@ -371,7 +371,7 @@
                         Daftar Tunggakan
                     </h3>
                     <div class="flex items-center gap-2" data-html2canvas-ignore="true">
-                        <button type="button" onclick="downloadMissingImage()" id="btn-download-missing" class="bg-white/20 hover:bg-white/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors flex items-center gap-1.5 border border-white/20">
+                        <button type="button" @click="downloadMissingList($data)" id="btn-download-missing" class="bg-white/20 hover:bg-white/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors flex items-center gap-1.5 border border-white/20">
                             <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Download Gambar</span>
                         </button>
                         <button @click="showMissingModal = false" class="text-red-100 hover:text-white transition-colors ml-2">
@@ -671,44 +671,89 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-    function downloadMissingImage() {
-        var modalContent = document.getElementById('missing-modal-content');
-        if (!modalContent) return;
-        
+    function downloadMissingList(alpineData) {
+        var missingData = alpineData.missingData;
+        var activeTab = alpineData.activeMissingTab;
+
+        if (!missingData) {
+            alert('Data belum siap.');
+            return;
+        }
+
         var btn = document.getElementById('btn-download-missing');
         var originalHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span class="hidden sm:inline">Processing...</span>';
         btn.disabled = true;
 
-        var scrollContainer = modalContent.querySelector('.overflow-y-auto');
-        var originalScrollMaxHeight = scrollContainer ? scrollContainer.style.maxHeight : '';
-        
-        if (scrollContainer) {
-            scrollContainer.style.maxHeight = 'none';
+        var isAttendance = activeTab === 'attendance';
+        var data = isAttendance ? missingData.missingAttendances : missingData.missingReports;
+        var titleText = isAttendance ? 'Daftar Tunggakan Absensi' : 'Daftar Tunggakan Laporan';
+
+        // Buat container tersembunyi
+        var exportContainer = document.createElement('div');
+        exportContainer.style.position = 'absolute';
+        exportContainer.style.left = '-9999px';
+        exportContainer.style.top = '0';
+        exportContainer.style.width = '800px';
+        exportContainer.style.backgroundColor = '#ffffff';
+        exportContainer.style.padding = '40px';
+        exportContainer.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+        exportContainer.style.color = '#1f2937';
+
+        var dateToday = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        var html = '<div style="text-align: center; border-bottom: 2px solid #ef4444; padding-bottom: 20px; margin-bottom: 20px;">';
+        html += '<h2 style="font-size: 24px; font-weight: 800; color: #dc2626; margin: 0 0 5px 0;">' + titleText + '</h2>';
+        html += '<p style="font-size: 14px; color: #6b7280; margin: 0;">Sistem Informasi Bimbel Missi | Tanggal Unduh: ' + dateToday + '</p>';
+        html += '</div>';
+
+        if (data.length === 0) {
+            html += '<p style="text-align: center; font-size: 18px; color: #10b981; font-weight: 700; padding: 40px 0;">Hore! Tidak ada tunggakan. Semua aman.</p>';
+        } else {
+            html += '<table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">';
+            html += '<thead>';
+            html += '<tr style="background-color: #f3f4f6; color: #374151; text-align: left;">';
+            html += '<th style="padding: 12px 15px; border: 1px solid #d1d5db; width: 40px; text-align: center;">No</th>';
+            html += '<th style="padding: 12px 15px; border: 1px solid #d1d5db;">Nama Tentor</th>';
+            html += '<th style="padding: 12px 15px; border: 1px solid #d1d5db;">Nama Siswa</th>';
+            html += '<th style="padding: 12px 15px; border: 1px solid #d1d5db;">Waktu Jadwal</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            
+            data.forEach(function(item, index) {
+                var bgRow = (index % 2 === 0) ? '#ffffff' : '#f9fafb';
+                html += '<tr style="background-color: ' + bgRow + ';">';
+                html += '<td style="padding: 10px 15px; border: 1px solid #d1d5db; text-align: center;">' + (index + 1) + '</td>';
+                html += '<td style="padding: 10px 15px; border: 1px solid #d1d5db; font-weight: 700;">' + item.tutor_name + '</td>';
+                html += '<td style="padding: 10px 15px; border: 1px solid #d1d5db;">' + item.student_name + '</td>';
+                html += '<td style="padding: 10px 15px; border: 1px solid #d1d5db; color: #dc2626; font-weight: 600;">' + item.date_formatted + ' | ' + item.time_formatted + '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
         }
 
-        html2canvas(modalContent, {
+        exportContainer.innerHTML = html;
+        document.body.appendChild(exportContainer);
+
+        html2canvas(exportContainer, {
             scale: 2,
             backgroundColor: '#ffffff',
-            useCORS: true,
-            windowWidth: modalContent.scrollWidth,
-            windowHeight: modalContent.scrollHeight
+            useCORS: true
         }).then(function(canvas) {
-            if (scrollContainer) {
-                scrollContainer.style.maxHeight = originalScrollMaxHeight;
-            }
+            document.body.removeChild(exportContainer);
             btn.innerHTML = originalHtml;
             btn.disabled = false;
 
             var link = document.createElement('a');
-            link.download = 'Daftar_Tunggakan_' + new Date().toISOString().slice(0,10) + '.png';
+            var filePrefix = isAttendance ? 'Tunggakan_Absen_' : 'Tunggakan_Laporan_';
+            link.download = filePrefix + new Date().toISOString().slice(0,10) + '.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         }).catch(function(error) {
             console.error('Error generating image:', error);
-            if (scrollContainer) {
-                scrollContainer.style.maxHeight = originalScrollMaxHeight;
-            }
+            if(exportContainer.parentNode) document.body.removeChild(exportContainer);
             btn.innerHTML = originalHtml;
             btn.disabled = false;
             alert('Gagal mendownload gambar. Silakan coba lagi.');
