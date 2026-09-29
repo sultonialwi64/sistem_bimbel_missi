@@ -13,8 +13,8 @@ class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Tentukan bulan yang mau dilihat (Default: Bulan lalu, karena tagihan dibuat setelah bulan berakhir)
-        $defaultMonth = Carbon::now()->subMonth()->format('Y-m');
+        // 1. Tentukan bulan yang mau dilihat (Default: Bulan ini)
+        $defaultMonth = Carbon::now()->format('Y-m');
         $monthFilter = $request->input('filter_month', $defaultMonth);
         $date = Carbon::parse($monthFilter);
         $periodStart = $date->copy()->startOfMonth();
@@ -133,6 +133,7 @@ class PaymentController extends Controller
             });
 
             $payment->tutors_with_status = $tutorDetails;
+            $payment->session_count = $schedules->count();
         });
 
         // Hitung jumlah anak yang dapat diskon per client (untuk display di kolom Diskon)
@@ -147,7 +148,7 @@ class PaymentController extends Controller
 
     public function generate(Request $request)
     {
-        $monthFilter = $request->input('filter_month', Carbon::now()->subMonth()->format('Y-m'));
+        $monthFilter = $request->input('filter_month', Carbon::now()->format('Y-m'));
         $date = Carbon::parse($monthFilter);
         $result = $this->syncPaymentsForPeriod($date);
 

@@ -142,7 +142,7 @@
                         <th class="text-left py-3.5 px-3 2xl:px-4">Klien</th>
                         <th class="text-left py-3.5 px-3 2xl:px-4">Siswa</th>
                         <th class="text-left py-3.5 px-3 2xl:px-4">Tentor</th>
-                        <th class="text-left py-3.5 px-3 2xl:px-4">Periode</th>
+                        <th class="text-center py-3.5 px-3 2xl:px-4">Jml Sesi</th>
                         <th class="text-left py-3.5 px-3 2xl:px-4">Diskon</th>
                         <th class="text-left py-3.5 px-3 2xl:px-4">Tagihan</th>
                         <th class="text-left py-3.5 px-3 2xl:px-4">Status</th>
@@ -193,12 +193,12 @@
                                     <p class="text-sm text-gray-700 break-words">-</p>
                                 @endif
                             </td>
-                            <td class="py-4 px-3 2xl:px-4">
+                            <td class="py-4 px-3 2xl:px-4 text-center">
                                 @php
                                     $periodMonth = \Carbon\Carbon::parse($payment->due_date)->subDays(7)->startOfMonth();
                                 @endphp
                                 <div>
-                                    <p class="text-[13px] font-bold text-gray-800 whitespace-nowrap">{{ $periodMonth->translatedFormat('F Y') }}</p>
+                                    <p class="text-[13px] font-bold text-indigo-700 whitespace-nowrap bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100 inline-flex">{{ $payment->session_count }} Sesi</p>
                                 </div>
                             </td>
                             <td class="py-4 px-3 2xl:px-4">
@@ -367,8 +367,8 @@
                     </div>
                     <div class="flex items-center justify-between py-2 border-y border-gray-50 mb-3">
                         <div>
-                            <p class="text-[10px] text-gray-400 uppercase font-bold">Periode</p>
-                            <p class="text-xs font-semibold text-gray-700">{{ $periodMonth->translatedFormat('F Y') }}</p>
+                            <p class="text-[10px] text-gray-400 uppercase font-bold">Jml Sesi</p>
+                            <p class="text-[13px] font-bold text-indigo-700 whitespace-nowrap bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100 inline-flex mt-0.5">{{ $payment->session_count }} Sesi</p>
                         </div>
                         @if($payment->discount > 0)
                         <div class="text-center">
