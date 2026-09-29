@@ -505,11 +505,11 @@
         var lastWidth = window.innerWidth;
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: isMobile ? 'listWeek' : 'dayGridMonth',
+            initialView: 'dayGridMonth',
             headerToolbar: isMobile ? {
                 left: 'prev,next',
                 center: 'title',
-                right: 'today,listWeek,dayGridMonth'
+                right: 'today,dayGridMonth,listWeek'
             } : {
                 left: 'prev,next today',
                 center: 'title',
@@ -532,14 +532,12 @@
 
                 var newMobile = window.innerWidth < 640;
                 if (newMobile) {
-                    calendar.changeView('listWeek');
                     calendar.setOption('headerToolbar', {
                         left: 'prev,next',
                         center: 'title',
                         right: 'today,dayGridMonth,listWeek'
                     });
                 } else {
-                    calendar.changeView('dayGridMonth');
                     calendar.setOption('headerToolbar', {
                         left: 'prev,next today',
                         center: 'title',

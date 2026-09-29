@@ -597,11 +597,11 @@
         var lastWidth = window.innerWidth;
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: isMobile ? 'listWeek' : 'dayGridMonth',
+            initialView: 'dayGridMonth',
             headerToolbar: isMobile ? {
                 left: 'prev,next',
                 center: 'title',
-                right: 'today,listWeek,dayGridMonth'
+                right: 'today,dayGridMonth,listWeek'
             } : {
                 left: 'prev,next today',
                 center: 'title',
@@ -623,15 +623,13 @@
                 lastWidth = window.innerWidth;
                 
                 var mobile = window.innerWidth < 640;
-                if (mobile && calendar.view.type !== 'listWeek') {
-                    calendar.changeView('listWeek');
+                if (mobile) {
                     calendar.setOption('headerToolbar', {
                         left: 'prev,next',
                         center: 'title',
-                        right: 'today,listWeek,dayGridMonth'
+                        right: 'today,dayGridMonth,listWeek'
                     });
-                } else if (!mobile && calendar.view.type === 'listWeek') {
-                    calendar.changeView('dayGridMonth');
+                } else {
                     calendar.setOption('headerToolbar', {
                         left: 'prev,next today',
                         center: 'title',
