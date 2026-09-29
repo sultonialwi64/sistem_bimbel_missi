@@ -25,14 +25,11 @@ class PaymentController extends Controller
         // 2. TAMPILKAN LISTNYA
         $query = Payment::with(['client.user', 'student', 'verifiedBy', 'waSentBy'])->orderBy('amount', 'desc')->latest();
 
-        if ($request->filled('filter_month')) {
-            // Due date = akhir bulan periode + 7 hari
-            // Jadi untuk filter periode Mei, due_date ada di antara 8 Mei s/d 7 Juni
-            $query->whereBetween('due_date', [
-                $periodStart->copy()->addDays(7),  // 1 Mei + 7 = 8 Mei (batas bawah, exclude tagihan April yg due_date 7 Mei)
-                $periodEnd->copy()->addDays(7),    // 31 Mei + 7 = 7 Juni (due_date tagihan Mei)
-            ]);
-        }
+        // Terapkan filter bulan (baik dari input maupun default)
+        $query->whereBetween('due_date', [
+            $periodStart->copy()->addDays(7),  // 1 Mei + 7 = 8 Mei (batas bawah, exclude tagihan April yg due_date 7 Mei)
+            $periodEnd->copy()->addDays(7),    // 31 Mei + 7 = 7 Juni (due_date tagihan Mei)
+        ]);
 
         // Filter Search (client name, student name, tutor name)
         if ($search = $request->input('search')) {
