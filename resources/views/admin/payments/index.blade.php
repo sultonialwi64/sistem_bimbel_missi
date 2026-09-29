@@ -80,7 +80,7 @@
                 @if(request('search'))
                     <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" class="rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-600 shadow-sm transition-all hover:bg-slate-50">Clear</a>
                 @endif
-                <input type="hidden" name="filter_month" value="{{ request('filter_month') }}">
+                <input type="hidden" name="filter_month" value="{{ $monthFilter }}">
                 <input type="hidden" name="status" value="{{ request('status', 'all') }}">
                 <input type="hidden" name="wa_status" value="{{ request('wa_status', 'all') }}">
                 <input type="hidden" name="tutor_status" value="{{ request('tutor_status', 'all') }}">
@@ -101,7 +101,7 @@
                 <div class="flex items-center gap-4 w-full sm:w-auto">
                     <!-- Filter Form -->
                     <form action="{{ route('admin.payments.index') }}" method="GET" class="flex items-center gap-2">
-                        <input type="month" name="filter_month" value="{{ request('filter_month') }}" class="rounded-xl border-none bg-indigo-900 text-white text-sm focus:ring-2 focus:ring-blue-400 py-1.5 px-3">
+                        <input type="month" name="filter_month" value="{{ $monthFilter }}" class="rounded-xl border-none bg-indigo-900 text-white text-sm focus:ring-2 focus:ring-blue-400 py-1.5 px-3">
                         <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-sm font-bold transition-colors">
                             Filter
                         </button>

@@ -143,7 +143,7 @@ class PaymentController extends Controller
             ->map(fn ($group) => $group->count())
             ->toArray();
 
-        return view('admin.payments.index', compact('payments', 'statusFilter', 'waStatusFilter', 'tutorStatusFilter', 'clientDiscountCounts'));
+        return view('admin.payments.index', compact('payments', 'statusFilter', 'waStatusFilter', 'tutorStatusFilter', 'clientDiscountCounts', 'monthFilter'));
     }
 
     public function generate(Request $request)
