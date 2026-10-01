@@ -82,7 +82,12 @@ Route::get('/', function () {
 
     $landingTutors = collect();
 
-    for ($position = 1; $position <= 4; $position++) {
+    $maxTutors = max(
+        $orderedFeaturedTutors->keys()->max() ?? 0,
+        $orderedFeaturedTutors->count() + $remainingTutorPool->count()
+    );
+
+    for ($position = 1; $position <= $maxTutors; $position++) {
         if ($orderedFeaturedTutors->has($position)) {
             $landingTutors->push($orderedFeaturedTutors->get($position));
             continue;
