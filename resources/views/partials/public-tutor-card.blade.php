@@ -20,7 +20,7 @@
 <article class="group relative flex h-[400px] w-full flex-col justify-end overflow-hidden rounded-2xl border-[3px] border-dark-ink bg-slate-950 brutal-shadow transition-transform duration-300 hover:scale-[1.02] hover:brutal-shadow-hover sm:h-[450px]">
     <!-- Image Background -->
     @if($avatarUrl)
-        <img src="{{ $avatarUrl }}" alt="Tutor {{ $tutor->user->name }}" class="absolute inset-0 h-full w-full object-cover grayscale-[30%] transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0">
+        <img src="{{ $avatarUrl }}" alt="Tutor {{ $tutor->user->name }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover grayscale-[30%] transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0">
     @else
         <!-- Placeholder -->
         <div class="absolute inset-0 bg-blue-50 bg-grid-pattern opacity-60"></div>

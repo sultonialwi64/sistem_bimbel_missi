@@ -80,7 +80,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Space+Grotesk:wght@500;700&family=EB+Garamond:ital,wght@0,500;0,700;1,500;1,700&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Space+Grotesk:wght@500;700&family=EB+Garamond:ital,wght@0,500;0,700;1,500;1,700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Space+Grotesk:wght@500;700&family=EB+Garamond:ital,wght@0,500;0,700;1,500;1,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Space+Grotesk:wght@500;700&family=EB+Garamond:ital,wght@0,500;0,700;1,500;1,700&display=swap"></noscript>
 
     <script>
         tailwind.config = {
@@ -405,7 +407,7 @@
                                         <source src="{{ asset('videos/hero-belajar.mp4') }}" type="video/mp4">
                                     </video>
                                 @else
-                                    <img src="{{ asset('images/Profil1.jpeg') }}" alt="Kegiatan belajar Bimbel Missi" class="h-full w-full object-cover">
+                                    <img src="{{ asset('images/Profil1.jpeg') }}" alt="Kegiatan belajar Bimbel Missi" fetchpriority="high" decoding="sync" class="h-full w-full object-cover">
                                 @endif
                             </div>
                         </div>
@@ -413,7 +415,7 @@
                         <!-- Image 2 -->
                         <div class="absolute bottom-0 right-0 w-[70%] h-[65%] sm:h-[70%] rounded-3xl border-4 border-slate-900 bg-white p-2 brutal-shadow-xl transform rotate-3 hover:rotate-0 hover:z-20 transition duration-300 z-10">
                             <div class="h-full w-full overflow-hidden rounded-2xl border-2 border-slate-900">
-                                <img src="{{ asset('images/Profile2.jpeg') }}" alt="Kegiatan belajar" class="h-full w-full object-cover">
+                                <img src="{{ asset('images/Profile2.jpeg') }}" alt="Kegiatan belajar" fetchpriority="high" decoding="sync" class="h-full w-full object-cover">
                             </div>
                         </div>
 
