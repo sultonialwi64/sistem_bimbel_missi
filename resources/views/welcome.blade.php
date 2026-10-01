@@ -108,7 +108,7 @@
         }
     </script>
 
-    <link rel="stylesheet" href="{{ asset('css/welcome.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('css/welcome.css') }}?v={{ filemtime(public_path('css/welcome.css')) }}">
 
     <script type="application/ld+json">
         {!! json_encode([
@@ -766,6 +766,6 @@
         WhatsApp
     </a>
 
-    <script src="{{ asset('js/welcome.js') }}?v=1"></script>
+    <script src="{{ asset('js/welcome.js') }}?v={{ filemtime(public_path('js/welcome.js')) }}"></script>
 </body>
 </html>
