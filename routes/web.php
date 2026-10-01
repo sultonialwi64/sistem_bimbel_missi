@@ -99,14 +99,14 @@ Route::get('/', function () {
             'target' => 100,
             'suffix' => '+',
             'label' => 'Siswa pernah belajar bersama Missi',
-            'accent' => 'text-miss-navy',
+            'accent' => 'text-electric-blue',
         ],
         [
             'value' => number_format($sessionCount),
             'target' => $sessionCount,
             'suffix' => '',
             'label' => 'Sesi belajar telah terlaksana',
-            'accent' => 'text-miss-goldDark',
+            'accent' => 'text-dark-ink',
         ],
     ];
 

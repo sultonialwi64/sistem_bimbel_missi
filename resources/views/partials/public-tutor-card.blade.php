@@ -17,38 +17,60 @@
         ->implode('');
 @endphp
 
-<article class="group relative overflow-hidden rounded-lg border border-white/80 bg-white p-5 shadow-xl shadow-slate-900/10 transition hover:-translate-y-1 hover:shadow-2xl">
-    <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-br from-miss-navy via-miss-navyDark to-miss-gold"></div>
-    <div class="relative">
-        <div class="flex items-start justify-between gap-4">
-            <div class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-miss-blueSoft shadow-xl sm:h-24 sm:w-24">
-                @if($avatarUrl)
-                    <img src="{{ $avatarUrl }}" alt="Tutor {{ $tutor->user->name }}" class="h-full w-full object-cover">
-                @else
-                    <span class="text-2xl font-black text-miss-navy">{{ $initials }}</span>
-                @endif
-            </div>
-            <span class="rounded-full bg-white/90 px-3 py-1 text-[11px] font-black text-miss-goldDark shadow-sm sm:text-xs">Tutor Missi</span>
+<article class="group relative flex h-[400px] w-full flex-col justify-end overflow-hidden rounded-2xl border-[3px] border-dark-ink bg-slate-950 brutal-shadow transition-transform duration-300 hover:scale-[1.02] hover:brutal-shadow-hover sm:h-[450px]">
+    <!-- Image Background -->
+    @if($avatarUrl)
+        <img src="{{ $avatarUrl }}" alt="Tutor {{ $tutor->user->name }}" class="absolute inset-0 h-full w-full object-cover grayscale-[30%] transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0">
+    @else
+        <!-- Placeholder -->
+        <div class="absolute inset-0 bg-blue-50 bg-grid-pattern opacity-60"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-7xl font-black text-electric-blue opacity-20">{{ $initials }}</span>
         </div>
+    @endif
 
-        <div class="mt-5">
-            <h3 class="text-lg font-black leading-7 text-slate-950 sm:text-xl">{{ $tutor->user->name }}</h3>
-            <p class="mt-1 min-h-5 text-sm font-bold leading-6 text-slate-500">{{ $tutor->education ?: 'Pengajar Missi' }}</p>
-            @if($tutor->teaching_experience_label)
-                <p class="mt-2 text-sm font-semibold leading-6 text-miss-goldDark">{{ $tutor->teaching_experience_label }}</p>
+    <!-- Gradient Overlay (Dark bottom for text legibility) -->
+    <div class="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-dark-ink via-dark-ink/80 to-transparent"></div>
+
+    <!-- Top Badge (Neo-Brutalist New/Tutor Badge) -->
+    <div class="absolute left-4 top-4">
+        <span class="inline-flex rounded-full border-2 border-dark-ink bg-acid-lime px-3 py-1 text-xs font-black uppercase text-dark-ink shadow-[2px_2px_0px_#0f172a] font-mono">
+            Tutor
+        </span>
+    </div>
+
+    <!-- Content (bottom) -->
+    <div class="relative z-10 p-5 pb-6 text-left">
+        <!-- Education / Subtitle -->
+        <p class="text-xs font-bold uppercase tracking-wide text-vivid-amber font-mono">
+            {{ $tutor->education ?: 'Pengajar Missi' }}
+        </p>
+        
+        <!-- Name -->
+        <h3 class="mt-1 text-2xl font-black leading-tight text-white font-display">
+            {{ $tutor->user->name }}
+        </h3>
+        
+        <!-- Divider -->
+        <div class="my-3 h-1 w-10 rounded-full bg-electric-blue"></div>
+        
+        <!-- Specializations -->
+        <div class="flex flex-wrap gap-2">
+            @forelse($specializations->take(2) as $specialization)
+                <span class="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+                    {{ $specialization }}
+                </span>
+            @empty
+                <span class="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+                    Privat
+                </span>
+            @endforelse
+            
+            @if($specializations->count() > 2)
+                <span class="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+                    +{{ $specializations->count() - 2 }}
+                </span>
             @endif
         </div>
-
-        <p class="mt-4 text-xs font-black uppercase text-miss-goldDark">Bidang yang diampu</p>
-        <div class="mt-3 flex flex-wrap gap-2">
-            @forelse($specializations->take(4) as $specialization)
-                <span class="rounded-full bg-miss-blueSoft px-3 py-1 text-xs font-black text-miss-navy">{{ $specialization }}</span>
-            @empty
-                <span class="rounded-full bg-miss-blueSoft px-3 py-1 text-xs font-black text-miss-navy">Tutor Missi</span>
-            @endforelse
-        </div>
-        @if($specializations->count() > 4)
-            <p class="mt-3 text-xs font-bold text-slate-500">+{{ $specializations->count() - 4 }} bidang lainnya</p>
-        @endif
     </div>
 </article>

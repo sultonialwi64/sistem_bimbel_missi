@@ -15,6 +15,12 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
+                missi: {
+                    gold: '#CD9B4A',
+                    bronze: '#8F5D2C',
+                    navy: '#172330',
+                    teal: '#2B586B',
+                },
                 brand: {
                     navy: {
                         50: '#f0f4f8',

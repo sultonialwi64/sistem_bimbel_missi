@@ -50,7 +50,7 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-white via-miss-cream to-miss-blueSoft text-slate-900 antialiased">
+<body class="bg-gradient-to-br from-white via-retro-cream to-blue-50 text-slate-900 antialiased">
     <nav class="nav-glass sticky top-0 z-40">
         <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <a href="{{ url('/') }}" class="focus-ring flex items-center gap-3 rounded-lg" aria-label="Bimbel Missi">
