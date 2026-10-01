@@ -306,7 +306,7 @@
         <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <a href="#home" class="focus-ring flex items-center gap-3 rounded-lg" aria-label="Bimbel Missi">
                 <img src="{{ asset('images/logo1.png') }}" alt="Logo Bimbel Missi" class="h-12 w-12 rounded-full border-[2px] border-dark-ink object-cover transition-transform hover:scale-105">
-                <span class="hidden text-base font-black text-dark-ink sm:block font-display">Missi Private Course</span>
+                <span class="text-sm font-black text-dark-ink sm:text-base font-display">Missi Private Course</span>
             </a>
 
             <div class="hidden items-center gap-7 text-sm font-bold text-slate-700 lg:flex">
@@ -795,25 +795,31 @@
                         </a>
                     </div>
                 </div>
+            </div>
 
-                @if(($landingTutors ?? collect())->isNotEmpty())
-                    <div class="mt-10 flex gap-5 overflow-x-auto pb-8 pt-4 snap-x snap-mandatory scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
+            @if(($landingTutors ?? collect())->isNotEmpty())
+                <div class="mt-10 w-full overflow-hidden">
+                    <div class="flex gap-5 overflow-x-auto pb-10 pt-4 px-4 sm:px-6 snap-x snap-mandatory scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
                         @foreach($landingTutors as $tutor)
                             <div class="w-[280px] shrink-0 snap-center sm:w-[300px]">
                                 @include('partials.public-tutor-card', ['tutor' => $tutor])
                             </div>
                         @endforeach
+                        <!-- Spacer to allow last card to be fully visible and snap properly -->
+                        <div class="w-4 shrink-0 sm:w-6 lg:w-8"></div>
                     </div>
-                @else
-                    <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                </div>
+            @else
+                <div class="mx-auto mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach(['Tutor dipilih sesuai kebutuhan anak', 'Bidang belajar disesuaikan dengan program', 'Admin membantu koordinasi jadwal'] as $process)
-                            <div class="rounded-lg bg-white p-5 shadow-sm">
-                                <p class="font-bold leading-7 text-slate-800">{{ $process }}</p>
+                            <div class="rounded-xl border-4 border-dark-ink bg-white p-5 brutal-shadow transition-transform hover:-translate-y-1">
+                                <p class="font-black leading-7 text-slate-800">{{ $process }}</p>
                             </div>
                         @endforeach
                     </div>
-                @endif
-            </div>
+                </div>
+            @endif
         </section>
 
         <section id="testimoni" class="bg-white py-16 sm:py-20">
