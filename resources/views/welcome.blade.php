@@ -108,7 +108,169 @@
         }
     </script>
 
-    <link rel="stylesheet" href="{{ asset('css/welcome.css') }}?v={{ filemtime(public_path('css/welcome.css')) }}">
+    <style>
+        * { letter-spacing: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        .brutal-shadow { box-shadow: 4px 4px 0px #0f172a; }
+        .brutal-shadow-lg { box-shadow: 6px 6px 0px #0f172a; }
+        .brutal-shadow-xl { box-shadow: 8px 8px 0px #0f172a; }
+        .brutal-shadow-sm { box-shadow: 2px 2px 0px #0f172a; }
+        .brutal-shadow-hover { transition: all 0.15s ease-in-out; }
+        .brutal-shadow-hover:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #0f172a; }
+
+        .bg-grid-pattern {
+            background-image:
+                linear-gradient(to right, rgba(15, 23, 42, 0.07) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(15, 23, 42, 0.07) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+        .bg-dot-pattern {
+            background-image: radial-gradient(rgba(15, 23, 42, 0.15) 1.5px, transparent 1.5px);
+            background-size: 18px 18px;
+        }
+
+        @keyframes scrollUp { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+        @keyframes scrollDown { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+        .marquee-container {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+            gap: 1rem;
+            align-items: start;
+            height: 560px;
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+        @media (min-width: 1024px) { .marquee-container { height: 680px; } }
+        .marquee-col { display: flex; flex-direction: column; gap: 1.25rem; height: max-content; will-change: transform; }
+        .marquee-up { animation: scrollUp 25s linear infinite; }
+        .marquee-down { animation: scrollDown 25s linear infinite; }
+        .marquee-up:hover, .marquee-down:hover { animation-play-state: paused; }
+
+        .nav-glass {
+            background: rgba(255, 255, 255, .95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 2px solid #0f172a;
+        }
+        .hero-pattern {
+            background: linear-gradient(115deg, #fffbeb 0%, #fef3c7 50%, #fef08a 100%);
+            position: relative;
+        }
+        .hero-pattern::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: .4;
+            background-image:
+                linear-gradient(90deg, rgba(15, 23, 42, 0.055) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+        .feature-pill {
+            display: flex;
+            align-items: center;
+            gap: .55rem;
+            border-radius: 9999px;
+            border: 2px solid #0f172a;
+            background: #d9f99d;
+            padding: .7rem .9rem;
+            box-shadow: 4px 4px 0px #0f172a;
+        }
+        .feature-pill::before {
+            content: "";
+            width: .48rem;
+            height: .48rem;
+            flex: 0 0 auto;
+            border-radius: 9999px;
+            background: #0f172a;
+        }
+        .quiet-strip { position: relative; overflow: hidden; background: rgba(255, 255, 255, .95); }
+        .story-section {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(112deg, #fffbeb 0%, #ffffff 50%, #fef3c7 100%);
+        }
+        .story-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: .3;
+            background-image:
+                linear-gradient(90deg, rgba(15, 23, 42, 0.055) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+        .story-photo { position: relative; overflow: hidden; }
+        .story-photo::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0;
+            height: 34%;
+            background: linear-gradient(180deg, transparent, rgba(15,23,42,.72));
+        }
+        .handline { position: relative; display: inline; }
+        .handline::after {
+            content: "";
+            position: absolute;
+            left: 0; right: 0;
+            bottom: .08em;
+            height: .28em;
+            z-index: -1;
+            background: #d9f99d;
+        }
+        .natural-list-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            align-items: start;
+            padding-block: 1.15rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+        }
+        .natural-list-item:last-child { border-bottom: 0; }
+        .benefit-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            background: #d9f99d;
+            color: #0f172a;
+            font-size: .78rem;
+            font-weight: 900;
+            border: 2px solid #0f172a;
+        }
+        .video-card { aspect-ratio: 9 / 16; }
+        .section-kicker {
+            color: #2563eb;
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-family: 'Space Grotesk', monospace;
+        }
+        .focus-ring:focus-visible { outline: 3px solid rgba(37, 99, 235, .4); outline-offset: 4px; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+            .hero-video { display: none; }
+        }
+        @media (max-width: 639px) {
+            .hero-pattern::before { opacity: .25; background-size: 28px 28px; }
+            .video-card { aspect-ratio: 5 / 7; }
+        }
+    </style>
 
     <script type="application/ld+json">
         {!! json_encode([
@@ -766,6 +928,91 @@
         WhatsApp
     </a>
 
-    <script src="{{ asset('js/welcome.js') }}?v={{ filemtime(public_path('js/welcome.js')) }}"></script>
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const navOffset = 92;
+        let activeScrollAnimation = null;
+
+        const easeInOutCubic = (progress) => {
+            return progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        };
+
+        const animateScrollTo = (targetTop, duration = 950) => {
+            const startTop = window.pageYOffset;
+            const distance = targetTop - startTop;
+            const startTime = performance.now();
+            if (activeScrollAnimation) { cancelAnimationFrame(activeScrollAnimation); }
+            const step = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = easeInOutCubic(progress);
+                window.scrollTo(0, startTop + distance * eased);
+                if (progress < 1) {
+                    activeScrollAnimation = requestAnimationFrame(step);
+                } else {
+                    activeScrollAnimation = null;
+                }
+            };
+            activeScrollAnimation = requestAnimationFrame(step);
+        };
+
+        btn?.addEventListener('click', () => { menu?.classList.toggle('hidden'); });
+        menu?.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', () => menu.classList.add('hidden'));
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach((link) => {
+            link.addEventListener('click', (event) => {
+                const targetId = link.getAttribute('href');
+                if (!targetId || targetId === '#') return;
+                const target = document.querySelector(targetId);
+                if (!target) return;
+                event.preventDefault();
+                const targetTop = target.getBoundingClientRect().top + window.pageYOffset - navOffset;
+                animateScrollTo(Math.max(targetTop, 0));
+                history.pushState(null, '', targetId);
+            });
+        });
+
+        const statsSection = document.getElementById('landing-stats');
+        const statValues = document.querySelectorAll('.landing-stat-value');
+        const numberFormatter = new Intl.NumberFormat('id-ID');
+
+        const animateStatValue = (element) => {
+            if (element.dataset.counted === 'true') return;
+            const target = Number(element.dataset.countupTarget || '0');
+            const suffix = element.dataset.countupSuffix || '';
+            const duration = 1400;
+            const startTime = performance.now();
+            const updateValue = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentValue = Math.round(target * eased);
+                element.textContent = `${numberFormatter.format(currentValue)}${suffix}`;
+                if (progress < 1) {
+                    requestAnimationFrame(updateValue);
+                } else {
+                    element.textContent = `${numberFormatter.format(target)}${suffix}`;
+                    element.dataset.counted = 'true';
+                }
+            };
+            requestAnimationFrame(updateValue);
+        };
+
+        if (statsSection && statValues.length > 0) {
+            const statsObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    statValues.forEach((element) => animateStatValue(element));
+                    observer.disconnect();
+                });
+            }, { threshold: 0.35 });
+            statsObserver.observe(statsSection);
+        }
+    </script>
 </body>
 </html>
