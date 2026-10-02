@@ -316,6 +316,7 @@
                 <a class="hover:text-electric-blue" href="#cara-kerja">Cara Kerja</a>
                 <a class="hover:text-electric-blue" href="#laporan">Laporan</a>
                 <a class="hover:text-electric-blue" href="#tutor">Tutor</a>
+                <a class="hover:text-electric-blue" href="#testimoni">Testimoni</a>
                 <a class="hover:text-electric-blue" href="#faq">FAQ</a>
             </div>
 
@@ -347,6 +348,7 @@
                 <a class="rounded-lg px-3 py-2 hover:bg-retro-cream" href="#cara-kerja">Cara Kerja</a>
                 <a class="rounded-lg px-3 py-2 hover:bg-retro-cream" href="#laporan">Laporan</a>
                 <a class="rounded-lg px-3 py-2 hover:bg-retro-cream" href="#tutor">Tutor</a>
+                <a class="rounded-lg px-3 py-2 hover:bg-retro-cream" href="#testimoni">Testimoni</a>
                 <a class="rounded-lg px-3 py-2 hover:bg-retro-cream" href="#faq">FAQ</a>
                 @auth
                     <a class="rounded-lg px-3 py-2 hover:bg-retro-cream" href="{{ url('/dashboard') }}">Dashboard</a>
@@ -827,19 +829,62 @@
                 <div class="max-w-3xl">
                     <p class="section-kicker">Cerita Orang Tua</p>
                     <h2 class="mt-3 text-3xl font-black leading-tight text-slate-950 sm:text-4xl font-display tracking-tight">Testimoni Orang Tua</h2>
-                    <p class="mt-4 text-base leading-8 text-slate-600">Testimoni publik akan ditampilkan setelah mendapatkan izin publikasi dari orang tua siswa.</p>
-                </div>
-                <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach([['Testimoni program Calistung', 'bg-electric-blue'], ['Testimoni les mapel sekolah', 'bg-neon-pink'], ['Testimoni bahasa Inggris atau program lain', 'bg-vivid-amber']] as $testimonial)
-                        <div class="relative rounded-2xl border-4 border-dark-ink bg-white p-6 brutal-shadow transition-transform hover:-translate-y-1">
-                            <div class="absolute -right-3 -top-3 h-8 w-8 rounded-full border-2 border-dark-ink {{ $testimonial[1] }} shadow-[2px_2px_0px_#0f172a]"></div>
-                            <p class="text-base font-black text-slate-950 font-display">{{ $testimonial[0] }}</p>
-                            <div class="mt-3 h-1 w-12 bg-dark-ink"></div>
-                            <p class="mt-3 text-sm font-bold leading-7 text-slate-600">[Menunggu testimoni asli dan izin publikasi]</p>
-                        </div>
-                    @endforeach
+                    <p class="mt-4 text-base leading-8 text-slate-600">Pengalaman nyata dari orang tua dan siswa yang telah belajar bersama tutor Bimbel Missi.</p>
                 </div>
             </div>
+
+            @php
+                $testimoniFiles = [];
+                $testimoniPath = public_path('images/testimoni');
+                if (is_dir($testimoniPath)) {
+                    $files = \File::files($testimoniPath);
+                    foreach ($files as $file) {
+                        if (in_array(strtolower($file->getExtension()), ['jpg', 'jpeg', 'png', 'webp'])) {
+                            $testimoniFiles[] = 'images/testimoni/' . $file->getFilename();
+                        }
+                    }
+                }
+            @endphp
+
+            @if(count($testimoniFiles) > 0)
+                <div class="mt-10 w-full overflow-hidden">
+                    <div class="flex gap-5 overflow-x-auto pb-10 pt-6 px-4 sm:px-6 lg:px-8 snap-x snap-mandatory scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
+                        @foreach($testimoniFiles as $imagePath)
+                            @php
+                                $colors = ['bg-electric-blue', 'bg-vivid-amber', 'bg-acid-lime', 'bg-neon-pink', 'bg-retro-cream'];
+                                $color = $colors[$loop->index % count($colors)];
+                            @endphp
+                            <div class="w-[260px] shrink-0 snap-center sm:w-[320px]">
+                                <div class="group relative h-[450px] sm:h-[550px] w-full rounded-2xl border-4 border-dark-ink {{ $color }} p-3 brutal-shadow transition-transform hover:-translate-y-1">
+                                    <!-- Decorative Badge (Star) -->
+                                    <div class="absolute -right-3 -top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border-4 border-dark-ink bg-white shadow-[2px_2px_0px_#0f172a]">
+                                        <svg class="h-4 w-4 text-dark-ink" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    </div>
+                                    <!-- Image Container -->
+                                    <div class="h-full w-full overflow-hidden rounded-xl border-4 border-dark-ink bg-slate-900">
+                                        <img src="{{ asset($imagePath) }}" alt="Testimoni" loading="lazy" class="h-full w-full object-cover object-top opacity-95 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100">
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                        <!-- Spacer to allow last card to be fully visible and snap properly -->
+                        <div class="w-4 shrink-0 sm:w-6 lg:w-8"></div>
+                    </div>
+                </div>
+            @else
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        @foreach([['Testimoni program Calistung', 'bg-electric-blue'], ['Testimoni les mapel sekolah', 'bg-neon-pink'], ['Testimoni bahasa Inggris atau program lain', 'bg-vivid-amber']] as $testimonial)
+                            <div class="relative rounded-2xl border-4 border-dark-ink bg-white p-6 brutal-shadow transition-transform hover:-translate-y-1">
+                                <div class="absolute -right-3 -top-3 h-8 w-8 rounded-full border-2 border-dark-ink {{ $testimonial[1] }} shadow-[2px_2px_0px_#0f172a]"></div>
+                                <p class="text-base font-black text-slate-950 font-display">{{ $testimonial[0] }}</p>
+                                <div class="mt-3 h-1 w-12 bg-dark-ink"></div>
+                                <p class="mt-3 text-sm font-bold leading-7 text-slate-600">[Menunggu testimoni asli dan izin publikasi. Silakan tambahkan foto ke public/images/testimoni/]</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </section>
 
         <section id="area" class="bg-retro-cream py-16 sm:py-20">
