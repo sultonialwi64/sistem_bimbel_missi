@@ -840,8 +840,7 @@
                     $files = \File::files($testimoniPath);
                     foreach ($files as $file) {
                         if (in_array(strtolower($file->getExtension()), ['jpg', 'jpeg', 'png', 'webp'])) {
-                            // Gunakan rawurlencode untuk mengatasi spasi pada nama file (seperti "WhatsApp Image...")
-                            $testimoniFiles[] = 'images/testimoni/' . rawurlencode($file->getFilename());
+                            $testimoniFiles[] = 'images/testimoni/' . $file->getFilename();
                         }
                     }
                 }
